@@ -19,7 +19,7 @@ type RepoWalker interface {
 }
 
 type Comitter interface {
-	AddFile(path string) error
+	StageFile(path string) error
 	Commit(message string) error
 }
 

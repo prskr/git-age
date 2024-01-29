@@ -17,6 +17,7 @@ func NewApp() *App {
 	filesHandler := clih.FilesCliHandler{}
 	initHandler := clih.InitCliHandler{}
 	genKeyHandler := clih.GenKeyCliHandler{}
+	addRecipientHandler := clih.AddRecipientCliHandler{}
 	installHandler := clih.InstallCliHandler{}
 
 	a := &App{
@@ -30,6 +31,7 @@ git-age is a Git filter to encrypt/decrypt files on push/pull operations.
 				cleanHandler.Command(),
 				initHandler.Command(),
 				genKeyHandler.Command(),
+				addRecipientHandler.Command(),
 				installHandler.Command(),
 				filesHandler.Command(),
 			},

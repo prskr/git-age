@@ -34,3 +34,13 @@ git age add-recipient -c "My comment" <public key>
 1. add the public key to the repository (`.agerecipients` file) 
 2. re-encrypt all files with the new set of recipients
 3. commit the changes
+
+## Tips and tricks
+
+### Diff of text files
+
+Set the `diff.age.textconv` git config to `cat` to see plain text diffs of encrypted files.
+
+```bash
+git config --global diff.age.textconv cat
+```

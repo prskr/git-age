@@ -55,7 +55,7 @@ func (g GitRepository) OpenObjectAtHead(filePath string) (*object.File, error) {
 	return tree.File(filePath)
 }
 
-func (g GitRepository) AddFile(path string) error {
+func (g GitRepository) StageFile(path string) error {
 	_, err := g.Worktree.Add(path)
 	return err
 }

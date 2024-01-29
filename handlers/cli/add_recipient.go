@@ -31,33 +31,54 @@ func (h *AddRecipientCliHandler) AddRecipient(ctx *cli.Context) (err error) {
 		return fmt.Errorf("failed to parse public key from argument: %w", err)
 	}
 
-	if clean, err := h.Repository.IsDirty(); err != nil {
+	if isDirty, err := h.Repository.IsDirty(); err != nil {
 		return fmt.Errorf("failed to check if repository is dirty: %w", err)
-	} else if !clean {
+	} else if isDirty {
 		return cli.Exit("Repository is dirty", 1)
 	}
 
-	f, err := h.RepoFS.Append(ports.RecipientsFileName)
+	if err := h.appendPublicKeyToRecipientsFile(pubKey, ctx.String("comment")); err != nil {
+		return fmt.Errorf("failed to append public key to recipients file: %w", err)
+	}
+
+	if err := h.Repository.StageFile(ports.RecipientsFileName); err != nil {
+		return fmt.Errorf("failed to add recipients file to git index: %w", err)
+	}
+
+	if err := h.Repository.WalkAgeFiles(ports.ReEncryptWalkFunc(h.Repository, h.RepoFS, h.Encryption)); err != nil {
+		return err
+	}
+
+	message := ctx.String("message")
+	if message == "" {
+		message = fmt.Sprintf("chore: add recipient %s", pubKey)
+	}
+
+	if err := h.Repository.Commit(message); err != nil {
+		return fmt.Errorf("failed to commit changes: %w", err)
+	}
+
+	return nil
+}
+
+func (h *AddRecipientCliHandler) appendPublicKeyToRecipientsFile(pubKey, comment string) (err error) {
+	recipientsFile, err := h.RepoFS.Append(ports.RecipientsFileName)
 	if err != nil {
 		return fmt.Errorf("failed to open recipients file: %w", err)
 	}
 
 	defer func() {
-		err = errors.Join(err, f.Close())
+		err = errors.Join(err, recipientsFile.Close())
 	}()
 
-	if comment := ctx.String("comment"); comment != "" {
-		if _, err := f.WriteString(fmt.Sprintf("# %s\n", comment)); err != nil {
+	if comment != "" {
+		if _, err := recipientsFile.WriteString(fmt.Sprintf("# %s\n", comment)); err != nil {
 			return fmt.Errorf("failed to write comment to recipients file: %w", err)
 		}
 	}
 
-	if _, err := f.WriteString(pubKey + "\n"); err != nil {
+	if _, err := recipientsFile.WriteString(pubKey + "\n"); err != nil {
 		return fmt.Errorf("failed to write public key to recipients file: %w", err)
-	}
-
-	if err := h.Repository.WalkAgeFiles(ports.ReEncryptWalkFunc(h.Repository, h.RepoFS, h.Encryption)); err != nil {
-		return err
 	}
 
 	return nil
@@ -73,6 +94,11 @@ func (h *AddRecipientCliHandler) Command() *cli.Command {
 				Name:    "comment",
 				Aliases: []string{"c"},
 				Usage:   "Comment for the recipient",
+			},
+			&cli.StringFlag{
+				Name:    "message",
+				Aliases: []string{"m"},
+				Usage:   "Message to be used for the commit",
 			},
 			&cli.StringFlag{
 				Name:        "keys",

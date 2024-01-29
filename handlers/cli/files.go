@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"github.com/adrg/xdg"
 	"github.com/go-git/go-git/v5"
@@ -14,6 +15,8 @@ import (
 )
 
 type FilesCliHandler struct {
+	// relative working directory within the repository
+	WorkingDir string
 	RepoFS     ports.ReadWriteFS
 	Encryption ports.FileOpenSealer
 	Repository ports.GitRepository
@@ -35,7 +38,24 @@ func (h *FilesCliHandler) ListFiles(*cli.Context) error {
 	})
 }
 
-func (h *FilesCliHandler) TrackFiles(*cli.Context) error {
+func (h *FilesCliHandler) TrackFiles(ctx *cli.Context) (err error) {
+	if ctx.NArg() != 1 {
+		return cli.Exit("Expected exactly one argument", 1)
+	}
+
+	attributesFile, err := h.RepoFS.Append(filepath.Join(h.WorkingDir, ".gitattributes"))
+	if err != nil {
+		return fmt.Errorf("failed to open .gitattributes file: %w", err)
+	}
+
+	defer func() {
+		err = errors.Join(err, attributesFile.Close())
+	}()
+
+	if _, err := attributesFile.WriteString(fmt.Sprintf("%s filter=age diff=age merge=age -text\n", ctx.Args().First())); err != nil {
+		return fmt.Errorf("failed to write to .gitattributes file: %w", err)
+	}
+
 	return nil
 }
 
@@ -88,6 +108,11 @@ func (h *FilesCliHandler) Command() *cli.Command {
 			}
 
 			repoRootPath, err := repoRoot(wd)
+			if err != nil {
+				return err
+			}
+
+			h.WorkingDir, err = filepath.Rel(repoRootPath, wd)
 			if err != nil {
 				return err
 			}

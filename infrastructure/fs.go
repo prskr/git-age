@@ -22,7 +22,7 @@ type ReadWriteDirFS struct {
 }
 
 func (f ReadWriteDirFS) Append(filePath string) (ports.ReadWriteFile, error) {
-	return os.OpenFile(filepath.Join(f.path, filePath), os.O_APPEND|os.O_WRONLY, 0644)
+	return os.OpenFile(filepath.Join(f.path, filePath), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 }
 
 func (f ReadWriteDirFS) Open(name string) (fs.File, error) {

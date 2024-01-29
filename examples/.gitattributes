@@ -1,1 +1,1 @@
-*.yaml text eol=lf filter=age
+*.yaml filter=age diff=age merge=age -text

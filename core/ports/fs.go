@@ -66,6 +66,6 @@ func ReEncryptWalkFunc(repo GitRepository, rwfs ReadWriteFS, sealer FileOpenSeal
 			return err
 		}
 
-		return repo.AddFile(path)
+		return repo.StageFile(path)
 	}
 }
