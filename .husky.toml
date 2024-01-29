@@ -1,0 +1,19 @@
+[hooks]
+
+# git hook pre commit
+pre-commit = [
+    "golangci-lint run",
+    "husky lint-staged",
+]
+
+# git hook commit msg
+commit-msg = [
+    "husky lint-commit",
+]
+
+# list staged files do some pre-process and git add
+[lint-staged]
+"*.go" = [
+    "goimports -l -w",
+    "gofmt -l -w",
+]

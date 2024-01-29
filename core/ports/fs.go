@@ -2,9 +2,10 @@ package ports
 
 import (
 	"errors"
-	"github.com/go-git/go-git/v5/plumbing"
 	"io"
 	"io/fs"
+
+	"github.com/go-git/go-git/v5/plumbing"
 )
 
 type ReadWriteFile interface {
@@ -21,6 +22,10 @@ type ReadWriteFS interface {
 
 func ReEncryptWalkFunc(repo GitRepository, rwfs ReadWriteFS, sealer FileOpenSealer) fs.WalkDirFunc {
 	return func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
 		fileObj, err := repo.OpenObjectAtHead(path)
 		if err != nil {
 			if errors.Is(err, plumbing.ErrObjectNotFound) {
