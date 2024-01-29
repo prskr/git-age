@@ -14,6 +14,10 @@ import (
 func NewApp() *App {
 	smudgeHandler := clih.SmudgeCliHandler{}
 	cleanHandler := clih.CleanCliHandler{}
+	filesHandler := clih.FilesCliHandler{}
+	initHandler := clih.InitCliHandler{}
+	genKeyHandler := clih.GenKeyCliHandler{}
+	installHandler := clih.InstallCliHandler{}
 
 	a := &App{
 		root: &cli.App{
@@ -24,6 +28,10 @@ git-age is a Git filter to encrypt/decrypt files on push/pull operations.
 			Commands: []*cli.Command{
 				smudgeHandler.Command(),
 				cleanHandler.Command(),
+				initHandler.Command(),
+				genKeyHandler.Command(),
+				installHandler.Command(),
+				filesHandler.Command(),
 			},
 		},
 	}
@@ -51,7 +59,7 @@ func (a *App) setup(*cli.Context) error {
 
 func (*App) configureLogging() {
 	opts := &tint.Options{
-		Level:      slog.LevelWarn,
+		Level:      slog.LevelInfo,
 		TimeFormat: time.RFC3339,
 	}
 	slog.SetDefault(slog.New(tint.NewHandler(os.Stderr, opts)))

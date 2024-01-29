@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"filippo.io/age"
-	"fmt"
 	"github.com/adrg/xdg"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -27,16 +26,6 @@ func (h *CleanCliHandler) CleanFile(ctx *cli.Context) error {
 		return err
 	}
 
-	wd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	alwaysEncrypt, err := h.checkIfRecipientsChanged(wd)
-	if err != nil {
-		return err
-	}
-
 	fileToCleanPath := ctx.Args().First()
 
 	fileToClean, err := copyToTemp(os.Stdin)
@@ -49,20 +38,18 @@ func (h *CleanCliHandler) CleanFile(ctx *cli.Context) error {
 		_ = os.Remove(fileToClean.Name())
 	}()
 
-	if !alwaysEncrypt {
-		obj, headHash, err := h.hashFileAtHead(fileToCleanPath, false)
-		if errors.Is(err, plumbing.ErrObjectNotFound) {
-			return h.copyEncryptedFileToStdout(fileToClean)
-		}
+	obj, headHash, err := h.hashFileAtHead(fileToCleanPath, true)
+	if errors.Is(err, plumbing.ErrObjectNotFound) {
+		return h.copyEncryptedFileToStdout(fileToClean)
+	}
 
-		currentHash, err := h.hashFileAt(fileToClean)
-		if err != nil {
-			return err
-		}
+	currentHash, err := h.hashFileAt(fileToClean)
+	if err != nil {
+		return err
+	}
 
-		if bytes.Equal(headHash, currentHash) {
-			return h.copyGitObjectToStdout(obj)
-		}
+	if bytes.Equal(headHash, currentHash) {
+		return h.copyGitObjectToStdout(obj)
 	}
 
 	return h.copyEncryptedFileToStdout(fileToClean)
@@ -105,35 +92,6 @@ func (h *CleanCliHandler) Command() *cli.Command {
 	}
 }
 
-func (h *CleanCliHandler) checkIfRecipientsChanged(repoRoot string) (alwaysEncrypt bool, err error) {
-	_, recipientsHeadHash, err := h.hashFileAtHead(recipientsFileName, true)
-	if errors.Is(err, plumbing.ErrObjectNotFound) {
-		alwaysEncrypt = true
-	} else if err != nil {
-		return false, err
-	}
-
-	recipientsFile, err := os.Open(filepath.Join(repoRoot, recipientsFileName))
-	if err != nil {
-		return false, fmt.Errorf("no recipients file found, please run 'git age add' first")
-	}
-
-	defer func() {
-		_ = recipientsFile.Close()
-	}()
-
-	currentRecipientsHash, err := h.hashFileAt(recipientsFile)
-	if err != nil {
-		return false, err
-	}
-
-	if !bytes.Equal(recipientsHeadHash, currentRecipientsHash) {
-		alwaysEncrypt = true
-	}
-
-	return alwaysEncrypt, nil
-}
-
 func (h *CleanCliHandler) copyEncryptedFileToStdout(reader io.Reader) (err error) {
 	encryptWriter, err := age.Encrypt(os.Stdout, h.Recipients...)
 	if err != nil {
@@ -163,22 +121,7 @@ func (h *CleanCliHandler) copyGitObjectToStdout(obj *object.File) error {
 }
 
 func (h *CleanCliHandler) hashFileAtHead(path string, encrypted bool) (obj *object.File, hash []byte, err error) {
-	head, err := h.Repository.Head()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	latestCommit, err := h.Repository.CommitObject(head.Hash())
-	if err != nil {
-		return nil, nil, err
-	}
-
-	headTree, err := latestCommit.Tree()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	fileObjAtHead, err := headTree.File(path)
+	fileObjAtHead, err := getObjectAtHead(h.Repository, path)
 	if err != nil {
 		return nil, nil, err
 	}
