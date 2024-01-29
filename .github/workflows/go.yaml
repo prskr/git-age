@@ -29,6 +29,9 @@ jobs:
           # Semantic version range syntax or exact version of Go
           go-version: '1.21.x'
 
+      - name: Setup Syft
+        run: curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
 
