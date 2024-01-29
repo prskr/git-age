@@ -44,3 +44,15 @@ Set the `diff.age.textconv` git config to `cat` to see plain text diffs of encry
 ```bash
 git config --global diff.age.textconv cat
 ```
+
+## Development
+
+
+### Install husky
+
+Ensure `golangci-lint` and other checks are executed before commit.
+
+```bash
+go install github.com/go-courier/husky/cmd/husky@latest
+husky init
+```
