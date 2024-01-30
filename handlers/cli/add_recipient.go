@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/go-git/go-git/v5"
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
 	"github.com/prskr/git-age/infrastructure"
@@ -23,15 +22,18 @@ func (h *AddRecipientCliHandler) AddRecipient(ctx *cli.Context) (err error) {
 		return cli.Exit("Expected exactly one argument", 1)
 	}
 
-	if isDirty, err := h.Repository.IsDirty(); err != nil {
+	if isDirty, err := h.Repository.IsStagingDirty(); err != nil {
 		return fmt.Errorf("failed to check if repository is dirty: %w", err)
 	} else if isDirty {
 		return cli.Exit("Repository is dirty", 1)
 	}
 
-	if err := h.Recipients.Append(ctx.Args().First(), ctx.String("comment")); err != nil {
+	recipients, err := h.Recipients.Append(ctx.Args().First(), ctx.String("comment"))
+	if err != nil {
 		return fmt.Errorf("failed to append public key to recipients file: %w", err)
 	}
+
+	h.Encryption.AddRecipients(recipients...)
 
 	if err := h.Repository.StageFile(ports.RecipientsFileName); err != nil {
 		return fmt.Errorf("failed to add recipients file to git index: %w", err)
@@ -63,36 +65,22 @@ func (h *AddRecipientCliHandler) Command() *cli.Command {
 			},
 			&keysFlag,
 		},
-		Before: func(context *cli.Context) error {
+		Before: func(context *cli.Context) (err error) {
 			wd, err := os.Getwd()
 			if err != nil {
 				return err
 			}
 
-			repoRootPath, err := repoRoot(wd)
+			h.Repository, h.RepoFS, err = infrastructure.NewGitRepositoryFromPath(wd)
 			if err != nil {
 				return err
 			}
-
-			gitRepo, err := git.PlainOpen(repoRootPath)
-			if err != nil {
-				return err
-			}
-
-			h.RepoFS = infrastructure.NewReadWriteDirFS(repoRootPath)
 
 			h.Recipients = infrastructure.NewRecipientsFile(h.RepoFS)
 
-			h.Repository, err = infrastructure.NewGitRepository(h.RepoFS, gitRepo)
-			if err != nil {
-				return err
-			}
-
-			keysPath := context.String("keys")
-
 			h.Encryption, err = services.NewAgeSealer(
-				services.WithIdentitiesFrom(keysPath),
-				services.WithRecipientsFrom(wd),
+				services.WithIdentities(infrastructure.NewIdentities(context.String("keys"))),
+				services.WithRecipients(h.Recipients),
 			)
 
 			return err

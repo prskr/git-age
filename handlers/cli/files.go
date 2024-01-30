@@ -3,12 +3,13 @@ package cli
 import (
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
 
-	"github.com/adrg/xdg"
 	"github.com/go-git/go-git/v5"
+
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
 	"github.com/prskr/git-age/infrastructure"
@@ -44,9 +45,13 @@ func (h *FilesCliHandler) TrackFiles(ctx *cli.Context) (err error) {
 		return cli.Exit("Expected exactly one argument", 1)
 	}
 
-	attributesFile, err := h.RepoFS.Append(filepath.Join(h.WorkingDir, ".gitattributes"))
+	attributesFile, err := h.RepoFS.OpenRW(filepath.Join(h.WorkingDir, ".gitattributes"))
 	if err != nil {
 		return fmt.Errorf("failed to open .gitattributes file: %w", err)
+	}
+
+	if _, err := attributesFile.Seek(0, io.SeekEnd); err != nil {
+		return err
 	}
 
 	defer func() {
@@ -61,7 +66,7 @@ func (h *FilesCliHandler) TrackFiles(ctx *cli.Context) (err error) {
 }
 
 func (h *FilesCliHandler) ReEncryptFiles(*cli.Context) error {
-	if clean, err := h.Repository.IsDirty(); err != nil {
+	if clean, err := h.Repository.IsStagingDirty(); err != nil {
 		return fmt.Errorf("failed to check if repository is dirty: %w", err)
 	} else if !clean {
 		return cli.Exit("Repository is dirty", 1)
@@ -102,7 +107,7 @@ func (h *FilesCliHandler) Command() *cli.Command {
 				return err
 			}
 
-			repoRootPath, err := repoRoot(wd)
+			repoRootPath, err := infrastructure.FindRepoRootFrom(wd)
 			if err != nil {
 				return err
 			}
@@ -112,26 +117,21 @@ func (h *FilesCliHandler) Command() *cli.Command {
 				return err
 			}
 
-			gitRepo, err := git.PlainOpen(repoRootPath)
+			repo, err := git.PlainOpen(repoRootPath)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to open git repository: %w", err)
 			}
 
 			h.RepoFS = infrastructure.NewReadWriteDirFS(repoRootPath)
 
-			h.Repository, err = infrastructure.NewGitRepository(h.RepoFS, gitRepo)
+			h.Repository, err = infrastructure.NewGitRepository(h.RepoFS, repo)
 			if err != nil {
 				return err
 			}
 
-			keysPath := filepath.Join(xdg.ConfigHome, "git-age", "keys.txt")
-			if flagPath := context.String("keys"); flagPath != "" {
-				keysPath = flagPath
-			}
-
 			h.Encryption, err = services.NewAgeSealer(
-				services.WithIdentitiesFrom(keysPath),
-				services.WithRecipientsFrom(wd),
+				services.WithIdentities(infrastructure.NewIdentities(context.String("keys"))),
+				services.WithRecipients(infrastructure.NewRecipientsFile(h.RepoFS)),
 			)
 
 			return err

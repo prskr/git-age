@@ -4,6 +4,8 @@ import (
 	"errors"
 	"io"
 	"os"
+
+	"filippo.io/age"
 )
 
 const RecipientsFileName = ".agerecipients"
@@ -14,10 +16,12 @@ type FileOpenSealer interface {
 }
 
 type FileSealer interface {
+	AddRecipients(r ...age.Recipient)
 	SealFile(dst io.Writer) (io.WriteCloser, error)
 }
 
 type FileOpener interface {
+	AddIdentity(identity age.Identity)
 	OpenFile(reader io.Reader) (io.Reader, error)
 }
 

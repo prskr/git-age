@@ -28,7 +28,7 @@ func (h *InitCliHandler) Init(ctx *cli.Context) (err error) {
 		return fmt.Errorf("failed to generate identity: %w", err)
 	}
 
-	if err := h.Recipients.Append(pubKey, ctx.String("comment")); err != nil {
+	if _, err := h.Recipients.Append(pubKey, ctx.String("comment")); err != nil {
 		return fmt.Errorf("failed to append recipient: %w", err)
 	}
 
@@ -52,7 +52,7 @@ func (h *InitCliHandler) Command() *cli.Command {
 				return err
 			}
 
-			repoRootPath, err := repoRoot(wd)
+			repoRootPath, err := infrastructure.FindRepoRootFrom(wd)
 			if err != nil {
 				return err
 			}

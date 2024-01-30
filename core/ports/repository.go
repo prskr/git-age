@@ -2,16 +2,18 @@ package ports
 
 import (
 	"errors"
-	"github.com/go-git/go-git/v5/config"
-	"github.com/go-git/go-git/v5/plumbing/object"
 	"io/fs"
 	"os"
+
+	"github.com/go-git/go-git/v5/config"
+	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
 var ErrNoGlobalConfig = errors.New("no global git config found")
 
 type RepoStater interface {
-	IsDirty() (bool, error)
+	// IsStagingDirty checks if there's any staged change that would be committed
+	IsStagingDirty() (bool, error)
 }
 
 type RepoWalker interface {

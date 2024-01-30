@@ -1,5 +1,8 @@
 package ports
 
+import "filippo.io/age"
+
 type Recipients interface {
-	Append(pubKey string, comment string) error
+	All() ([]age.Recipient, error)
+	Append(pubKey string, comment string) ([]age.Recipient, error)
 }

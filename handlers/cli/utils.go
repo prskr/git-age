@@ -2,11 +2,8 @@ package cli
 
 import (
 	"fmt"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing/object"
 	"io"
 	"os"
-	"path/filepath"
 )
 
 func requireStdin() error {
@@ -42,38 +39,4 @@ func copyToTemp(reader io.Reader) (f *os.File, err error) {
 	}
 
 	return f, nil
-}
-
-func repoRoot(currentDir string) (string, error) {
-	for {
-		if _, err := os.Stat(filepath.Join(currentDir, ".git")); err == nil {
-			break
-		}
-
-		currentDir = filepath.Dir(currentDir)
-		if currentDir == "/" {
-			return "", fmt.Errorf("could not find git repository")
-		}
-	}
-
-	return currentDir, nil
-}
-
-func getObjectAtHead(repo *git.Repository, path string) (*object.File, error) {
-	head, err := repo.Head()
-	if err != nil {
-		return nil, err
-	}
-
-	commit, err := repo.CommitObject(head.Hash())
-	if err != nil {
-		return nil, err
-	}
-
-	tree, err := commit.Tree()
-	if err != nil {
-		return nil, err
-	}
-
-	return tree.File(path)
 }

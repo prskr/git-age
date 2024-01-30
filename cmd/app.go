@@ -2,13 +2,14 @@ package cmd
 
 import (
 	"context"
-	"github.com/lmittmann/tint"
-	clih "github.com/prskr/git-age/handlers/cli"
-	"github.com/urfave/cli/v2"
 	"log/slog"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/lmittmann/tint"
+	clih "github.com/prskr/git-age/handlers/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func NewApp() *App {
@@ -54,15 +55,23 @@ func (a *App) Run() error {
 }
 
 func (a *App) setup(*cli.Context) error {
-	a.configureLogging()
-
-	return nil
+	return a.configureLogging()
 }
 
-func (*App) configureLogging() {
+func (*App) configureLogging() error {
+	level := slog.LevelWarn
+
+	if rawLevel, set := os.LookupEnv("GIT_AGE_LOG_LEVEL"); set {
+		if err := level.UnmarshalText([]byte(rawLevel)); err != nil {
+			return err
+		}
+	}
+
 	opts := &tint.Options{
-		Level:      slog.LevelInfo,
+		Level:      level,
 		TimeFormat: time.RFC3339,
 	}
 	slog.SetDefault(slog.New(tint.NewHandler(os.Stderr, opts)))
+
+	return nil
 }

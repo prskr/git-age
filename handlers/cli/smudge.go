@@ -3,15 +3,15 @@ package cli
 import (
 	"io"
 	"os"
-	"path/filepath"
 
-	"filippo.io/age"
-	"github.com/adrg/xdg"
+	"github.com/prskr/git-age/core/ports"
+	"github.com/prskr/git-age/core/services"
+	"github.com/prskr/git-age/infrastructure"
 	"github.com/urfave/cli/v2"
 )
 
 type SmudgeCliHandler struct {
-	baseHandler
+	Opener ports.FileOpener
 }
 
 func (h *SmudgeCliHandler) SmudgeFile(*cli.Context) error {
@@ -19,7 +19,7 @@ func (h *SmudgeCliHandler) SmudgeFile(*cli.Context) error {
 		return err
 	}
 
-	decryptedReader, err := age.Decrypt(os.Stdin, h.Identities...)
+	decryptedReader, err := h.Opener.OpenFile(os.Stdin)
 	if err != nil {
 		return err
 	}
@@ -36,13 +36,11 @@ func (h *SmudgeCliHandler) Command() *cli.Command {
 		Action: h.SmudgeFile,
 		Args:   true,
 		Hidden: true,
-		Before: func(context *cli.Context) error {
-			keysPath := filepath.Join(xdg.ConfigHome, "git-age", "keys.txt")
-			if flagPath := context.String("keys"); flagPath != "" {
-				keysPath = flagPath
-			}
-
-			return h.AddIdentitiesFromPath(keysPath)
+		Before: func(context *cli.Context) (err error) {
+			h.Opener, err = services.NewAgeSealer(
+				services.WithIdentities(infrastructure.NewIdentities(context.String("keys"))),
+			)
+			return err
 		},
 		Flags: []cli.Flag{
 			&keysFlag,

@@ -1,11 +1,12 @@
 package services
 
 import (
-	"filippo.io/age"
-	"github.com/prskr/git-age/core/ports"
 	"io"
 	"os"
 	"path/filepath"
+
+	"filippo.io/age"
+	"github.com/prskr/git-age/core/ports"
 )
 
 var (
@@ -15,15 +16,27 @@ var (
 
 type AgeSealerOption func(*AgeSealer) error
 
-func WithRecipientsFrom(filePath string) AgeSealerOption {
-	return func(s *AgeSealer) error {
-		return s.AddRecipientsFromPath(filePath)
+func WithRecipients(r ports.Recipients) AgeSealerOption {
+	return func(sealer *AgeSealer) error {
+		recipients, err := r.All()
+		if err != nil {
+			return err
+		}
+
+		sealer.Recipients = recipients
+		return nil
 	}
 }
 
-func WithIdentitiesFrom(filePath string) AgeSealerOption {
-	return func(s *AgeSealer) error {
-		return s.AddIdentitiesFromPath(filePath)
+func WithIdentities(id ports.Identities) AgeSealerOption {
+	return func(sealer *AgeSealer) error {
+		identities, err := id.All()
+		if err != nil {
+			return err
+		}
+
+		sealer.Identities = identities
+		return nil
 	}
 }
 
@@ -42,6 +55,14 @@ func NewAgeSealer(opts ...AgeSealerOption) (*AgeSealer, error) {
 type AgeSealer struct {
 	Recipients []age.Recipient
 	Identities []age.Identity
+}
+
+func (h *AgeSealer) AddRecipients(r ...age.Recipient) {
+	h.Recipients = append(h.Recipients, r...)
+}
+
+func (h *AgeSealer) AddIdentity(identity age.Identity) {
+	h.Identities = append(h.Identities, identity)
 }
 
 func (h *AgeSealer) OpenFile(reader io.Reader) (io.Reader, error) {

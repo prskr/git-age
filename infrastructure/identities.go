@@ -23,6 +23,22 @@ type Identities struct {
 	IdentitiesFile string
 }
 
+func (i Identities) All() ([]age.Identity, error) {
+	f, err := os.Open(i.IdentitiesFile)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	defer func() {
+		_ = f.Close()
+	}()
+
+	return age.ParseIdentities(f)
+}
+
 func (i Identities) Generate(comment string) (pubKey string, err error) {
 	identity, err := age.GenerateX25519Identity()
 	if err != nil {

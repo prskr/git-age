@@ -1,13 +1,16 @@
 package infrastructure
 
 import (
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/format/gitattributes"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/prskr/git-age/core/ports"
-	"io/fs"
-	"path/filepath"
-	"strings"
 )
 
 var (
@@ -16,6 +19,27 @@ var (
 	_ ports.Comitter         = (*GitRepository)(nil)
 	_ ports.HeadObjectOpener = (*GitRepository)(nil)
 )
+
+func NewGitRepositoryFromPath(from string) (*GitRepository, *ReadWriteDirFS, error) {
+	repoRootPath, err := FindRepoRootFrom(from)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	gitRepo, err := git.PlainOpen(repoRootPath)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	repoFS := NewReadWriteDirFS(repoRootPath)
+
+	repo, err := NewGitRepository(repoFS, gitRepo)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return repo, repoFS, nil
+}
 
 func NewGitRepository(repoFS fs.FS, repository *git.Repository) (*GitRepository, error) {
 	wt, err := repository.Worktree()
@@ -97,11 +121,32 @@ func (g GitRepository) WalkAgeFiles(onMatch fs.WalkDirFunc) error {
 	})
 }
 
-func (g GitRepository) IsDirty() (bool, error) {
+func (g GitRepository) IsStagingDirty() (bool, error) {
 	status, err := g.Worktree.Status()
 	if err != nil {
 		return false, err
 	}
 
-	return !status.IsClean(), nil
+	for _, s := range status {
+		if s.Staging != git.Unmodified {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func FindRepoRootFrom(currentDir string) (string, error) {
+	for {
+		if _, err := os.Stat(filepath.Join(currentDir, ".git")); err == nil {
+			break
+		}
+
+		currentDir = filepath.Dir(currentDir)
+		if currentDir == "/" {
+			return "", fmt.Errorf("could not find git repository")
+		}
+	}
+
+	return currentDir, nil
 }

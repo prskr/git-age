@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"io/fs"
+	"path/filepath"
 
 	"github.com/go-git/go-git/v5/plumbing"
 )
@@ -12,12 +13,15 @@ type ReadWriteFile interface {
 	fs.File
 	io.WriteSeeker
 	WriteString(s string) (int, error)
+	Name() string
 }
 
 type ReadWriteFS interface {
 	fs.FS
-	Create(filePath string) (ReadWriteFile, error)
-	Append(filePath string) (ReadWriteFile, error)
+	OpenRW(filePath string) (ReadWriteFile, error)
+	TempFile(dir, pattern string) (ReadWriteFile, error)
+	Rename(oldPath, newPath string) error
+	Remove(filePath string) error
 }
 
 func ReEncryptWalkFunc(repo GitRepository, rwfs ReadWriteFS, sealer FileOpenSealer) fs.WalkDirFunc {
@@ -43,7 +47,23 @@ func ReEncryptWalkFunc(repo GitRepository, rwfs ReadWriteFS, sealer FileOpenSeal
 			_ = objReader.Close()
 		}()
 
-		f, err := rwfs.Create(path)
+		dir, fileName := filepath.Split(path)
+
+		tmp, err := rwfs.TempFile(dir, fileName)
+		if err != nil {
+			return err
+		}
+
+		defer func() {
+			if err == nil {
+				err = errors.Join(tmp.Close(), rwfs.Rename(tmp.Name(), path))
+			} else {
+				_ = tmp.Close()
+				_ = rwfs.Remove(tmp.Name())
+			}
+		}()
+
+		f, err := rwfs.OpenRW(path)
 		if err != nil {
 			return err
 		}
@@ -63,14 +83,10 @@ func ReEncryptWalkFunc(repo GitRepository, rwfs ReadWriteFS, sealer FileOpenSeal
 		}
 
 		defer func() {
-			err = errors.Join(err, encryptWriter.Close())
+			err = errors.Join(err, encryptWriter.Close(), repo.StageFile(path))
 		}()
 
-		_, err = io.Copy(encryptWriter, plainTextReader)
-		if err != nil {
-			return err
-		}
-
-		return repo.StageFile(path)
+		_, err = io.Copy(encryptWriter, io.TeeReader(plainTextReader, tmp))
+		return err
 	}
 }

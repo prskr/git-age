@@ -6,20 +6,19 @@ import (
 	"io"
 	"log/slog"
 	"os"
-	"path/filepath"
 
-	"filippo.io/age"
-	"github.com/adrg/xdg"
-	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/minio/sha256-simd"
+	"github.com/prskr/git-age/core/ports"
+	"github.com/prskr/git-age/core/services"
+	"github.com/prskr/git-age/infrastructure"
 	"github.com/urfave/cli/v2"
 )
 
 type CleanCliHandler struct {
-	baseHandler
-	Repository *git.Repository
+	Repository ports.GitRepository
+	OpenSealer ports.FileOpenSealer
 }
 
 func (h *CleanCliHandler) CleanFile(ctx *cli.Context) error {
@@ -69,17 +68,19 @@ func (h *CleanCliHandler) Command() *cli.Command {
 				return err
 			}
 
-			h.Repository, err = git.PlainOpen(wd)
+			var repoFS ports.ReadWriteFS
+
+			h.Repository, repoFS, err = infrastructure.NewGitRepositoryFromPath(wd)
 			if err != nil {
 				return err
 			}
 
-			keysPath := filepath.Join(xdg.ConfigHome, "git-age", "keys.txt")
-			if flagPath := context.String("keys"); flagPath != "" {
-				keysPath = flagPath
-			}
+			h.OpenSealer, err = services.NewAgeSealer(
+				services.WithRecipients(infrastructure.NewRecipientsFile(repoFS)),
+				services.WithIdentities(infrastructure.NewIdentities(context.String("keys"))),
+			)
 
-			return errors.Join(h.AddRecipientsFromPath(wd), h.AddIdentitiesFromPath(keysPath))
+			return err
 		},
 		Flags: []cli.Flag{
 			&keysFlag,
@@ -88,7 +89,7 @@ func (h *CleanCliHandler) Command() *cli.Command {
 }
 
 func (h *CleanCliHandler) copyEncryptedFileToStdout(reader io.Reader) (err error) {
-	encryptWriter, err := age.Encrypt(os.Stdout, h.Recipients...)
+	encryptWriter, err := h.OpenSealer.SealFile(os.Stdout)
 	if err != nil {
 		return err
 	}
@@ -103,20 +104,21 @@ func (h *CleanCliHandler) copyEncryptedFileToStdout(reader io.Reader) (err error
 }
 
 func (h *CleanCliHandler) copyGitObjectToStdout(obj *object.File) error {
-	if r, err := obj.Blob.Reader(); err != nil {
-		return err
-	} else {
-		defer func() {
-			_ = r.Close()
-		}()
-
-		_, err = io.Copy(os.Stdout, r)
+	r, err := obj.Blob.Reader()
+	if err != nil {
 		return err
 	}
+
+	defer func() {
+		_ = r.Close()
+	}()
+
+	_, err = io.Copy(os.Stdout, r)
+	return err
 }
 
 func (h *CleanCliHandler) hashFileAtHead(path string, encrypted bool) (obj *object.File, hash []byte, err error) {
-	fileObjAtHead, err := getObjectAtHead(h.Repository, path)
+	fileObjAtHead, err := h.Repository.OpenObjectAtHead(path)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -132,7 +134,7 @@ func (h *CleanCliHandler) hashFileAtHead(path string, encrypted bool) (obj *obje
 
 	var reader io.Reader = fileObjReader
 	if encrypted {
-		if r, err := age.Decrypt(fileObjReader, h.Identities...); err != nil {
+		if r, err := h.OpenSealer.OpenFile(fileObjReader); err != nil {
 			slog.Warn("Expected encrypted file but failed to decrypt", slog.String("path", path), slog.String("err", err.Error()))
 		} else {
 			reader = r
