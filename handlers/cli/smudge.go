@@ -1,12 +1,13 @@
 package cli
 
 import (
-	"filippo.io/age"
-	"github.com/adrg/xdg"
-	"github.com/urfave/cli/v2"
 	"io"
 	"os"
 	"path/filepath"
+
+	"filippo.io/age"
+	"github.com/adrg/xdg"
+	"github.com/urfave/cli/v2"
 )
 
 type SmudgeCliHandler struct {
@@ -44,13 +45,7 @@ func (h *SmudgeCliHandler) Command() *cli.Command {
 			return h.AddIdentitiesFromPath(keysPath)
 		},
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "keys",
-				DefaultText: "By default keys are read from $XDG_CONFIG_HOME/git-age/keys.txt i.e. $HOME/.config/git-age/keys.txt on most systems",
-				EnvVars: []string{
-					"GIT_AGE_KEYS",
-				},
-			},
+			&keysFlag,
 		},
 	}
 }

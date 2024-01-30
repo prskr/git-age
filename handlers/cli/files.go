@@ -3,15 +3,16 @@ package cli
 import (
 	"errors"
 	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+
 	"github.com/adrg/xdg"
 	"github.com/go-git/go-git/v5"
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
 	"github.com/prskr/git-age/infrastructure"
 	"github.com/urfave/cli/v2"
-	"io/fs"
-	"os"
-	"path/filepath"
 )
 
 type FilesCliHandler struct {
@@ -77,13 +78,7 @@ func (h *FilesCliHandler) Command() *cli.Command {
 	return &cli.Command{
 		Name: "files",
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "keys",
-				DefaultText: "By default keys are read from $XDG_CONFIG_HOME/git-age/keys.txt i.e. $HOME/.config/git-age/keys.txt on most systems",
-				EnvVars: []string{
-					"GIT_AGE_KEYS",
-				},
-			},
+			&keysFlag,
 		},
 		Subcommands: []*cli.Command{
 			{

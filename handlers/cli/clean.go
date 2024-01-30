@@ -3,6 +3,11 @@ package cli
 import (
 	"bytes"
 	"errors"
+	"io"
+	"log/slog"
+	"os"
+	"path/filepath"
+
 	"filippo.io/age"
 	"github.com/adrg/xdg"
 	"github.com/go-git/go-git/v5"
@@ -10,10 +15,6 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/minio/sha256-simd"
 	"github.com/urfave/cli/v2"
-	"io"
-	"log/slog"
-	"os"
-	"path/filepath"
 )
 
 type CleanCliHandler struct {
@@ -81,13 +82,7 @@ func (h *CleanCliHandler) Command() *cli.Command {
 			return errors.Join(h.AddRecipientsFromPath(wd), h.AddIdentitiesFromPath(keysPath))
 		},
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "keys",
-				DefaultText: "By default keys are read from $XDG_CONFIG_HOME/git-age/keys.txt i.e. $HOME/.config/git-age/keys.txt on most systems",
-				EnvVars: []string{
-					"GIT_AGE_KEYS",
-				},
-			},
+			&keysFlag,
 		},
 	}
 }

@@ -1,22 +1,19 @@
 package cli
 
 import (
-	"errors"
-	"filippo.io/age"
 	"fmt"
-	"github.com/adrg/xdg"
+	"os"
+
 	"github.com/go-git/go-git/v5"
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
 	"github.com/prskr/git-age/infrastructure"
 	"github.com/urfave/cli/v2"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 type AddRecipientCliHandler struct {
 	RepoFS     ports.ReadWriteFS
+	Recipients ports.Recipients
 	Encryption ports.FileOpenSealer
 	Repository ports.GitRepository
 }
@@ -26,18 +23,13 @@ func (h *AddRecipientCliHandler) AddRecipient(ctx *cli.Context) (err error) {
 		return cli.Exit("Expected exactly one argument", 1)
 	}
 
-	pubKey := ctx.Args().First()
-	if _, err := age.ParseRecipients(strings.NewReader(pubKey)); err != nil {
-		return fmt.Errorf("failed to parse public key from argument: %w", err)
-	}
-
 	if isDirty, err := h.Repository.IsDirty(); err != nil {
 		return fmt.Errorf("failed to check if repository is dirty: %w", err)
 	} else if isDirty {
 		return cli.Exit("Repository is dirty", 1)
 	}
 
-	if err := h.appendPublicKeyToRecipientsFile(pubKey, ctx.String("comment")); err != nil {
+	if err := h.Recipients.Append(ctx.Args().First(), ctx.String("comment")); err != nil {
 		return fmt.Errorf("failed to append public key to recipients file: %w", err)
 	}
 
@@ -49,36 +41,8 @@ func (h *AddRecipientCliHandler) AddRecipient(ctx *cli.Context) (err error) {
 		return err
 	}
 
-	message := ctx.String("message")
-	if message == "" {
-		message = fmt.Sprintf("chore: add recipient %s", pubKey)
-	}
-
-	if err := h.Repository.Commit(message); err != nil {
+	if err := h.Repository.Commit(ctx.String("message")); err != nil {
 		return fmt.Errorf("failed to commit changes: %w", err)
-	}
-
-	return nil
-}
-
-func (h *AddRecipientCliHandler) appendPublicKeyToRecipientsFile(pubKey, comment string) (err error) {
-	recipientsFile, err := h.RepoFS.Append(ports.RecipientsFileName)
-	if err != nil {
-		return fmt.Errorf("failed to open recipients file: %w", err)
-	}
-
-	defer func() {
-		err = errors.Join(err, recipientsFile.Close())
-	}()
-
-	if comment != "" {
-		if _, err := recipientsFile.WriteString(fmt.Sprintf("# %s\n", comment)); err != nil {
-			return fmt.Errorf("failed to write comment to recipients file: %w", err)
-		}
-	}
-
-	if _, err := recipientsFile.WriteString(pubKey + "\n"); err != nil {
-		return fmt.Errorf("failed to write public key to recipients file: %w", err)
 	}
 
 	return nil
@@ -90,23 +54,14 @@ func (h *AddRecipientCliHandler) Command() *cli.Command {
 		Action: h.AddRecipient,
 		Args:   true,
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "comment",
-				Aliases: []string{"c"},
-				Usage:   "Comment for the recipient",
-			},
+			&commentFlag,
 			&cli.StringFlag{
 				Name:    "message",
 				Aliases: []string{"m"},
 				Usage:   "Message to be used for the commit",
+				Value:   "chore: add recipient",
 			},
-			&cli.StringFlag{
-				Name:        "keys",
-				DefaultText: "By default keys are read from $XDG_CONFIG_HOME/git-age/keys.txt i.e. $HOME/.config/git-age/keys.txt on most systems",
-				EnvVars: []string{
-					"GIT_AGE_KEYS",
-				},
-			},
+			&keysFlag,
 		},
 		Before: func(context *cli.Context) error {
 			wd, err := os.Getwd()
@@ -126,15 +81,14 @@ func (h *AddRecipientCliHandler) Command() *cli.Command {
 
 			h.RepoFS = infrastructure.NewReadWriteDirFS(repoRootPath)
 
+			h.Recipients = infrastructure.NewRecipientsFile(h.RepoFS)
+
 			h.Repository, err = infrastructure.NewGitRepository(h.RepoFS, gitRepo)
 			if err != nil {
 				return err
 			}
 
-			keysPath := filepath.Join(xdg.ConfigHome, "git-age", "keys.txt")
-			if flagPath := context.String("keys"); flagPath != "" {
-				keysPath = flagPath
-			}
+			keysPath := context.String("keys")
 
 			h.Encryption, err = services.NewAgeSealer(
 				services.WithIdentitiesFrom(keysPath),
