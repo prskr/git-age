@@ -1,0 +1,28 @@
+linter-settings:
+  dupl:
+    threshold: 100
+  funlen:
+    lines: 100
+    statements: 50
+  gci:
+    local-prefixes: github.com/prskr/git-age
+  goconst:
+    min-len: 2
+    min-occurrences: 2
+  gocyclo:
+    min-complexity: 15
+  goimports:
+    local-prefixes: github.com/prskr/git-age
+  golint:
+    min-confidence: 0
+  importas:
+    no-unaliased: true
+  lll:
+    line-length: 140
+  misspell:
+    locale: US
+
+run:
+  skip-files: []
+  modules-download-mode: readonly
+  timeout: 5m

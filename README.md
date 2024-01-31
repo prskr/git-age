@@ -1,4 +1,7 @@
-# go-git
+# git-age
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/prskr/git-age)](https://goreportcard.com/report/github.com/prskr/git-age)
+[![Go build](https://github.com/prskr/git-age/actions/workflows/go.yaml/badge.svg)](https://github.com/prskr/git-age/actions/workflows/go.yaml)
 
 ## Introduction
 
@@ -31,7 +34,7 @@ git age add-recipient -c "My comment" <public key>
 
 `git age add-recipient` will:
 
-1. add the public key to the repository (`.agerecipients` file) 
+1. add the public key to the repository (`.agerecipients` file)
 2. re-encrypt all files with the new set of recipients
 3. commit the changes
 
@@ -46,7 +49,6 @@ git config --global diff.age.textconv cat
 ```
 
 ## Development
-
 
 ### Install husky
 
