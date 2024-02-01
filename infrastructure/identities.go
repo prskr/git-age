@@ -1,10 +1,12 @@
 package infrastructure
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"filippo.io/age"
@@ -63,8 +65,15 @@ func (i Identities) Generate(comment string) (pubKey string, err error) {
 		comment = fmt.Sprintf("# generated on %s", time.Now().Format(time.RFC3339))
 	}
 
-	if _, err := identitiesFile.WriteString(fmt.Sprintf("# %s\n", comment)); err != nil {
-		return "", fmt.Errorf("failed to write comment to identities file: %w", err)
+	scanner := bufio.NewScanner(strings.NewReader(comment))
+	for scanner.Scan() {
+		if _, err := identitiesFile.WriteString(fmt.Sprintf("# %s\n", scanner.Text())); err != nil {
+			return "", fmt.Errorf("failed to write comment to identities file: %w", err)
+		}
+	}
+
+	if scanner.Err() != nil {
+		return "", fmt.Errorf("failed to write comment: %w", err)
 	}
 
 	if _, err := identitiesFile.WriteString(fmt.Sprintf("# public key: %s\n", identity.Recipient().String())); err != nil {

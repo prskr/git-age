@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/prskr/git-age/core/ports"
@@ -28,13 +29,14 @@ func (h *AddRecipientCliHandler) AddRecipient(ctx *cli.Context) (err error) {
 		return cli.Exit("Repository is dirty", 1)
 	}
 
+	slog.Info("Adding recipient", slog.String("recipient", ctx.Args().First()))
 	recipients, err := h.Recipients.Append(ctx.Args().First(), ctx.String("comment"))
 	if err != nil {
 		return fmt.Errorf("failed to append public key to recipients file: %w", err)
 	}
-
 	h.Encryption.AddRecipients(recipients...)
 
+	slog.Info("Staging recipients file")
 	if err := h.Repository.StageFile(ports.RecipientsFileName); err != nil {
 		return fmt.Errorf("failed to add recipients file to git index: %w", err)
 	}
@@ -43,6 +45,7 @@ func (h *AddRecipientCliHandler) AddRecipient(ctx *cli.Context) (err error) {
 		return err
 	}
 
+	slog.Info("Committing changes")
 	if err := h.Repository.Commit(ctx.String("message")); err != nil {
 		return fmt.Errorf("failed to commit changes: %w", err)
 	}

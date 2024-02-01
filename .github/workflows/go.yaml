@@ -36,6 +36,9 @@ jobs:
       - name: Setup Syft
         run: curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
 
+      - name: Install gotestsum
+        run: go install gotest.tools/gotestsum@latest
+
       - name: Init go
         run: |
           go mod download
@@ -43,6 +46,10 @@ jobs:
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
+
+      - name: Test
+        run: |
+            gotestsum --format pkgname -- -covermode=atomic ./...
 
       # run release only on linux
       - name: Snapshot release

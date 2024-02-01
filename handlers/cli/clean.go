@@ -27,7 +27,9 @@ func (h *CleanCliHandler) CleanFile(ctx *cli.Context) error {
 	}
 
 	fileToCleanPath := ctx.Args().First()
+	logger := slog.Default().With("path", fileToCleanPath)
 
+	logger.Info("Copying file to temp")
 	fileToClean, err := copyToTemp(os.Stdin)
 	if err != nil {
 		return err
@@ -38,17 +40,21 @@ func (h *CleanCliHandler) CleanFile(ctx *cli.Context) error {
 		_ = os.Remove(fileToClean.Name())
 	}()
 
+	logger.Info("Hashing file at HEAD")
 	obj, headHash, err := h.hashFileAtHead(fileToCleanPath, true)
 	if errors.Is(err, plumbing.ErrObjectNotFound) {
+		logger.Info("File not found at HEAD, file is apparently new")
 		return h.copyEncryptedFileToStdout(fileToClean)
 	}
 
+	logger.Info("Hashing file at current state to determine whether it has changed")
 	currentHash, err := h.hashFileAt(fileToClean)
 	if err != nil {
 		return err
 	}
 
 	if bytes.Equal(headHash, currentHash) {
+		logger.Info("File has not changed, returning original")
 		return h.copyGitObjectToStdout(obj)
 	}
 

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"io/fs"
+	"log/slog"
 	"path/filepath"
 
 	"github.com/go-git/go-git/v5/plumbing"
@@ -30,6 +31,11 @@ func ReEncryptWalkFunc(repo GitRepository, rwfs ReadWriteFS, sealer FileOpenSeal
 			return err
 		}
 
+		logger := slog.Default().With(slog.String("path", path))
+
+		logger.Info("Re-encrypting file")
+
+		logger.Debug("Checking if file was already present at HEAD")
 		fileObj, err := repo.OpenObjectAtHead(path)
 		if err != nil {
 			if errors.Is(err, plumbing.ErrObjectNotFound) {
@@ -48,11 +54,11 @@ func ReEncryptWalkFunc(repo GitRepository, rwfs ReadWriteFS, sealer FileOpenSeal
 		}()
 
 		dir, fileName := filepath.Split(path)
-
 		tmp, err := rwfs.TempFile(dir, fileName)
 		if err != nil {
 			return err
 		}
+		logger.Debug("Preserve decrypted file in temp file", slog.String("tmp_file_path", tmp.Name()))
 
 		defer func() {
 			if err == nil {
