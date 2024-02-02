@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/prskr/git-age/cmd"
 	"log/slog"
 	"os"
+
+	"github.com/prskr/git-age/cmd"
 )
 
 func main() {

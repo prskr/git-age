@@ -48,11 +48,11 @@ func (i Identities) Generate(comment string) (pubKey string, err error) {
 	}
 
 	identitiesDir, _ := filepath.Split(i.IdentitiesFile)
-	if err := os.MkdirAll(identitiesDir, 0700); err != nil {
+	if err := os.MkdirAll(identitiesDir, 0o700); err != nil {
 		return "", fmt.Errorf("failed to create identities directory: %w", err)
 	}
 
-	identitiesFile, err := os.OpenFile(i.IdentitiesFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
+	identitiesFile, err := os.OpenFile(i.IdentitiesFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o600)
 	if err != nil {
 		return "", fmt.Errorf("failed to open identities file: %w", err)
 	}

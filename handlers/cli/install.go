@@ -3,17 +3,17 @@ package cli
 import (
 	"errors"
 	"fmt"
-	"github.com/go-git/go-git/v5/config"
-	"github.com/prskr/git-age/core/ports"
-	"github.com/urfave/cli/v2"
 	"io"
 	"log/slog"
 	"os"
 	"strconv"
+
+	"github.com/go-git/go-git/v5/config"
+	"github.com/prskr/git-age/core/ports"
+	"github.com/urfave/cli/v2"
 )
 
-type InstallCliHandler struct {
-}
+type InstallCliHandler struct{}
 
 func (h *InstallCliHandler) Install(*cli.Context) (err error) {
 	cfgPath, err := ports.GlobalGitConfigPath()
@@ -21,7 +21,7 @@ func (h *InstallCliHandler) Install(*cli.Context) (err error) {
 		return fmt.Errorf("failed to locate global git config: %w", err)
 	}
 
-	cfgFile, err := os.OpenFile(cfgPath, os.O_RDWR, 0644)
+	cfgFile, err := os.OpenFile(cfgPath, os.O_RDWR, 0o644)
 	if err != nil {
 		return fmt.Errorf("failed to open global git config: %w", err)
 	}

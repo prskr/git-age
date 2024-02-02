@@ -130,7 +130,7 @@ func TestReadWriteDirFS_TempFile(t *testing.T) {
 			t.Parallel()
 			dir := t.TempDir()
 
-			if err := os.MkdirAll(filepath.Join(dir, "dir1"), 0755); err != nil {
+			if err := os.MkdirAll(filepath.Join(dir, "dir1"), 0o755); err != nil {
 				t.Fatal(err)
 			}
 
@@ -212,6 +212,7 @@ func TestReadWriteDirFS_OpenRW(t *testing.T) {
 				filePath: path.Join("dir0", "file0"),
 			},
 			want: func(tb testing.TB, f ports.ReadWriteFile) {
+				tb.Helper()
 				content, err := io.ReadAll(f)
 				if err != nil {
 					tb.Fatal(err)
@@ -228,6 +229,7 @@ func TestReadWriteDirFS_OpenRW(t *testing.T) {
 				filePath: path.Join("dir0", "file0"),
 			},
 			want: func(tb testing.TB, f ports.ReadWriteFile) {
+				tb.Helper()
 				_, err := f.Write([]byte("hello"))
 				if err != nil {
 					tb.Fatal(err)
@@ -260,6 +262,7 @@ func TestReadWriteDirFS_OpenRW(t *testing.T) {
 }
 
 func TestReadWriteDirFS_Walk(t *testing.T) {
+	t.Parallel()
 	root := populateTestDirectory(t)
 	rwfs := infrastructure.NewReadWriteDirFS(root)
 
@@ -279,7 +282,6 @@ func TestReadWriteDirFS_Walk(t *testing.T) {
 
 		return f.Close()
 	})
-
 	if err != nil {
 		t.Errorf("Walk() error = %v", err)
 	}
@@ -298,7 +300,7 @@ func populateTestDirectory(tb testing.TB) (root string) {
 		}
 
 		if d.IsDir() {
-			return os.MkdirAll(filepath.Join(root, path), 0755)
+			return os.MkdirAll(filepath.Join(root, path), 0o755)
 		}
 
 		f, err := srcFS.Open(path)
@@ -322,7 +324,6 @@ func populateTestDirectory(tb testing.TB) (root string) {
 		_, err = io.Copy(dst, f)
 		return err
 	})
-
 	if err != nil {
 		tb.Fatalf("failed to populate test directory: %v", err)
 	}

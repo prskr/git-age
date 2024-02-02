@@ -57,6 +57,10 @@ type AgeSealer struct {
 	Identities []age.Identity
 }
 
+func (h *AgeSealer) CanOpen() bool {
+	return len(h.Identities) > 0
+}
+
 func (h *AgeSealer) CanSeal() bool {
 	return len(h.Recipients) > 0
 }

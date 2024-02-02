@@ -1,6 +1,7 @@
 package infrastructure
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -12,6 +13,8 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/prskr/git-age/core/ports"
 )
+
+var ErrRepoNotFound = errors.New("could not find git repository")
 
 var (
 	_ ports.RepoStater       = (*GitRepository)(nil)
@@ -128,6 +131,7 @@ func (g GitRepository) IsStagingDirty() (bool, error) {
 	}
 
 	for _, s := range status {
+		//nolint:exhaustive // we are only interested in these two states
 		switch s.Staging {
 		case git.Unmodified, git.Untracked:
 			continue
@@ -147,7 +151,7 @@ func FindRepoRootFrom(currentDir string) (string, error) {
 
 		currentDir = filepath.Dir(currentDir)
 		if currentDir == "/" {
-			return "", fmt.Errorf("could not find git repository")
+			return "", fmt.Errorf("%w: %s", ErrRepoNotFound, currentDir)
 		}
 	}
 

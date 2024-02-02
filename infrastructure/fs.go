@@ -44,7 +44,7 @@ func (f ReadWriteDirFS) TempFile(dir, pattern string) (ports.ReadWriteFile, erro
 }
 
 func (f ReadWriteDirFS) OpenRW(filePath string) (ports.ReadWriteFile, error) {
-	file, err := os.OpenFile(filepath.Join(f.rootPath, filePath), os.O_CREATE|os.O_RDWR, 0644)
+	file, err := os.OpenFile(filepath.Join(f.rootPath, filePath), os.O_CREATE|os.O_RDWR, 0o644)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,6 @@ func (r readWriteOsFile) Name() string {
 
 	var err error
 	name, err = filepath.Rel(r.fsRoot, name)
-
 	if err != nil {
 		panic(fmt.Sprintf("failed to get relative path: %s", err.Error()))
 	}

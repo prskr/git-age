@@ -22,6 +22,7 @@ type FileSealer interface {
 }
 
 type FileOpener interface {
+	CanOpen() bool
 	AddIdentity(identity age.Identity)
 	OpenFile(reader io.Reader) (io.Reader, error)
 }

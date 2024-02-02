@@ -151,7 +151,11 @@ func (h *CleanCliHandler) hashFileAtHead(path string, encrypted bool) (obj *obje
 	var reader io.Reader = fileObjReader
 	if encrypted {
 		if r, err := h.OpenSealer.OpenFile(fileObjReader); err != nil {
-			slog.Warn("Expected encrypted file but failed to decrypt", slog.String("path", path), slog.String("err", err.Error()))
+			slog.Warn(
+				"Expected encrypted file but failed to decrypt",
+				slog.String("path", path),
+				slog.String("err", err.Error()),
+			)
 		} else {
 			reader = r
 		}

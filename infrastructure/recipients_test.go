@@ -24,6 +24,7 @@ func TestRecipientsFile_All(t *testing.T) {
 		{
 			name: "garbage in file",
 			setup: func(tb testing.TB, fs testfs.TestFS) {
+				tb.Helper()
 				if err := fs.Add(ports.RecipientsFileName, []byte("garbage")); err != nil {
 					tb.Fatalf("failed to write garbage to file: %v", err)
 				}
@@ -33,6 +34,7 @@ func TestRecipientsFile_All(t *testing.T) {
 		{
 			name: "single recipient",
 			setup: func(tb testing.TB, fs testfs.TestFS) {
+				tb.Helper()
 				id, err := age.GenerateX25519Identity()
 				if err != nil {
 					tb.Fatalf("failed to create age identity: %v", err)
@@ -47,6 +49,7 @@ func TestRecipientsFile_All(t *testing.T) {
 		{
 			name: "multiple recipients",
 			setup: func(tb testing.TB, fs testfs.TestFS) {
+				tb.Helper()
 				publicKeys := make([]string, 0, 5)
 				for i := 0; i < 5; i++ {
 					id, err := age.GenerateX25519Identity()

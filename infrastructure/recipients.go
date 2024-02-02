@@ -44,20 +44,10 @@ func (r RecipientsFile) Append(pubKey string, comment string) (recipients []age.
 		return nil, fmt.Errorf("failed to parse public key: %w", err)
 	}
 
-	existingRecipients, err := r.All()
+	alreadyInRecipients, err := r.isKnown(pubKey)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to check if recipient is already known: %w", err)
 	}
-
-	alreadyInRecipients := slices.ContainsFunc(existingRecipients, func(recipient age.Recipient) bool {
-		switch actual := recipient.(type) {
-		// currently there are only X25519 recipients
-		case *age.X25519Recipient:
-			return actual.String() == pubKey
-		default:
-			return false
-		}
-	})
 
 	if alreadyInRecipients {
 		return nil, nil
@@ -87,4 +77,21 @@ func (r RecipientsFile) Append(pubKey string, comment string) (recipients []age.
 	}
 
 	return recipients, nil
+}
+
+func (r RecipientsFile) isKnown(pubKey string) (bool, error) {
+	recipients, err := r.All()
+	if err != nil {
+		return false, err
+	}
+
+	return slices.ContainsFunc(recipients, func(recipient age.Recipient) bool {
+		switch actual := recipient.(type) {
+		// currently there are only X25519 recipients
+		case *age.X25519Recipient:
+			return actual.String() == pubKey
+		default:
+			return false
+		}
+	}), nil
 }

@@ -58,7 +58,8 @@ func (h *FilesCliHandler) TrackFiles(ctx *cli.Context) (err error) {
 		err = errors.Join(err, attributesFile.Close())
 	}()
 
-	if _, err := attributesFile.WriteString(fmt.Sprintf("%s filter=age diff=age merge=age -text\n", ctx.Args().First())); err != nil {
+	attributesLine := fmt.Sprintf("%s filter=age diff=age merge=age -text\n", ctx.Args().First())
+	if _, err := attributesFile.WriteString(attributesLine); err != nil {
 		return fmt.Errorf("failed to write to .gitattributes file: %w", err)
 	}
 

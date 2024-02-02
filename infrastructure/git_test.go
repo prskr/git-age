@@ -18,6 +18,7 @@ import (
 )
 
 func TestNewGitRepositoryFromPath(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		from string
 	}
@@ -65,6 +66,7 @@ func TestNewGitRepositoryFromPath(t *testing.T) {
 }
 
 func TestGitRepository_OpenObjectAtHead(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		filePath string
 	}
@@ -101,7 +103,9 @@ func TestGitRepository_OpenObjectAtHead(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			root, repo := prepareTestRepo(t)
 			repoFS := infrastructure.NewReadWriteDirFS(root)
 
@@ -121,6 +125,7 @@ func TestGitRepository_OpenObjectAtHead(t *testing.T) {
 }
 
 func TestGitRepository_IsStagingDirty(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name    string
 		setup   func(tb testing.TB, fs ports.ReadWriteFS, repo *git.Repository)
@@ -172,7 +177,9 @@ func TestGitRepository_IsStagingDirty(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			root, repo := prepareTestRepo(t)
 			repoFS := infrastructure.NewReadWriteDirFS(root)
 
@@ -195,6 +202,8 @@ func TestGitRepository_IsStagingDirty(t *testing.T) {
 }
 
 func TestGitRepository_WalkAgeFiles(t *testing.T) {
+	t.Parallel()
+
 	root, repo := prepareTestRepo(t)
 	repoFS := infrastructure.NewReadWriteDirFS(root)
 
@@ -214,7 +223,6 @@ func TestGitRepository_WalkAgeFiles(t *testing.T) {
 
 		return nil
 	})
-
 	if err != nil {
 		t.Errorf("WalkAgeFiles() error = %v", err)
 		return

@@ -194,6 +194,8 @@ func randomString(length int) string {
 
 	b := make([]byte, length)
 	for i := range b {
+		//nolint:gosec // no need to use cryptographically secure random number generator
+		// we are only generating some random file names for testing
 		b[i] = charset[rand.Intn(len(charset))]
 	}
 

@@ -26,6 +26,7 @@ func TestIdentities_All(t *testing.T) {
 			name:    "garbage in file",
 			wantErr: true,
 			setup: func(tb testing.TB, writer io.StringWriter) {
+				tb.Helper()
 				if _, err := writer.WriteString("garbage"); err != nil {
 					tb.Fatalf("failed to write garbage to file: %v", err)
 				}
@@ -34,6 +35,7 @@ func TestIdentities_All(t *testing.T) {
 		{
 			name: "single key",
 			setup: func(tb testing.TB, writer io.StringWriter) {
+				tb.Helper()
 				id, err := age.GenerateX25519Identity()
 				if err != nil {
 					tb.Fatalf("failed to create age identity: %v", err)
@@ -48,6 +50,7 @@ func TestIdentities_All(t *testing.T) {
 		{
 			name: "multiple keys",
 			setup: func(tb testing.TB, writer io.StringWriter) {
+				tb.Helper()
 				for i := 0; i < 5; i++ {
 					id, err := age.GenerateX25519Identity()
 					if err != nil {

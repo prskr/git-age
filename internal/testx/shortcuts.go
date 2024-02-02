@@ -19,6 +19,7 @@ func ResultOf[T any](tb testing.TB, f func() (T, error)) T {
 func ResultOfA[T any](tb testing.TB, f any, args ...any) (t T) {
 	tb.Helper()
 
+	//nolint:exhaustive // we are only interested in functions
 	switch reflect.TypeOf(f).Kind() {
 	case reflect.Func:
 		// do nothing

@@ -25,6 +25,7 @@ type ReadWriteFS interface {
 	Remove(filePath string) error
 }
 
+//nolint:funlen // cannot split this function further
 func ReEncryptWalkFunc(repo GitRepository, rwfs ReadWriteFS, sealer FileOpenSealer) fs.WalkDirFunc {
 	return func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
