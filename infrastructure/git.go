@@ -156,10 +156,14 @@ func FindRepoRootFrom(currentDir string) (string, error) {
 		if _, err := os.Stat(filepath.Join(currentDir, ".git")); err == nil {
 			break
 		}
-		currentDir = filepath.Dir(currentDir)
-		if currentDir == "." {
+
+		parent := filepath.Dir(currentDir)
+
+		// we reached to root
+		if parent == currentDir {
 			return "", fmt.Errorf("%w: %s", ErrRepoNotFound, currentDir)
 		}
+		currentDir = parent
 	}
 
 	return currentDir, nil
