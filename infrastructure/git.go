@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/go-git/go-git/v5"
@@ -153,17 +152,12 @@ func FindRepoRootFrom(currentDir string) (string, error) {
 		currentDir = abs
 	}
 
-	root := "/"
-	if runtime.GOOS == "windows" {
-		root = filepath.VolumeName(currentDir)
-	}
-
 	for {
 		if _, err := os.Stat(filepath.Join(currentDir, ".git")); err == nil {
 			break
 		}
 		currentDir = filepath.Dir(currentDir)
-		if currentDir == root {
+		if currentDir == "." {
 			return "", fmt.Errorf("%w: %s", ErrRepoNotFound, currentDir)
 		}
 	}
