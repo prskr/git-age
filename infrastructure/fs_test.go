@@ -1,6 +1,7 @@
 package infrastructure_test
 
 import (
+	"errors"
 	"io"
 	"io/fs"
 	"os"
@@ -294,9 +295,9 @@ func populateTestDirectory(tb testing.TB) (root string) {
 	wd := testx.ResultOf(tb, os.Getwd)
 
 	srcFS := os.DirFS(filepath.Join(wd, "testdata"))
-	err := fs.WalkDir(srcFS, ".", func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
+	err := fs.WalkDir(srcFS, ".", func(path string, d fs.DirEntry, walkErr error) (err error) {
+		if walkErr != nil {
+			return walkErr
 		}
 
 		if d.IsDir() {
@@ -309,7 +310,7 @@ func populateTestDirectory(tb testing.TB) (root string) {
 		}
 
 		defer func() {
-			_ = f.Close()
+			err = errors.Join(err, f.Close())
 		}()
 
 		dst, err := os.Create(filepath.Join(root, path))
@@ -318,7 +319,7 @@ func populateTestDirectory(tb testing.TB) (root string) {
 		}
 
 		defer func() {
-			_ = dst.Close()
+			err = errors.Join(err, dst.Close())
 		}()
 
 		_, err = io.Copy(dst, f)

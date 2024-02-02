@@ -27,15 +27,17 @@ type ReadWriteDirFS struct {
 }
 
 func (f ReadWriteDirFS) Rename(oldPath, newPath string) error {
-	return os.Rename(filepath.Join(f.rootPath, oldPath), filepath.Join(f.rootPath, newPath))
+	fullOldPath := filepath.Join(f.rootPath, filepath.FromSlash(oldPath))
+	fullNewPath := filepath.Join(f.rootPath, filepath.FromSlash(newPath))
+	return os.Rename(fullOldPath, fullNewPath)
 }
 
 func (f ReadWriteDirFS) Remove(filePath string) error {
-	return os.Remove(filepath.Join(f.rootPath, filePath))
+	return os.Remove(filepath.Join(f.rootPath, filepath.FromSlash(filePath)))
 }
 
 func (f ReadWriteDirFS) TempFile(dir, pattern string) (ports.ReadWriteFile, error) {
-	tmpFile, err := os.CreateTemp(filepath.Join(f.rootPath, dir), pattern)
+	tmpFile, err := os.CreateTemp(filepath.Join(f.rootPath, filepath.FromSlash(dir)), pattern)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +46,7 @@ func (f ReadWriteDirFS) TempFile(dir, pattern string) (ports.ReadWriteFile, erro
 }
 
 func (f ReadWriteDirFS) OpenRW(filePath string) (ports.ReadWriteFile, error) {
-	file, err := os.OpenFile(filepath.Join(f.rootPath, filePath), os.O_CREATE|os.O_RDWR, 0o644)
+	file, err := os.OpenFile(filepath.Join(f.rootPath, filepath.FromSlash(filePath)), os.O_CREATE|os.O_RDWR, 0o644)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +59,7 @@ func (f ReadWriteDirFS) Open(name string) (fs.File, error) {
 }
 
 func (f ReadWriteDirFS) ReadDir(name string) ([]fs.DirEntry, error) {
-	return os.ReadDir(filepath.Join(f.rootPath, name))
+	return os.ReadDir(filepath.Join(f.rootPath, filepath.FromSlash(name)))
 }
 
 var _ ports.ReadWriteFile = (*readWriteOsFile)(nil)
@@ -76,5 +78,5 @@ func (r readWriteOsFile) Name() string {
 		panic(fmt.Sprintf("failed to get relative path: %s", err.Error()))
 	}
 
-	return name
+	return filepath.ToSlash(name)
 }

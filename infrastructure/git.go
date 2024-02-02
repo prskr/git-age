@@ -113,7 +113,7 @@ func (g GitRepository) WalkAgeFiles(onMatch fs.WalkDirFunc) error {
 			return nil
 		}
 
-		_, matched := matcher.Match(strings.Split(path, string([]rune{filepath.Separator})), wantedAttributes)
+		_, matched := matcher.Match(strings.Split(filepath.ToSlash(path), "/"), wantedAttributes)
 		if matched {
 			if err := onMatch(path, d, err); err != nil {
 				return err
