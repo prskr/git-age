@@ -16,6 +16,7 @@ type FileOpenSealer interface {
 }
 
 type FileSealer interface {
+	CanSeal() bool
 	AddRecipients(r ...age.Recipient)
 	SealFile(dst io.Writer) (io.WriteCloser, error)
 }

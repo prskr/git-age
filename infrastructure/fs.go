@@ -9,7 +9,10 @@ import (
 	"github.com/prskr/git-age/core/ports"
 )
 
-var _ ports.ReadWriteFS = (*ReadWriteDirFS)(nil)
+var (
+	_ ports.ReadWriteFS = (*ReadWriteDirFS)(nil)
+	_ fs.ReadDirFS      = (*ReadWriteDirFS)(nil)
+)
 
 func NewReadWriteDirFS(rootPath string) *ReadWriteDirFS {
 	return &ReadWriteDirFS{
@@ -51,6 +54,10 @@ func (f ReadWriteDirFS) OpenRW(filePath string) (ports.ReadWriteFile, error) {
 
 func (f ReadWriteDirFS) Open(name string) (fs.File, error) {
 	return f.underlying.Open(name)
+}
+
+func (f ReadWriteDirFS) ReadDir(name string) ([]fs.DirEntry, error) {
+	return os.ReadDir(filepath.Join(f.rootPath, name))
 }
 
 var _ ports.ReadWriteFile = (*readWriteOsFile)(nil)

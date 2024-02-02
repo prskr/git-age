@@ -57,6 +57,10 @@ type AgeSealer struct {
 	Identities []age.Identity
 }
 
+func (h *AgeSealer) CanSeal() bool {
+	return len(h.Recipients) > 0
+}
+
 func (h *AgeSealer) AddRecipients(r ...age.Recipient) {
 	h.Recipients = append(h.Recipients, r...)
 }

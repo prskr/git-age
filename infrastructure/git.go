@@ -128,7 +128,10 @@ func (g GitRepository) IsStagingDirty() (bool, error) {
 	}
 
 	for _, s := range status {
-		if s.Staging != git.Unmodified {
+		switch s.Staging {
+		case git.Unmodified, git.Untracked:
+			continue
+		default:
 			return true, nil
 		}
 	}

@@ -3,6 +3,7 @@ package cli
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 	"os"
@@ -27,7 +28,16 @@ func (h *CleanCliHandler) CleanFile(ctx *cli.Context) error {
 	}
 
 	fileToCleanPath := ctx.Args().First()
+
 	logger := slog.Default().With("path", fileToCleanPath)
+
+	if !h.OpenSealer.CanSeal() {
+		logger.Warn("No recipients specified - file will be staged as plain text")
+		if _, err := io.Copy(os.Stdout, os.Stdin); err != nil {
+			return fmt.Errorf("failed to copy file to stdout: %w", err)
+		}
+		return nil
+	}
 
 	logger.Info("Copying file to temp")
 	fileToClean, err := copyToTemp(os.Stdin)
