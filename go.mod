@@ -14,7 +14,7 @@ require (
 	github.com/urfave/cli/v2 v2.27.1
 )
 
-replace github.com/go-git/go-git/v5 => github.com/prskr/go-git/v5 v5.0.0-20240202125542-690f6574d8d1
+replace github.com/go-git/go-git/v5 => github.com/prskr/go-git/v5 v5.0.0-20240205092825-798d9942c362
 
 require (
 	dario.cat/mergo v1.0.0 // indirect
