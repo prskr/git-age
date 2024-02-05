@@ -41,3 +41,37 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
+
+nfpms:
+  - package_name: git-age
+    homepage: https://github.com/prskr/git-age
+    maintainer: Peter Kurfer <peter.kurfer@gmail.com>
+    license: MIT
+    formats:
+      - apk
+      - deb
+      - rpm
+    dependencies:
+      - git
+
+brews:
+  - name: git-age
+    homepage: https://github.com/prskr/git-age
+    description: |-
+      git-age is a smudge/clean filter to encrypt/decrypt files in a git repository transparently
+    license: "MIT"
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+    folder: deploy/homebrew
+    dependencies:
+      - name: git
+        os: mac
+    test: |
+      system "#{bin}/git-age --help"
+    repository:
+      owner: prskr
+      name: git-age
+      pull_request:
+        enabled: true
