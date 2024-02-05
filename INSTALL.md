@@ -25,5 +25,6 @@ or
 
 ```bash
 brew tap prskr/the-prancing-package
+
 brew install git-age
 ```

@@ -42,6 +42,9 @@ changelog:
       - "^docs:"
       - "^test:"
 
+checksum:
+  name_template: "checksums.txt"
+
 nfpms:
   - package_name: git-age
     homepage: https://github.com/prskr/git-age
@@ -65,7 +68,7 @@ brews:
       email: bot@goreleaser.com
     commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
     skip_upload: auto
-    folder: deploy/homebrew
+    folder: Formula
     dependencies:
       - name: git
         os: mac
