@@ -64,6 +64,7 @@ brews:
       name: goreleaserbot
       email: bot@goreleaser.com
     commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+    skip_upload: auto
     folder: deploy/homebrew
     dependencies:
       - name: git
@@ -72,6 +73,7 @@ brews:
       system "#{bin}/git-age --help"
     repository:
       owner: prskr
-      name: git-age
+      name: the-prancing-package
+      token: "{{ .Env.GH_TAP_PAT }}"
       pull_request:
         enabled: true

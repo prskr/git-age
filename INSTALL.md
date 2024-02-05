@@ -10,10 +10,20 @@ go install github.com/prskr/git-age@latest
 
 ## GitHub releases
 
-Coming soon
-
-_Note:_ the GitHub releases will also include Linux packages at some point.
+See [the releases page](/prskr/git-age/releases/latest) for the latest release.
+You can download the binary for your platform from there.
 
 ## Homebrew
 
-Coming soon
+There's a tap for `git-age` available at [prskr/the-prancing-package](https://github.com/prskr/the-prancing-package).
+
+```bash
+brew install prskr/the-prancing-package/git-age
+```
+
+or
+
+```bash
+brew tap prskr/the-prancing-package
+brew install git-age
+```
