@@ -41,7 +41,7 @@ func (h *AddRecipientCliHandler) AddRecipient(ctx *cli.Context) (err error) {
 		return fmt.Errorf("failed to add recipients file to git index: %w", err)
 	}
 
-	if err := h.Repository.WalkAgeFiles(ports.ReEncryptWalkFunc(h.Repository, h.RepoFS, h.Encryption)); err != nil {
+	if err := h.Repository.WalkAgeFiles(services.ReEncryptWalkFunc(h.Repository, h.RepoFS, h.Encryption)); err != nil {
 		return err
 	}
 

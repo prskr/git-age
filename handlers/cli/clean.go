@@ -8,9 +8,10 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/prskr/git-age/internal/fsx"
+
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
-	"github.com/minio/sha256-simd"
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
 	"github.com/prskr/git-age/infrastructure"
@@ -161,7 +162,7 @@ func (h *CleanCliHandler) hashFileAtHead(path string, encrypted bool) (obj *obje
 		}
 	}
 
-	hashBytes, err := hashFile(reader)
+	hashBytes, err := fsx.HashFile(reader)
 	return fileObjAtHead, hashBytes, err
 }
 
@@ -171,13 +172,5 @@ func (h *CleanCliHandler) hashFileAt(f io.ReadSeeker) (hash []byte, err error) {
 		err = errors.Join(err, seekErr)
 	}()
 
-	return hashFile(f)
-}
-
-func hashFile(reader io.Reader) ([]byte, error) {
-	h := sha256.New()
-	if _, err := io.Copy(h, reader); err != nil {
-		return nil, err
-	}
-	return h.Sum(nil), nil
+	return fsx.HashFile(f)
 }

@@ -79,6 +79,7 @@ issues:
       linters:
         - funlen
         - cyclop
+        - goerr113
 
 run:
   skip-files: [ ]

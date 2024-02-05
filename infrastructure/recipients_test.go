@@ -4,17 +4,18 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/prskr/git-age/internal/fsx"
+
 	"filippo.io/age"
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/infrastructure"
-	"github.com/prskr/git-age/internal/testfs"
 )
 
 func TestRecipientsFile_All(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name    string
-		setup   func(tb testing.TB, fs testfs.TestFS)
+		setup   func(tb testing.TB, fs ports.ReadWriteFS)
 		wantNum int
 		wantErr bool
 	}{
@@ -23,9 +24,10 @@ func TestRecipientsFile_All(t *testing.T) {
 		},
 		{
 			name: "garbage in file",
-			setup: func(tb testing.TB, fs testfs.TestFS) {
+			setup: func(tb testing.TB, rwfs ports.ReadWriteFS) {
 				tb.Helper()
-				if err := fs.Add(ports.RecipientsFileName, []byte("garbage")); err != nil {
+
+				if err := fsx.WriteTo(rwfs, ports.RecipientsFileName, []byte("garbage")); err != nil {
 					tb.Fatalf("failed to write garbage to file: %v", err)
 				}
 			},
@@ -33,14 +35,14 @@ func TestRecipientsFile_All(t *testing.T) {
 		},
 		{
 			name: "single recipient",
-			setup: func(tb testing.TB, fs testfs.TestFS) {
+			setup: func(tb testing.TB, rwfs ports.ReadWriteFS) {
 				tb.Helper()
 				id, err := age.GenerateX25519Identity()
 				if err != nil {
 					tb.Fatalf("failed to create age identity: %v", err)
 				}
 
-				if err := fs.Add(ports.RecipientsFileName, []byte(id.Recipient().String())); err != nil {
+				if err := fsx.WriteTo(rwfs, ports.RecipientsFileName, []byte(id.Recipient().String())); err != nil {
 					tb.Fatalf("failed to write identity to file: %v", err)
 				}
 			},
@@ -48,7 +50,7 @@ func TestRecipientsFile_All(t *testing.T) {
 		},
 		{
 			name: "multiple recipients",
-			setup: func(tb testing.TB, fs testfs.TestFS) {
+			setup: func(tb testing.TB, rwfs ports.ReadWriteFS) {
 				tb.Helper()
 				publicKeys := make([]string, 0, 5)
 				for i := 0; i < 5; i++ {
@@ -59,7 +61,7 @@ func TestRecipientsFile_All(t *testing.T) {
 
 					publicKeys = append(publicKeys, id.Recipient().String())
 				}
-				if err := fs.Add(ports.RecipientsFileName, []byte(strings.Join(publicKeys, "\n"))); err != nil {
+				if err := fsx.WriteTo(rwfs, ports.RecipientsFileName, []byte(strings.Join(publicKeys, "\n"))); err != nil {
 					tb.Fatalf("failed to write identity to file: %v", err)
 				}
 			},
@@ -70,7 +72,7 @@ func TestRecipientsFile_All(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			tfs := testfs.NewTestFS()
+			tfs := infrastructure.NewReadWriteDirFS(t.TempDir())
 
 			if tt.setup != nil {
 				tt.setup(t, tfs)

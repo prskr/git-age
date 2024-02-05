@@ -73,7 +73,7 @@ func (h *FilesCliHandler) ReEncryptFiles(*cli.Context) error {
 		return cli.Exit("Repository is dirty", 1)
 	}
 
-	if err := h.Repository.WalkAgeFiles(ports.ReEncryptWalkFunc(h.Repository, h.RepoFS, h.Encryption)); err != nil {
+	if err := h.Repository.WalkAgeFiles(services.ReEncryptWalkFunc(h.Repository, h.RepoFS, h.Encryption)); err != nil {
 		return err
 	}
 

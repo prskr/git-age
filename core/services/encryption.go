@@ -2,8 +2,6 @@ package services
 
 import (
 	"io"
-	"os"
-	"path/filepath"
 
 	"filippo.io/age"
 	"github.com/prskr/git-age/core/ports"
@@ -69,8 +67,8 @@ func (h *AgeSealer) AddRecipients(r ...age.Recipient) {
 	h.Recipients = append(h.Recipients, r...)
 }
 
-func (h *AgeSealer) AddIdentity(identity age.Identity) {
-	h.Identities = append(h.Identities, identity)
+func (h *AgeSealer) AddIdentities(identities ...age.Identity) {
+	h.Identities = append(h.Identities, identities...)
 }
 
 func (h *AgeSealer) OpenFile(reader io.Reader) (io.Reader, error) {
@@ -79,50 +77,4 @@ func (h *AgeSealer) OpenFile(reader io.Reader) (io.Reader, error) {
 
 func (h *AgeSealer) SealFile(dst io.Writer) (io.WriteCloser, error) {
 	return age.Encrypt(dst, h.Recipients...)
-}
-
-func (h *AgeSealer) AddRecipientsFrom(reader io.Reader) error {
-	r, err := age.ParseRecipients(reader)
-	if err != nil {
-		return err
-	}
-
-	h.Recipients = append(h.Recipients, r...)
-	return nil
-}
-
-func (h *AgeSealer) AddRecipientsFromPath(repoPath string) error {
-	f, err := os.Open(filepath.Join(repoPath, ports.RecipientsFileName))
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		_ = f.Close()
-	}()
-
-	return h.AddRecipientsFrom(f)
-}
-
-func (h *AgeSealer) AddIdentitiesFrom(reader io.Reader) error {
-	i, err := age.ParseIdentities(reader)
-	if err != nil {
-		return err
-	}
-
-	h.Identities = append(h.Identities, i...)
-	return nil
-}
-
-func (h *AgeSealer) AddIdentitiesFromPath(path string) error {
-	f, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		_ = f.Close()
-	}()
-
-	return h.AddIdentitiesFrom(f)
 }

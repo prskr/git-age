@@ -1,7 +1,6 @@
 package infrastructure_test
 
 import (
-	"errors"
 	"io"
 	"io/fs"
 	"os"
@@ -9,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/prskr/git-age/internal/fsx"
 
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/internal/testx"
@@ -295,36 +296,9 @@ func populateTestDirectory(tb testing.TB) (root string) {
 	wd := testx.ResultOf(tb, os.Getwd)
 
 	srcFS := os.DirFS(filepath.Join(wd, "testdata"))
-	err := fs.WalkDir(srcFS, ".", func(path string, d fs.DirEntry, walkErr error) (err error) {
-		if walkErr != nil {
-			return walkErr
-		}
+	destFS := infrastructure.NewReadWriteDirFS(root)
 
-		if d.IsDir() {
-			return os.MkdirAll(filepath.Join(root, path), 0o755)
-		}
-
-		f, err := srcFS.Open(path)
-		if err != nil {
-			return err
-		}
-
-		defer func() {
-			err = errors.Join(err, f.Close())
-		}()
-
-		dst, err := os.Create(filepath.Join(root, path))
-		if err != nil {
-			return err
-		}
-
-		defer func() {
-			err = errors.Join(err, dst.Close())
-		}()
-
-		_, err = io.Copy(dst, f)
-		return err
-	})
+	err := fsx.NewSyncer(srcFS, destFS).Sync()
 	if err != nil {
 		tb.Fatalf("failed to populate test directory: %v", err)
 	}

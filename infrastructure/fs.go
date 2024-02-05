@@ -26,6 +26,10 @@ type ReadWriteDirFS struct {
 	underlying fs.FS
 }
 
+func (f ReadWriteDirFS) Mkdir(dir string, all bool, mode os.FileMode) error {
+	return os.MkdirAll(filepath.Join(f.rootPath, filepath.FromSlash(dir)), mode)
+}
+
 func (f ReadWriteDirFS) Rename(oldPath, newPath string) error {
 	fullOldPath := filepath.Join(f.rootPath, filepath.FromSlash(oldPath))
 	fullNewPath := filepath.Join(f.rootPath, filepath.FromSlash(newPath))
