@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
@@ -134,7 +135,10 @@ func (h *CleanCliHandler) copyGitObjectToStdout(obj *object.File) error {
 	return err
 }
 
-func (h *CleanCliHandler) hashFileAtHead(path string, encrypted bool) (obj *object.File, hash []byte, err error) {
+func (h *CleanCliHandler) hashFileAtHead(
+	path string,
+	expectToBeEncrypted bool,
+) (obj *object.File, hash []byte, err error) {
 	fileObjAtHead, err := h.Repository.OpenObjectAtHead(path)
 	if err != nil {
 		return nil, nil, err
@@ -150,13 +154,20 @@ func (h *CleanCliHandler) hashFileAtHead(path string, encrypted bool) (obj *obje
 	}()
 
 	var reader io.Reader = fileObjReader
-	if encrypted {
-		if r, err := h.OpenSealer.OpenFile(fileObjReader); err != nil {
+
+	if expectToBeEncrypted {
+		bufReader := bufio.NewReader(reader)
+		isEncrypted, err := h.OpenSealer.IsEncrypted(bufReader)
+		if err != nil {
+			return nil, nil, err
+		} else if !isEncrypted {
 			slog.Warn(
-				"Expected encrypted file but failed to decrypt",
+				"Expected encrypted file but age header is missing",
 				slog.String("path", path),
 				slog.String("err", err.Error()),
 			)
+		} else if r, err := h.OpenSealer.OpenFile(fileObjReader); err != nil {
+			return nil, nil, err
 		} else {
 			reader = r
 		}

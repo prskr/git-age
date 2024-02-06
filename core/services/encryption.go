@@ -1,6 +1,8 @@
 package services
 
 import (
+	"bytes"
+	"fmt"
 	"io"
 
 	"filippo.io/age"
@@ -11,6 +13,9 @@ var (
 	_ ports.FileOpener = (*AgeSealer)(nil)
 	_ ports.FileSealer = (*AgeSealer)(nil)
 )
+
+//nolint:gochecknoglobals // cannot declare a constant byte array
+var ageIntro = []byte("age-encryption.org/v1\n")
 
 type AgeSealerOption func(*AgeSealer) error
 
@@ -53,6 +58,15 @@ func NewAgeSealer(opts ...AgeSealerOption) (*AgeSealer, error) {
 type AgeSealer struct {
 	Recipients []age.Recipient
 	Identities []age.Identity
+}
+
+func (h *AgeSealer) IsEncrypted(src ports.PeekReader) (bool, error) {
+	peeked, err := src.Peek(len(ageIntro))
+	if err != nil {
+		return false, fmt.Errorf("failed to determine whether file is encrypted: %w", err)
+	}
+
+	return bytes.Equal(peeked, ageIntro), nil
 }
 
 func (h *AgeSealer) CanOpen() bool {

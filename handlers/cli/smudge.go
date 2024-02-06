@@ -1,7 +1,9 @@
 package cli
 
 import (
+	"bufio"
 	"io"
+	"log/slog"
 	"os"
 
 	"github.com/prskr/git-age/core/ports"
@@ -19,7 +21,17 @@ func (h *SmudgeCliHandler) SmudgeFile(*cli.Context) error {
 		return err
 	}
 
-	decryptedReader, err := h.Opener.OpenFile(os.Stdin)
+	reader := bufio.NewReader(os.Stdin)
+
+	if isEncrypted, err := h.Opener.IsEncrypted(reader); err != nil {
+		return err
+	} else if !isEncrypted {
+		slog.Warn("expected age-encrypted file, but got plaintext. Copying to stdout.")
+		_, err = io.Copy(os.Stdout, reader)
+		return err
+	}
+
+	decryptedReader, err := h.Opener.OpenFile(reader)
 	if err != nil {
 		return err
 	}
