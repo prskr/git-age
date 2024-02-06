@@ -122,7 +122,7 @@ winget:
         owner: prskr
         name: winget-pkgs
         branch: "git-age-{{.Version}}"
-        token: "{{ .Env.GH_WINGET_PAT_TOKEN }}"
+        token: "{{ .Env.GH_WINGET_PAT }}"
         pull_request:
           enabled: true
           draft: true
