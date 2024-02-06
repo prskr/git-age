@@ -3,9 +3,11 @@ version: 1
 before:
   hooks:
     - go mod tidy -go=1.21
-    - ronn docs/git-age.md
-    - rm -f docs/git-age.1.gz
-    - gzip docs/git-age.1
+    - mkdir -p out/man
+    - mkdir -p out/html
+    - asciidoctor -a reproducible -b manpage -o out/man/git-age.1 docs/git-age.adoc
+    - gzip out/man/git-age.1
+    - asciidoctor -a reproducible -b html5 -o out/html/git-age.html docs/git-age.adoc
 
 builds:
   - env:
@@ -36,7 +38,8 @@ archives:
       - goos: windows
         format: zip
     files:
-      - docs/git-age.1.gz
+      - src: out/man/git-age.1.gz
+        dst: docs/git-age.1.gz
 
 sboms:
   - artifacts: binary
@@ -63,7 +66,7 @@ nfpms:
     dependencies:
       - git
     contents:
-      - src: docs/git-age.1.gz
+      - src: out/man/git-age.1.gz
         dst: /usr/share/man/man1/git-age.1.gz
       - src: LICENSE
         dst: /usr/share/licenses/git-age/LICENSE
