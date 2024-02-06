@@ -4,12 +4,15 @@ before:
   hooks:
     - go mod tidy -go=1.21
     - ronn docs/git-age.md
+    - rm -f docs/git-age.1.gz
     - gzip docs/git-age.1
 
 builds:
   - env:
       - CGO_ENABLED=0
     binary: git-age
+    ldflags:
+      - '-s -w -X github.com/prskr/git-age/handlers/cli.version={{.Version}} -X github.com/prskr/git-age/handlers/cli.commit={{.Commit}} -X github.com/prskr/git-age/handlers/cli.date={{.Date}}'
     goos:
       - linux
       - windows
@@ -90,3 +93,37 @@ brews:
       token: "{{ .Env.GH_TAP_PAT }}"
       pull_request:
         enabled: true
+
+winget:
+  - name: git-age
+    publisher: prskr
+    short_description: |-
+      git-age is a smudge/clean filter to encrypt/decrypt files in a git repository transparently
+    license: mit
+    homepage: https://github.com/prskr/git-age
+    publisher_support_url: "https://github.com/prskr/git-age/issues/new"
+    package_identifier: prskr.git-age
+    url_template: "https://github.com/prskr/git-age/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    commit_msg_template: "{{ .PackageIdentifier }}: {{ .Tag }}"
+    license_url: "https://raw.githubusercontent.com/prskr/git-age/main/LICENSE"
+    release_notes: "{{.Changelog}}"
+    tags:
+      - git
+      - age
+      - cli
+      - encryption
+    repository:
+        owner: prskr
+        name: winget-pkgs
+        branch: "git-age-{{.Version}}"
+        token: "{{ .Env.GH_WINGET_PAT_TOKEN }}"
+        pull_request:
+          enabled: true
+          draft: true
+          base:
+            owner: microsoft
+            name: winget-pkgs
+            branch: master
