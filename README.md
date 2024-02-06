@@ -100,6 +100,7 @@ By default `git-age` will store the private keys in `$XDG_CONFIG_HOME/git-age/ke
 - [`husky`](https://github.com/go-courier/husky)
 - `goimports`
 - `gofumpt`
+- `asciidoctor`
 - *optionally*: [`goreleaser`](https://goreleaser.com/)
 - *optionally*: [`dlv`](https://github.com/go-delve/delve)
 
