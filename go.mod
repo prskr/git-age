@@ -12,6 +12,7 @@ require (
 	github.com/lmittmann/tint v1.0.4
 	github.com/minio/sha256-simd v1.0.1
 	github.com/urfave/cli/v2 v2.27.1
+	golang.org/x/mod v0.14.0
 )
 
 replace github.com/go-git/go-git/v5 => github.com/prskr/go-git/v5 v5.0.0-20240205092825-798d9942c362
@@ -36,7 +37,6 @@ require (
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xrash/smetrics v0.0.0-20231213231151-1d8dd44e695e // indirect
 	golang.org/x/crypto v0.18.0 // indirect
-	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect

@@ -73,3 +73,29 @@ Re-encrypt all files that are tracked by `git-age`.
 This is useful if you want to change the recipients of the files e.g. if a developer leaves the team.
 It can also be used to onboard a new developer to the team but it's recommended to use `git age add-recipient` for that
 as it is specifically designed for this use case.
+
+### git age version
+
+`git age version`
+
+Prints the version of the `git-age` tool.
+
+### git age version check-update
+
+`git age version check-update`
+
+Checks if there is a new version of the `git-age` tool available.
+
+## EXAMPLES
+
+### Initialize a new repository
+
+git age init --comment "Alice"
+
+### Add a new recipient
+
+Bob:<br/>
+git age gen-key --comment "Bob" > bob.pub
+
+Alice: <br/>
+git age add-recipient --comment "Bob" $(cat bob.pub)
