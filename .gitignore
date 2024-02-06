@@ -1,3 +1,5 @@
 .idea/
 out/
 dist/
+docs/*.1*
+docs/*.html

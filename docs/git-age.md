@@ -1,4 +1,75 @@
 git-age(1) -- protect secrets required for development in your repository
 =========================================================================
 
+## DESCRIPTION
 
+`git-age` is a smudge/clean filter for git that encrypts and decrypts files in your repository.
+It is designed to be used in a team environment where you want to protect secrets required for development, such as API
+keys, passwords, etc.
+
+It is based on the great tool age(1) by Filippo Valsorda.
+Every file encrypted by `git-age` is a valid age(1) file, and can be decrypted using the age(1) tool.
+
+## SUBCOMMANDS
+
+### git age install
+
+Install the git-age hooks in global git configuration.
+
+### git age init
+
+`git age init` [`--comment` &lt;COMMENT&gt;, `--keys` &lt;KEYS_TXT&gt;]
+
+Initialize the current repository for git-age.
+This will:
+
+1. create a `.agerecipients` file in the root of the repository
+2. bootstrap a new keypair for the current user
+3. add the public key to the `.agerecipients` file, optionally with a comment
+4. add the private key to the keys file, optionally with a comment
+
+### git age gen-key
+
+`git age gen-key` [`--comment` &lt;COMMENT&gt; `--keys` &lt;KEYS_TXT&gt;]
+
+To quickly prepare your environment to participate at a project that already uses *git-age*, you can use the `gen-key`
+command to:
+
+1. generate a new keypair for the current user
+2. add the private key to the keys file, optionally with a comment
+3. print the public key for sharing with a developer that already has access
+
+The keys file can either be specified as flag or be read from the environment variable `GIT_AGE_KEYS`.
+
+### git age add-recipient
+
+`git age add-recipient` [`--comment` &lt;COMMENT&gt; `--keys` &lt;KEYS_TXT&gt; `--message` &lt;COMMIT_MESSAGE&gt;]
+&lt;PUBLIC_KEY&gt;<br>
+
+### git age files
+
+`files` is the main command to manage the files that should be encrypted and decrypted by `git-age`.
+
+### git age files list
+
+`git age files list`
+
+Lists all files that are/will be tracked by `git-age`.
+This allows to verify that the files that should be encrypted are actually tracked.
+
+### git age files track
+
+`git age files track` &lt;PATTERN&gt;
+
+Add a file pattern to the `.gitattributes` file to track the file with `git-age`.
+`git-age` will either append the pattern to the already present `.gitattributes` file in the **current** directory or
+create a new `.gitattributes` file if it does not exist.
+
+### git age files re-encrypt
+
+`git age files re-encrypt`
+
+Re-encrypt all files that are tracked by `git-age`.
+This is useful if you want to change the recipients of the files e.g. if a developer leaves the team.
+It can also be used to onboard a new developer to the team but it's recommended to use `git age add-recipient` for that
+as it is specifically designed for this use case.

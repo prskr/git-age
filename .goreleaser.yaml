@@ -2,8 +2,9 @@ version: 1
 
 before:
   hooks:
-    # You may remove this if you don't use go modules.
     - go mod tidy -go=1.21
+    - ronn docs/git-age.md
+    - gzip docs/git-age.1
 
 builds:
   - env:
@@ -31,6 +32,8 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
+    files:
+      - docs/git-age.1.gz
 
 sboms:
   - artifacts: binary
@@ -56,6 +59,11 @@ nfpms:
       - rpm
     dependencies:
       - git
+    contents:
+      - src: docs/git-age.1.gz
+        dst: /usr/share/man/man1/git-age.1.gz
+      - src: LICENSE
+        dst: /usr/share/licenses/git-age/LICENSE
 
 brews:
   - name: git-age
@@ -72,6 +80,8 @@ brews:
     dependencies:
       - name: git
         os: mac
+    extra_install: |
+      man1.install "docs/git-age.1.gz"
     test: |
       system "#{bin}/git-age --help"
     repository:

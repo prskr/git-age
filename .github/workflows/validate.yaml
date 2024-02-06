@@ -1,0 +1,58 @@
+name: Go build
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "*"
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  checks: write
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        go-version: [1.21.x]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+          fetch-tags: 'true'
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          # Semantic version range syntax or exact version of Go
+          go-version: ${{ matrix.go-version }}
+
+      - name: Setup Syft
+        run: curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Install gotestsum
+        run: go install gotest.tools/gotestsum@latest
+
+      - name: Init go
+        run: |
+          go mod download
+          go generate .
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+
+      - name: Test
+        run: |
+            gotestsum --format pkgname -- -covermode=atomic ./...
+
+      - name: Snapshot release
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --clean --snapshot
