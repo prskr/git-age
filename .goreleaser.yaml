@@ -15,7 +15,7 @@ builds:
       - CGO_ENABLED=0
     binary: git-age
     ldflags:
-      - '-s -w -X github.com/prskr/git-age/handlers/cli.version={{.Version}} -X github.com/prskr/git-age/handlers/cli.commit={{.Commit}} -X github.com/prskr/git-age/handlers/cli.date={{.Date}}'
+      - '-s -w -X github.com/prskr/git-age/handlers/cli.version={{.Tag}} -X github.com/prskr/git-age/handlers/cli.commit={{.Commit}} -X github.com/prskr/git-age/handlers/cli.date={{.Date}}'
     goos:
       - linux
       - windows
