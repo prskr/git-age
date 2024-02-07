@@ -28,3 +28,35 @@ brew tap prskr/the-prancing-package
 
 brew install git-age
 ```
+
+## Linux
+
+### RPM - Fedora, CentOS, RHEL, SUSE
+
+#### DNF
+
+```bash
+dnf config-manager --add-repo https://code.icb4dc0.de/api/packages/prskr/rpm.repo
+
+dnf install git-age
+```
+
+#### Zypper
+
+```bash
+zypper addrepo https://code.icb4dc0.de/api/packages/prskr/rpm.repo
+
+zypper install git-age
+```
+
+### DEB - Debian, Ubuntu
+
+```bash
+sudo curl https://code.icb4dc0.de/api/packages/prskr/debian/repository.key -o /etc/apt/trusted.gpg.d/forgejo-prskr.asc
+
+# distribution is currently only bookworm - but should work for other debian based distributions as well
+echo "deb https://code.icb4dc0.de/api/packages/prskr/debian bookworm main" | sudo tee -a /etc/apt/sources.list.d/forgejo.list
+sudo apt update
+
+sudo apt install git-age
+```
