@@ -1,4 +1,4 @@
-name: Go build
+name: Validate
 on:
   push:
     branches:
@@ -58,6 +58,12 @@ jobs:
         run: curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
         if: ${{ !contains(matrix.os, 'windows') }}
 
+      - name: Prepare GPG setup
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/.gnupg
+          echo "${{ secrets.GPG_SIGNING_KEY }}" | base64 -d > $GITHUB_WORKSPACE/.gnupg/gpg.key
+        if: ${{ !contains(matrix.os, 'windows') }}
+
       - name: Snapshot release
         uses: goreleaser/goreleaser-action@v5
         if: ${{ !contains(matrix.os, 'windows') }}
@@ -65,3 +71,5 @@ jobs:
           distribution: goreleaser
           version: latest
           args: release --clean --snapshot
+        env:
+          NFPM_GIT_AGE_PASSPHRASE: ${{ secrets.NFPM_GIT_AGE_PASSPHRASE }}

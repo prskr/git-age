@@ -3,6 +3,7 @@ version: 1
 before:
   hooks:
     - go mod tidy -go=1.21
+    - rm -rf out/man
     - mkdir -p out/man
     - mkdir -p out/html
     - asciidoctor -a reproducible -b manpage -o out/man/git-age.1 docs/git-age.adoc
@@ -55,12 +56,12 @@ checksum:
   name_template: "checksums.txt"
 
 nfpms:
-  - package_name: git-age
+  - id: git_age
+    package_name: git-age
     homepage: https://github.com/prskr/git-age
     maintainer: Peter Kurfer <peter.kurfer@gmail.com>
     license: MIT
     formats:
-      - apk
       - deb
       - rpm
     dependencies:
@@ -70,6 +71,13 @@ nfpms:
         dst: /usr/share/man/man1/git-age.1.gz
       - src: LICENSE
         dst: /usr/share/licenses/git-age/LICENSE
+
+    rpm:
+      signature:
+        key_file: "{{ .Env.GITHUB_WORKSPACE }}/.gnupg/gpg.key"
+    deb:
+      signature:
+        key_file: "{{ .Env.GITHUB_WORKSPACE }}/.gnupg/gpg.key"
 
 brews:
   - name: git-age
@@ -132,3 +140,24 @@ winget:
             owner: microsoft
             name: winget-pkgs
             branch: master
+
+uploads:
+  - name: RPM
+    method: PUT
+    target: https://code.icb4dc0.de/api/packages/prskr/rpm/upload
+    exts:
+      - rpm
+    username: prskr
+    checksum: false
+    signature: false
+    custom_artifact_name: true
+
+  - name: DEB
+    method: PUT
+    target: https://code.icb4dc0.de/api/packages/prskr/debian/pool/bookworm/main/upload
+    exts:
+      - deb
+    username: prskr
+    checksum: false
+    signature: false
+    custom_artifact_name: true

@@ -1,4 +1,4 @@
-name: Go build
+name: Release
 on:
   push:
     tags:
@@ -54,6 +54,11 @@ jobs:
         run: |
           gotestsum --format pkgname -- -covermode=atomic ./...
 
+      - name: Prepare GPG setup
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/.gnupg
+          echo "${{ secrets.GPG_SIGNING_KEY }}" | base64 -d > $GITHUB_WORKSPACE/.gnupg/gpg.key
+
       - name: Release
         uses: goreleaser/goreleaser-action@v5
         with:
@@ -64,6 +69,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TAP_PAT: ${{ secrets.GH_TAP_PAT }}
           GH_WINGET_PAT: ${{ secrets.GH_WINGET_PAT }}
+          NFPM_GIT_AGE_PASSPHRASE: ${{ secrets.NFPM_GIT_AGE_PASSPHRASE }}
+          UPLOAD_RPM_SECRET: ${{ secrets.UPLOAD_RPM_SECRET }}
+          UPLOAD_DEB_SECRET: ${{ secrets.UPLOAD_DEB_SECRET }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -71,7 +79,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'docs/'
+          path: 'out/html/'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

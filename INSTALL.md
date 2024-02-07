@@ -36,7 +36,7 @@ brew install git-age
 #### DNF
 
 ```bash
-dnf config-manager --add-repo https://code.icb4dc0.de/api/packages/prskr/rpm.repo
+dnf config-manager --nogpgcheck --add-repo https://code.icb4dc0.de/api/packages/prskr/rpm.repo
 
 dnf install git-age
 ```
@@ -56,6 +56,8 @@ sudo curl https://code.icb4dc0.de/api/packages/prskr/debian/repository.key -o /e
 
 # distribution is currently only bookworm - but should work for other debian based distributions as well
 echo "deb https://code.icb4dc0.de/api/packages/prskr/debian bookworm main" | sudo tee -a /etc/apt/sources.list.d/forgejo.list
+sudo curl https://code.icb4dc0.de/api/packages/prskr/debian/repository.key -o /etc/apt/trusted.gpg.d/forgejo-prskr.asc
+
 sudo apt update
 
 sudo apt install git-age
