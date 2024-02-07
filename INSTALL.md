@@ -36,7 +36,11 @@ brew install git-age
 #### DNF
 
 ```bash
-dnf config-manager --nogpgcheck --add-repo https://code.icb4dc0.de/api/packages/prskr/rpm.repo
+# Import the GPG key
+curl https://api.github.com/users/prskr/gpg_keys | jq -r '.[] | select (.key_id=="1A80DDB584AF7DA7") | .raw_key' > /tmp/prskr.gpg
+sudo rpm --import /tmp/prskr.gpg
+
+dnf config-manager --add-repo https://code.icb4dc0.de/api/packages/prskr/rpm.repo
 
 dnf install git-age
 ```
