@@ -23,14 +23,16 @@ type VersionCliHandler struct {
 	Client *http.Client
 }
 
-func (VersionCliHandler) Version(ctx *cli.Context) error {
+func (h VersionCliHandler) Version(ctx *cli.Context) error {
 	if ctx.Bool("short") {
 		fmt.Println(version)
 		return nil
 	}
 
 	if version == defaultVersion {
-		version = "development"
+		fmt.Println("Version is not set. This is a development build.")
+
+		return nil
 	}
 
 	fmt.Printf(`%s
@@ -38,12 +40,7 @@ Commit: %s
 Built at %s
 `, version, commit, date)
 
-	return nil
-}
-
-func (h VersionCliHandler) CheckUpdate(*cli.Context) error {
-	if version == defaultVersion {
-		fmt.Println("You are using a development version")
+	if ctx.Bool("skip-version-check") {
 		return nil
 	}
 
@@ -74,11 +71,11 @@ func (h VersionCliHandler) CheckUpdate(*cli.Context) error {
 	}
 
 	if result := semver.Compare(release.TagName, version); result > 0 {
-		fmt.Printf("A new version is available: %s\n", release.TagName)
+		fmt.Printf("A new version is available: %s 👉\n", release.TagName)
 	} else if result == 0 {
-		fmt.Println("You are using the latest version")
+		fmt.Println("You are using the latest version 🎉")
 	} else {
-		fmt.Println("You're using a version that is somewhat newer than the latest release!")
+		fmt.Println("You're using a version that is somewhat newer than the latest release! 👻")
 	}
 
 	return nil
@@ -92,11 +89,8 @@ func (h VersionCliHandler) Command() *cli.Command {
 			&cli.BoolFlag{
 				Name: "short",
 			},
-		},
-		Subcommands: []*cli.Command{
-			{
-				Name:   "check-update",
-				Action: h.CheckUpdate,
+			&cli.BoolFlag{
+				Name: "skip-version-check",
 			},
 		},
 	}

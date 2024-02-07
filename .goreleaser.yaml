@@ -74,10 +74,10 @@ nfpms:
 
     rpm:
       signature:
-        key_file: "{{ .Env.GITHUB_WORKSPACE }}/.gnupg/gpg.key"
+        key_file: '{{ envOrDefault "GITHUB_WORKSPACE" "." }}/.gnupg/gpg.key'
     deb:
       signature:
-        key_file: "{{ .Env.GITHUB_WORKSPACE }}/.gnupg/gpg.key"
+        key_file: '{{ envOrDefault "GITHUB_WORKSPACE" "." }}/.gnupg/gpg.key'
 
 brews:
   - name: git-age
