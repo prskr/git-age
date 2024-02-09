@@ -1,7 +1,6 @@
 package infrastructure
 
 import (
-	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -79,7 +78,7 @@ func (r readWriteOsFile) Name() string {
 	var err error
 	name, err = filepath.Rel(r.fsRoot, name)
 	if err != nil {
-		panic(fmt.Sprintf("failed to get relative path: %s", err.Error()))
+		panic("failed to get relative path: " + err.Error())
 	}
 
 	return filepath.ToSlash(name)

@@ -62,7 +62,7 @@ func (i Identities) Generate(comment string) (pubKey string, err error) {
 	}()
 
 	if comment == "" {
-		comment = fmt.Sprintf("# generated on %s", time.Now().Format(time.RFC3339))
+		comment = "# generated on " + time.Now().Format(time.RFC3339)
 	}
 
 	scanner := bufio.NewScanner(strings.NewReader(comment))

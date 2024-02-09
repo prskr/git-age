@@ -3,15 +3,17 @@ package cli
 import (
 	"bufio"
 	"bytes"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 	"os"
 
+	"github.com/go-git/go-git/v5/plumbing"
+
 	"github.com/prskr/git-age/internal/fsx"
 
-	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
@@ -54,10 +56,16 @@ func (h *CleanCliHandler) CleanFile(ctx *cli.Context) error {
 
 	logger.Info("Hashing file at HEAD")
 	obj, headHash, err := h.hashFileAtHead(fileToCleanPath, true)
-	if errors.Is(err, plumbing.ErrObjectNotFound) {
-		logger.Info("File not found at HEAD, file is apparently new")
-		return h.copyEncryptedFileToStdout(fileToClean)
+	if err != nil {
+		if errors.Is(err, plumbing.ErrObjectNotFound) {
+			logger.Info("File not found at HEAD, file is apparently new")
+			return h.copyEncryptedFileToStdout(fileToClean)
+		}
+
+		return fmt.Errorf("failed to hash file at HEAD: %w", err)
 	}
+
+	logger = logger.With(slog.String("orig_hash", hex.EncodeToString(headHash)))
 
 	logger.Info("Hashing file at current state to determine whether it has changed")
 	currentHash, err := h.hashFileAt(fileToClean)
@@ -65,11 +73,14 @@ func (h *CleanCliHandler) CleanFile(ctx *cli.Context) error {
 		return err
 	}
 
+	logger = logger.With(slog.String("current_hash", hex.EncodeToString(currentHash)))
+
 	if bytes.Equal(headHash, currentHash) {
 		logger.Info("File has not changed, returning original")
 		return h.copyGitObjectToStdout(obj)
 	}
 
+	logger.Info("File has changed since last commit")
 	return h.copyEncryptedFileToStdout(fileToClean)
 }
 
@@ -166,7 +177,7 @@ func (h *CleanCliHandler) hashFileAtHead(
 				slog.String("path", path),
 				slog.String("err", err.Error()),
 			)
-		} else if r, err := h.OpenSealer.OpenFile(fileObjReader); err != nil {
+		} else if r, err := h.OpenSealer.OpenFile(bufReader); err != nil {
 			return nil, nil, err
 		} else {
 			reader = r

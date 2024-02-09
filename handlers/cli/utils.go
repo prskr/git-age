@@ -24,7 +24,9 @@ func copyToTemp(reader io.Reader) (f *os.File, err error) {
 	}
 
 	defer func() {
-		_, err = f.Seek(0, io.SeekStart)
+		if err == nil {
+			_, err = f.Seek(0, io.SeekStart)
+		}
 	}()
 
 	defer func() {
