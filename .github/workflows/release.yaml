@@ -48,7 +48,7 @@ jobs:
           go generate .
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v4
 
       - name: Test
         run: |
