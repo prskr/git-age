@@ -92,6 +92,11 @@ By default `git-age` will store the private keys in `$XDG_CONFIG_HOME/git-age/ke
 | macOS    | `$HOME/Library/Application Support/git-age/keys.txt`                      |
 | Windows  | `%LOCALAPPDATA%\git-age\keys.txt`                                         |
 
+## Alternatives
+
+- [git-crypt](/AGWA/git-crypt) - based on GPG
+- [git-private](/erkkah/git-private) - not a Git clean/smudge filter but encrypts/decrypts on demand
+
 ## Development
 
 ### Required Tools
