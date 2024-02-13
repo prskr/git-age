@@ -172,11 +172,7 @@ func (h *CleanCliHandler) hashFileAtHead(
 		if err != nil {
 			return nil, nil, err
 		} else if !isEncrypted {
-			slog.Warn(
-				"Expected encrypted file but age header is missing",
-				slog.String("path", path),
-				slog.String("err", err.Error()),
-			)
+			slog.Warn("Expected encrypted file but age header is missing", slog.String("path", path))
 		} else if r, err := h.OpenSealer.OpenFile(bufReader); err != nil {
 			return nil, nil, err
 		} else {
