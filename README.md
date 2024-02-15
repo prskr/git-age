@@ -1,7 +1,7 @@
 # git-age
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/prskr/git-age)](https://goreportcard.com/report/github.com/prskr/git-age)
-[![Go build](https://github.com/prskr/git-age/actions/workflows/go.yaml/badge.svg)](https://github.com/prskr/git-age/actions/workflows/go.yaml)
+[![Go build](https://github.com/prskr/git-age/actions/workflows/validate.yaml/badge.svg)](https://github.com/prskr/git-age/actions/workflows/validate.yaml)
 
 ## Disclaimer
 
@@ -17,6 +17,14 @@ A big shoutout to Filippo Valsorda for creating `age` and making it available to
 See [INSTALL.md](INSTALL.md).
 
 ## Getting started
+
+### Install hooks in global git config
+
+```bash
+git age install
+```
+
+This will add the `git-age` clean and smudge filters to your global git config.
 
 ### Init repository to share secret files
 
