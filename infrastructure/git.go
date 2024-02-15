@@ -92,6 +92,7 @@ func (g GitRepository) Commit(message string) error {
 	return err
 }
 
+//nolint:cyclop // can't split this function
 func (g GitRepository) WalkAgeFiles(onMatch fs.WalkDirFunc) error {
 	matchAttrs, err := gitattributes.ReadPatterns(g.Worktree.Filesystem, nil)
 	if err != nil {
@@ -113,11 +114,18 @@ func (g GitRepository) WalkAgeFiles(onMatch fs.WalkDirFunc) error {
 			return nil
 		}
 
-		_, matched := matcher.Match(strings.Split(filepath.ToSlash(path), "/"), wantedAttributes)
-		if matched {
-			if err := onMatch(path, d, err); err != nil {
-				return err
-			}
+		matches, matched := matcher.Match(strings.Split(filepath.ToSlash(path), "/"), wantedAttributes)
+		if !matched {
+			return nil
+		}
+
+		filterMatch, ok := matches["filter"]
+		if !ok || filterMatch.IsUnset() || filterMatch.IsUnspecified() || filterMatch.Value() != "age" {
+			return nil
+		}
+
+		if err := onMatch(path, d, err); err != nil {
+			return err
 		}
 
 		return nil

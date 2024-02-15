@@ -18,22 +18,21 @@ import (
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
 	"github.com/prskr/git-age/infrastructure"
-	"github.com/urfave/cli/v2"
 )
 
 type CleanCliHandler struct {
-	Repository ports.GitRepository
-	OpenSealer ports.FileOpenSealer
+	KeysFlag        `embed:""`
+	Repository      ports.GitRepository  `kong:"-"`
+	OpenSealer      ports.FileOpenSealer `kong:"-"`
+	FileToCleanPath string               `arg:"" name:"file" help:"Path to the file to clean"`
 }
 
-func (h *CleanCliHandler) CleanFile(ctx *cli.Context) error {
+func (h *CleanCliHandler) Run() error {
 	if err := requireStdin(); err != nil {
 		return err
 	}
 
-	fileToCleanPath := ctx.Args().First()
-
-	logger := slog.Default().With("path", fileToCleanPath)
+	logger := slog.Default().With("path", h.FileToCleanPath)
 
 	if !h.OpenSealer.CanSeal() {
 		logger.Warn("No recipients specified - file will be staged as plain text")
@@ -55,7 +54,7 @@ func (h *CleanCliHandler) CleanFile(ctx *cli.Context) error {
 	}()
 
 	logger.Info("Hashing file at HEAD")
-	obj, headHash, err := h.hashFileAtHead(fileToCleanPath, true)
+	obj, headHash, err := h.hashFileAtHead(h.FileToCleanPath, true)
 	if err != nil {
 		if errors.Is(err, plumbing.ErrObjectNotFound) {
 			logger.Info("File not found at HEAD, file is apparently new")
@@ -84,37 +83,25 @@ func (h *CleanCliHandler) CleanFile(ctx *cli.Context) error {
 	return h.copyEncryptedFileToStdout(fileToClean)
 }
 
-func (h *CleanCliHandler) Command() *cli.Command {
-	return &cli.Command{
-		Name:   "clean",
-		Usage:  "clean should only be invoked by Git",
-		Action: h.CleanFile,
-		Args:   true,
-		Hidden: true,
-		Before: func(context *cli.Context) error {
-			wd, err := os.Getwd()
-			if err != nil {
-				return err
-			}
-
-			var repoFS ports.ReadWriteFS
-
-			h.Repository, repoFS, err = infrastructure.NewGitRepositoryFromPath(wd)
-			if err != nil {
-				return err
-			}
-
-			h.OpenSealer, err = services.NewAgeSealer(
-				services.WithRecipients(infrastructure.NewRecipientsFile(repoFS)),
-				services.WithIdentities(infrastructure.NewIdentities(context.String("keys"))),
-			)
-
-			return err
-		},
-		Flags: []cli.Flag{
-			&keysFlag,
-		},
+func (h *CleanCliHandler) AfterApply() error {
+	wd, err := os.Getwd()
+	if err != nil {
+		return err
 	}
+
+	var repoFS ports.ReadWriteFS
+
+	h.Repository, repoFS, err = infrastructure.NewGitRepositoryFromPath(wd)
+	if err != nil {
+		return err
+	}
+
+	h.OpenSealer, err = services.NewAgeSealer(
+		services.WithRecipients(infrastructure.NewRecipientsFile(repoFS)),
+		services.WithIdentities(infrastructure.NewIdentities(h.Keys)),
+	)
+
+	return err
 }
 
 func (h *CleanCliHandler) copyEncryptedFileToStdout(reader io.Reader) (err error) {

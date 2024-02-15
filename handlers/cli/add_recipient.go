@@ -5,88 +5,82 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/alecthomas/kong"
+
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
 	"github.com/prskr/git-age/infrastructure"
-	"github.com/urfave/cli/v2"
 )
 
 type AddRecipientCliHandler struct {
-	RepoFS     ports.ReadWriteFS
-	Recipients ports.Recipients
-	Encryption ports.FileOpenSealer
-	Repository ports.GitRepository
+	KeysFlag    `embed:""`
+	CommentFlag `embed:""`
+	Recipient   string `arg:"" help:"Recipient to add"`
+	Message     string `help:"Message to be used for the commit" default:"chore: add recipient" aliases:"m"`
 }
 
-func (h *AddRecipientCliHandler) AddRecipient(ctx *cli.Context) (err error) {
-	if ctx.NArg() != 1 {
-		return cli.Exit("Expected exactly one argument", 1)
-	}
-
-	if isDirty, err := h.Repository.IsStagingDirty(); err != nil {
+func (h *AddRecipientCliHandler) Run(
+	repoFS ports.ReadWriteFS,
+	recipients ports.Recipients,
+	openSealer ports.FileOpenSealer,
+	repo ports.GitRepository,
+) (err error) {
+	if isDirty, err := repo.IsStagingDirty(); err != nil {
 		return fmt.Errorf("failed to check if repository is dirty: %w", err)
 	} else if isDirty {
-		return cli.Exit("Repository is dirty", 1)
+		slog.Warn("Repository is dirty")
+		os.Exit(1)
 	}
 
-	slog.Info("Adding recipient", slog.String("recipient", ctx.Args().First()))
-	recipients, err := h.Recipients.Append(ctx.Args().First(), ctx.String("comment"))
+	slog.Info("Adding recipient", slog.String("recipient", h.Recipient))
+	appendedRecipients, err := recipients.Append(h.Recipient, h.Comment)
 	if err != nil {
 		return fmt.Errorf("failed to append public key to recipients file: %w", err)
 	}
-	h.Encryption.AddRecipients(recipients...)
+	openSealer.AddRecipients(appendedRecipients...)
 
 	slog.Info("Staging recipients file")
-	if err := h.Repository.StageFile(ports.RecipientsFileName); err != nil {
+	if err := repo.StageFile(ports.RecipientsFileName); err != nil {
 		return fmt.Errorf("failed to add recipients file to git index: %w", err)
 	}
 
-	if err := h.Repository.WalkAgeFiles(services.ReEncryptWalkFunc(h.Repository, h.RepoFS, h.Encryption)); err != nil {
+	if err := repo.WalkAgeFiles(services.ReEncryptWalkFunc(repo, repoFS, openSealer)); err != nil {
 		return err
 	}
 
 	slog.Info("Committing changes")
-	if err := h.Repository.Commit(ctx.String("message")); err != nil {
+	if err := repo.Commit(h.Message); err != nil {
 		return fmt.Errorf("failed to commit changes: %w", err)
 	}
 
 	return nil
 }
 
-func (h *AddRecipientCliHandler) Command() *cli.Command {
-	return &cli.Command{
-		Name:   "add-recipient",
-		Action: h.AddRecipient,
-		Args:   true,
-		Flags: []cli.Flag{
-			&commentFlag,
-			&cli.StringFlag{
-				Name:    "message",
-				Aliases: []string{"m"},
-				Usage:   "Message to be used for the commit",
-				Value:   "chore: add recipient",
-			},
-			&keysFlag,
-		},
-		Before: func(context *cli.Context) (err error) {
-			wd, err := os.Getwd()
-			if err != nil {
-				return err
-			}
-
-			h.Repository, h.RepoFS, err = infrastructure.NewGitRepositoryFromPath(wd)
-			if err != nil {
-				return err
-			}
-
-			h.Recipients = infrastructure.NewRecipientsFile(h.RepoFS)
-
-			h.Encryption, err = services.NewAgeSealer(
-				services.WithIdentities(infrastructure.NewIdentities(context.String("keys"))),
-				services.WithRecipients(h.Recipients),
-			)
-
-			return err
-		},
+func (h *AddRecipientCliHandler) AfterApply(kctx *kong.Context) error {
+	wd, err := os.Getwd()
+	if err != nil {
+		return err
 	}
+
+	repository, repoFS, err := infrastructure.NewGitRepositoryFromPath(wd)
+	if err != nil {
+		return err
+	}
+
+	recipients := infrastructure.NewRecipientsFile(repoFS)
+
+	openSealer, err := services.NewAgeSealer(
+		services.WithIdentities(infrastructure.NewIdentities(h.Keys)),
+		services.WithRecipients(recipients),
+	)
+	if err != nil {
+		return err
+	}
+
+	kctx.BindTo(repoFS, (*ports.ReadWriteFS)(nil))
+	kctx.BindTo(repository, (*ports.GitRepository)(nil))
+	kctx.BindTo(recipients, (*ports.Recipients)(nil))
+	kctx.BindTo(openSealer, (*ports.FileOpenSealer)(nil))
+
+	return nil
 }

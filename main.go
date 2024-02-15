@@ -8,9 +8,9 @@ import (
 )
 
 func main() {
-	app := cmd.NewApp()
+	app := new(cmd.App)
 
-	if err := app.Run(); err != nil {
+	if err := app.Execute(); err != nil {
 		slog.Error("Error occurred while running app", slog.String("err", err.Error()))
 		os.Exit(1)
 	}

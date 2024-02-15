@@ -2,7 +2,7 @@ version: 1
 
 before:
   hooks:
-    - go mod tidy -go=1.21
+    - go mod tidy -go=1.22
     - rm -rf out/man
     - mkdir -p out/man
     - mkdir -p out/html

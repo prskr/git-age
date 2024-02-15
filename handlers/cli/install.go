@@ -10,12 +10,11 @@ import (
 
 	"github.com/go-git/go-git/v5/config"
 	"github.com/prskr/git-age/core/ports"
-	"github.com/urfave/cli/v2"
 )
 
 type InstallCliHandler struct{}
 
-func (h *InstallCliHandler) Install(*cli.Context) (err error) {
+func (h *InstallCliHandler) Run() (err error) {
 	cfgPath, err := ports.GlobalGitConfigPath()
 	if err != nil {
 		return fmt.Errorf("failed to locate global git config: %w", err)
@@ -64,12 +63,4 @@ func (h *InstallCliHandler) Install(*cli.Context) (err error) {
 	}
 
 	return nil
-}
-
-func (h *InstallCliHandler) Command() *cli.Command {
-	return &cli.Command{
-		Name:   "install",
-		Usage:  ``,
-		Action: h.Install,
-	}
 }

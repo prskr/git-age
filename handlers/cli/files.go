@@ -5,27 +5,23 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log/slog"
 	"os"
 	"path/filepath"
+
+	"github.com/alecthomas/kong"
 
 	"github.com/go-git/go-git/v5"
 
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
 	"github.com/prskr/git-age/infrastructure"
-	"github.com/urfave/cli/v2"
 )
 
-type FilesCliHandler struct {
-	// relative working directory within the repository
-	WorkingDir string
-	RepoFS     ports.ReadWriteFS
-	Encryption ports.FileOpenSealer
-	Repository ports.GitRepository
-}
+type ListFilesCliHandler struct{}
 
-func (h *FilesCliHandler) ListFiles(*cli.Context) error {
-	return h.Repository.WalkAgeFiles(func(path string, d fs.DirEntry, err error) error {
+func (ListFilesCliHandler) Run(repo ports.GitRepository) error {
+	return repo.WalkAgeFiles(func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -40,12 +36,15 @@ func (h *FilesCliHandler) ListFiles(*cli.Context) error {
 	})
 }
 
-func (h *FilesCliHandler) TrackFiles(ctx *cli.Context) (err error) {
-	if ctx.NArg() != 1 {
-		return cli.Exit("Expected exactly one argument", 1)
-	}
+type TrackFilesCliHandler struct {
+	Pattern string `arg:"" help:"Pattern to track"`
 
-	attributesFile, err := h.RepoFS.OpenRW(filepath.Join(h.WorkingDir, ".gitattributes"))
+	// relative working directory within the repository
+	WorkingDir string `kong:"-"`
+}
+
+func (h *TrackFilesCliHandler) Run(repoFS ports.ReadWriteFS) error {
+	attributesFile, err := repoFS.OpenRW(filepath.Join(h.WorkingDir, ".gitattributes"))
 	if err != nil {
 		return fmt.Errorf("failed to open .gitattributes file: %w", err)
 	}
@@ -58,7 +57,7 @@ func (h *FilesCliHandler) TrackFiles(ctx *cli.Context) (err error) {
 		err = errors.Join(err, attributesFile.Close())
 	}()
 
-	attributesLine := ctx.Args().First() + " filter=age diff=age merge=age -text\n"
+	attributesLine := h.Pattern + " filter=age diff=age merge=age -text\n"
 	if _, err := attributesFile.WriteString(attributesLine); err != nil {
 		return fmt.Errorf("failed to write to .gitattributes file: %w", err)
 	}
@@ -66,76 +65,84 @@ func (h *FilesCliHandler) TrackFiles(ctx *cli.Context) (err error) {
 	return nil
 }
 
-func (h *FilesCliHandler) ReEncryptFiles(*cli.Context) error {
-	if clean, err := h.Repository.IsStagingDirty(); err != nil {
-		return fmt.Errorf("failed to check if repository is dirty: %w", err)
-	} else if !clean {
-		return cli.Exit("Repository is dirty", 1)
+func (h *TrackFilesCliHandler) AfterApply() (err error) {
+	wd, err := os.Getwd()
+	if err != nil {
+		return err
 	}
 
-	if err := h.Repository.WalkAgeFiles(services.ReEncryptWalkFunc(h.Repository, h.RepoFS, h.Encryption)); err != nil {
+	repoRootPath, err := infrastructure.FindRepoRootFrom(wd)
+	if err != nil {
+		return err
+	}
+
+	h.WorkingDir, err = filepath.Rel(repoRootPath, wd)
+
+	return err
+}
+
+type ReEncryptFilesCliHandler struct{}
+
+func (ReEncryptFilesCliHandler) Run(
+	repo ports.GitRepository,
+	repoFS ports.ReadWriteFS,
+	sealer ports.FileOpenSealer,
+) error {
+	if dirty, err := repo.IsStagingDirty(); err != nil {
+		return fmt.Errorf("failed to check if repository is dirty: %w", err)
+	} else if dirty {
+		slog.Warn("Repository is dirty")
+		os.Exit(1)
+	}
+
+	if err := repo.WalkAgeFiles(services.ReEncryptWalkFunc(repo, repoFS, sealer)); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (h *FilesCliHandler) Command() *cli.Command {
-	return &cli.Command{
-		Name: "files",
-		Flags: []cli.Flag{
-			&keysFlag,
-		},
-		Subcommands: []*cli.Command{
-			{
-				Name:    "list",
-				Aliases: []string{"ls"},
-				Action:  h.ListFiles,
-			},
-			{
-				Name:   "track",
-				Action: h.TrackFiles,
-				Args:   true,
-			},
-			{
-				Name:   "re-encrypt",
-				Action: h.ReEncryptFiles,
-			},
-		},
-		Before: func(context *cli.Context) error {
-			wd, err := os.Getwd()
-			if err != nil {
-				return err
-			}
+type FilesCliHandler struct {
+	KeysFlag  `embed:""`
+	List      ListFilesCliHandler      `cmd:"" help:"List files"`
+	Track     TrackFilesCliHandler     `cmd:"" help:"Track files"`
+	ReEncrypt ReEncryptFilesCliHandler `cmd:"" help:"Re-encrypt files tracked by git-age"`
+}
 
-			repoRootPath, err := infrastructure.FindRepoRootFrom(wd)
-			if err != nil {
-				return err
-			}
-
-			h.WorkingDir, err = filepath.Rel(repoRootPath, wd)
-			if err != nil {
-				return err
-			}
-
-			repo, err := git.PlainOpen(repoRootPath)
-			if err != nil {
-				return fmt.Errorf("failed to open git repository: %w", err)
-			}
-
-			h.RepoFS = infrastructure.NewReadWriteDirFS(repoRootPath)
-
-			h.Repository, err = infrastructure.NewGitRepository(h.RepoFS, repo)
-			if err != nil {
-				return err
-			}
-
-			h.Encryption, err = services.NewAgeSealer(
-				services.WithIdentities(infrastructure.NewIdentities(context.String("keys"))),
-				services.WithRecipients(infrastructure.NewRecipientsFile(h.RepoFS)),
-			)
-
-			return err
-		},
+func (h *FilesCliHandler) AfterApply(kctx *kong.Context) error {
+	wd, err := os.Getwd()
+	if err != nil {
+		return err
 	}
+
+	repoRootPath, err := infrastructure.FindRepoRootFrom(wd)
+	if err != nil {
+		return err
+	}
+
+	repo, err := git.PlainOpen(repoRootPath)
+	if err != nil {
+		return fmt.Errorf("failed to open git repository: %w", err)
+	}
+
+	repoFS := infrastructure.NewReadWriteDirFS(repoRootPath)
+
+	gr, err := infrastructure.NewGitRepository(repoFS, repo)
+	if err != nil {
+		return err
+	}
+
+	sealer, err := services.NewAgeSealer(
+		services.WithIdentities(infrastructure.NewIdentities(h.Keys)),
+		services.WithRecipients(infrastructure.NewRecipientsFile(repoFS)),
+	)
+	if err != nil {
+		return err
+	}
+
+	kctx.BindTo(repoFS, (*ports.ReadWriteFS)(nil))
+	kctx.BindTo(gr, (*ports.GitRepository)(nil))
+	kctx.BindTo(sealer, (*ports.FileOpenSealer)(nil))
+
+	return nil
 }

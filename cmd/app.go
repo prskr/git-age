@@ -5,72 +5,47 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"time"
+
+	"github.com/adrg/xdg"
+	"github.com/alecthomas/kong"
 
 	"github.com/lmittmann/tint"
 	clih "github.com/prskr/git-age/handlers/cli"
-	"github.com/urfave/cli/v2"
 )
 
-func NewApp() *App {
-	smudgeHandler := clih.SmudgeCliHandler{}
-	cleanHandler := clih.CleanCliHandler{}
-	filesHandler := clih.FilesCliHandler{}
-	initHandler := clih.InitCliHandler{}
-	genKeyHandler := clih.GenKeyCliHandler{}
-	addRecipientHandler := clih.AddRecipientCliHandler{}
-	installHandler := clih.InstallCliHandler{}
-	versionHandler := clih.VersionCliHandler{}
-
-	a := &App{
-		root: &cli.App{
-			Name: "git-age",
-			Usage: `
-git-age is a Git filter to encrypt/decrypt files on push/pull operations.
-`,
-			Commands: []*cli.Command{
-				smudgeHandler.Command(),
-				cleanHandler.Command(),
-				initHandler.Command(),
-				genKeyHandler.Command(),
-				addRecipientHandler.Command(),
-				installHandler.Command(),
-				filesHandler.Command(),
-				versionHandler.Command(),
-			},
-		},
-	}
-
-	a.root.Before = a.setup
-
-	return a
-}
-
 type App struct {
-	root *cli.App
+	Logging struct {
+		Level slog.Level `env:"GIT_AGE_LOG_LEVEL" help:"Log level" default:"warn"`
+	} `embed:""`
+
+	Clean        clih.CleanCliHandler        `cmd:"" hidden:"" help:"clean should only be invoked by Git"`
+	Smudge       clih.SmudgeCliHandler       `cmd:"" hidden:"" help:"smudge should only be invoked by Git"`
+	Files        clih.FilesCliHandler        `cmd:"" help:"Interact with repo files"`
+	AddRecipient clih.AddRecipientCliHandler `cmd:"" help:"Add a recipient to the list of recipients"`
+	GenKey       clih.GenKeyCliHandler       `cmd:"" help:"Generate a new key pair"`
+	Init         clih.InitCliHandler         `cmd:"" help:"Initialize a repository"`
+	Install      clih.InstallCliHandler      `cmd:"" help:"Install git-age hooks in global git config"`
+	Version      clih.VersionCliHandler      `cmd:"" help:"Print version information"`
 }
 
-func (a *App) Run() error {
+func (a *App) Execute() error {
 	ctx, _ := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
+	cliCtx := kong.Parse(a,
+		kong.Name("git-age"),
+		kong.BindTo(ctx, (*context.Context)(nil)),
+		kong.Vars{
+			"XDG_CONFIG_HOME":     xdg.ConfigHome,
+			"file_path_separator": string(filepath.Separator),
+		})
 
-	return a.root.RunContext(ctx, os.Args)
+	return cliCtx.Run()
 }
 
-func (a *App) setup(*cli.Context) error {
-	return a.configureLogging()
-}
-
-func (*App) configureLogging() error {
-	level := slog.LevelWarn
-
-	if rawLevel, set := os.LookupEnv("GIT_AGE_LOG_LEVEL"); set {
-		if err := level.UnmarshalText([]byte(rawLevel)); err != nil {
-			return err
-		}
-	}
-
+func (a *App) AfterApply() error {
 	opts := &tint.Options{
-		Level:      level,
+		Level:      a.Logging.Level,
 		TimeFormat: time.RFC3339,
 	}
 	slog.SetDefault(slog.New(tint.NewHandler(os.Stderr, opts)))
