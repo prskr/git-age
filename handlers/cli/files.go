@@ -104,7 +104,7 @@ func (ReEncryptFilesCliHandler) Run(
 
 type FilesCliHandler struct {
 	KeysFlag  `embed:""`
-	List      ListFilesCliHandler      `cmd:"" help:"List files"`
+	List      ListFilesCliHandler      `cmd:"" help:"List files" aliases:"ls"`
 	Track     TrackFilesCliHandler     `cmd:"" help:"Track files"`
 	ReEncrypt ReEncryptFilesCliHandler `cmd:"" help:"Re-encrypt files tracked by git-age"`
 }

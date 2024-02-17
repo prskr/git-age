@@ -56,8 +56,8 @@ func (h *CleanCliHandler) Run() error {
 	logger.Info("Hashing file at HEAD")
 	obj, headHash, err := h.hashFileAtHead(h.FileToCleanPath, true)
 	if err != nil {
-		if errors.Is(err, plumbing.ErrObjectNotFound) {
-			logger.Info("File not found at HEAD, file is apparently new")
+		if errors.Is(err, plumbing.ErrObjectNotFound) || errors.Is(err, plumbing.ErrReferenceNotFound) {
+			logger.Info("Could not compare file to HEAD, handling as new")
 			return h.copyEncryptedFileToStdout(fileToClean)
 		}
 
@@ -130,7 +130,8 @@ func (h *CleanCliHandler) copyGitObjectToStdout(obj *object.File) error {
 	}()
 
 	_, err = io.Copy(os.Stdout, r)
-	return err
+
+	return errors.Join(err, os.Stdout.Sync())
 }
 
 func (h *CleanCliHandler) hashFileAtHead(

@@ -21,8 +21,8 @@ func (nopWriteCloser) Close() error {
 	return nil
 }
 
-func SealingMiddleware(sealer ports.FileSealer, pattern string) SyncerMiddleware {
-	return func(filePath string, w io.Writer) (io.WriteCloser, error) {
+func SealingMiddleware(sealer ports.FileSealer, pattern string) MiddlewareProvider {
+	return func(filePath string, w io.Writer) (io.Writer, error) {
 		match, err := filepath.Match(pattern, filePath)
 		if err != nil {
 			return nil, err
@@ -32,13 +32,31 @@ func SealingMiddleware(sealer ports.FileSealer, pattern string) SyncerMiddleware
 			return sealer.SealFile(w)
 		}
 
-		return NopeWriteCloser(w), nil
+		return w, nil
 	}
 }
 
-type SyncerMiddleware func(filePath string, w io.Writer) (io.WriteCloser, error)
+type MiddlewareProvider func(filePath string, w io.Writer) (io.Writer, error)
 
-func NewSyncer(source fs.FS, destination ports.ReadWriteFS, middlewares ...SyncerMiddleware) Syncer {
+var _ io.WriteCloser = (*syncerMiddleware)(nil)
+
+type syncerMiddleware struct {
+	writer io.Writer
+}
+
+func (s syncerMiddleware) Write(p []byte) (n int, err error) {
+	return s.writer.Write(p)
+}
+
+func (s syncerMiddleware) Close() error {
+	if closer, ok := s.writer.(io.Closer); ok {
+		return closer.Close()
+	}
+
+	return nil
+}
+
+func NewSyncer(source fs.FS, destination ports.ReadWriteFS, middlewares ...MiddlewareProvider) Syncer {
 	return Syncer{
 		Source:      source,
 		Destination: destination,
@@ -49,7 +67,7 @@ func NewSyncer(source fs.FS, destination ports.ReadWriteFS, middlewares ...Synce
 type Syncer struct {
 	Source      fs.FS
 	Destination ports.ReadWriteFS
-	middlewares []SyncerMiddleware
+	middlewares []MiddlewareProvider
 }
 
 func (s Syncer) Sync() error {
@@ -71,26 +89,24 @@ func (s Syncer) Sync() error {
 			err = errors.Join(err, f.Close())
 		}()
 
-		dst, err := s.Destination.OpenRW(path)
+		dst, err := s.Destination.OpenRW(path, ports.WithTruncate)
 		if err != nil {
 			return err
 		}
 
-		closers := []io.Closer{dst}
-		defer func() {
-			for i := len(closers) - 1; i >= 0; i-- {
-				err = errors.Join(err, closers[i].Close())
-			}
-		}()
-
 		var w io.WriteCloser = dst
 
-		for _, middleware := range s.middlewares {
-			w, err = middleware(path, w)
+		defer func() {
+			err = errors.Join(err, w.Close())
+		}()
+
+		for _, provider := range s.middlewares {
+			m, err := provider(path, w)
 			if err != nil {
 				return err
 			}
-			closers = append(closers, w)
+
+			w = syncerMiddleware{writer: m}
 		}
 
 		_, err = io.Copy(w, f)

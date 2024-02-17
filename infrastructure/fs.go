@@ -48,8 +48,14 @@ func (f ReadWriteDirFS) TempFile(dir, pattern string) (ports.ReadWriteFile, erro
 	return readWriteOsFile{File: tmpFile, fsRoot: f.rootPath}, nil
 }
 
-func (f ReadWriteDirFS) OpenRW(filePath string) (ports.ReadWriteFile, error) {
-	file, err := os.OpenFile(filepath.Join(f.rootPath, filepath.FromSlash(filePath)), os.O_CREATE|os.O_RDWR, 0o644)
+func (f ReadWriteDirFS) OpenRW(filePath string, opts ...ports.OpenRWOptions) (ports.ReadWriteFile, error) {
+	openFlags := os.O_CREATE | os.O_RDWR
+
+	for _, opt := range opts {
+		openFlags = opt(openFlags)
+	}
+
+	file, err := os.OpenFile(filepath.Join(f.rootPath, filepath.FromSlash(filePath)), openFlags, 0o644)
 	if err != nil {
 		return nil, err
 	}

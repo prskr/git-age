@@ -16,7 +16,7 @@ type AddRecipientCliHandler struct {
 	KeysFlag    `embed:""`
 	CommentFlag `embed:""`
 	Recipient   string `arg:"" help:"Recipient to add"`
-	Message     string `help:"Message to be used for the commit" default:"chore: add recipient" aliases:"m"`
+	Message     string `help:"Message to be used for the commit" default:"chore: add recipient" short:"m"`
 }
 
 func (h *AddRecipientCliHandler) Run(

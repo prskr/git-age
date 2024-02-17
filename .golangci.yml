@@ -75,11 +75,16 @@ linters:
 
 issues:
   exclude-rules:
+    - path: handlers/cli/
+      linters:
+        - paralleltest
     - path: _test\.go
       linters:
         - funlen
         - cyclop
         - goerr113
+        - gochecknoinits
+        - gochecknoglobals
 
 run:
   skip-files: [ ]

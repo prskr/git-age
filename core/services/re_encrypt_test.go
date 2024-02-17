@@ -136,7 +136,7 @@ func prepareRepo(tb testing.TB) (s *testSetup) {
 	srcFS := os.DirFS(filepath.Join(wd, "testdata"))
 	s.repoFS = infrastructure.NewReadWriteDirFS(s.root)
 
-	sealingOpts := []fsx.SyncerMiddleware{
+	sealingOpts := []fsx.MiddlewareProvider{
 		fsx.SealingMiddleware(sealer, "*.yaml"),
 		fsx.SealingMiddleware(sealer, "*/*.json"),
 	}
