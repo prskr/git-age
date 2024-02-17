@@ -1,11 +1,11 @@
 package cli_test
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
 	"filippo.io/age"
+
 	"github.com/prskr/git-age/handlers/cli"
 	"github.com/prskr/git-age/infrastructure"
 )
@@ -16,11 +16,6 @@ func TestAddRecipientCliHandler_Run(t *testing.T) {
 	idToAdd, err := age.GenerateX25519Identity()
 	if err != nil {
 		t.Errorf("failed to generate identity: %v", err)
-		return
-	}
-
-	if err := os.Chdir(setup.root); err != nil {
-		t.Errorf("failed to change directory: %v", err)
 		return
 	}
 

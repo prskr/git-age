@@ -15,6 +15,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/cache"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/storage/filesystem"
+
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
 	"github.com/prskr/git-age/infrastructure"
@@ -48,6 +49,12 @@ func prepareTestRepo(tb testing.TB) (s *testSetup) {
 
 	s.root = tb.TempDir()
 	wd := testx.ResultOf(tb, os.Getwd)
+
+	tb.Cleanup(func() {
+		if err := os.Chdir(wd); err != nil {
+			tb.Errorf("failed to restore working directory: %v", err)
+		}
+	})
 
 	srcFS := infrastructure.NewReadWriteDirFS(filepath.Join(wd, "testdata"))
 	s.repoFS = infrastructure.NewReadWriteDirFS(s.root)
@@ -123,6 +130,10 @@ func prepareTestRepo(tb testing.TB) (s *testSetup) {
 	err = fsx.NewSyncer(srcFS, s.repoFS).Sync()
 	if err != nil {
 		tb.Fatalf("failed to populate test directory: %v", err)
+	}
+
+	if err := os.Chdir(s.root); err != nil {
+		tb.Errorf("failed to change directory: %v", err)
 	}
 
 	return s

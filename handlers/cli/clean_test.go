@@ -11,6 +11,7 @@ import (
 
 	"filippo.io/age"
 	"github.com/minio/sha256-simd"
+
 	"github.com/prskr/git-age/handlers/cli"
 )
 
@@ -32,11 +33,6 @@ func init() {
 
 func TestCleanCliHandler_Run(t *testing.T) {
 	setup := prepareTestRepo(t)
-
-	if err := os.Chdir(setup.root); err != nil {
-		t.Errorf("failed to change directory: %v", err)
-		return
-	}
 
 	outFile, err := os.CreateTemp(t.TempDir(), ".env")
 	if err != nil {
