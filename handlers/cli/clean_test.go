@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	expectedhash []byte
+	expectedHash []byte
 
 	//go:embed testdata/keys.txt
 	keys []byte
@@ -28,19 +28,12 @@ func init() {
 		panic(err)
 	}
 
-	expectedhash = s
+	expectedHash = s
 }
 
 func TestCleanCliHandler_Run(t *testing.T) {
 	setup := prepareTestRepo(t)
-
-	outFile, err := os.CreateTemp(t.TempDir(), ".env")
-	if err != nil {
-		t.Errorf("failed to create temp file: %v", err)
-		return
-	}
-
-	os.Stdout = outFile
+	outFile := stdoutTempFile(t)
 
 	parser := newKong(t, new(cli.CleanCliHandler))
 
@@ -95,7 +88,7 @@ func TestCleanCliHandler_Run(t *testing.T) {
 	}
 
 	outHash := hash.Sum(nil)
-	if !bytes.Equal(expectedhash, outHash) {
+	if !bytes.Equal(expectedHash, outHash) {
 		t.Errorf("input and output hashes do not match")
 	}
 }

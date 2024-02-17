@@ -42,6 +42,28 @@ type testSetup struct {
 	repoFS ports.ReadWriteFS
 }
 
+func stdoutTempFile(tb testing.TB) *os.File {
+	tb.Helper()
+
+	orig := os.Stdout
+	tb.Cleanup(func() {
+		os.Stdout = orig
+	})
+
+	f, err := os.CreateTemp(tb.TempDir(), "stdout")
+	if err != nil {
+		tb.Fatalf("failed to create temp file: %v", err)
+	}
+
+	tb.Cleanup(func() {
+		_ = f.Close()
+	})
+
+	os.Stdout = f
+
+	return f
+}
+
 func prepareTestRepo(tb testing.TB) (s *testSetup) {
 	tb.Helper()
 

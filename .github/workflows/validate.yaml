@@ -42,7 +42,7 @@ jobs:
 
       - name: Test
         run: |
-            gotestsum --format pkgname -- -covermode=atomic ./...
+          gotestsum --format pkgname -- -race -shuffle=on -covermode=atomic ./...
 
       # Do not run release on windows
       - uses: ruby/setup-ruby@v1
