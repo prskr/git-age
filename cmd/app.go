@@ -8,10 +8,13 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/prskr/git-age/core/ports"
+
 	"github.com/adrg/xdg"
 	"github.com/alecthomas/kong"
 
 	"github.com/lmittmann/tint"
+
 	clih "github.com/prskr/git-age/handlers/cli"
 )
 
@@ -31,10 +34,18 @@ type App struct {
 }
 
 func (a *App) Execute() error {
+	wd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
 	ctx, _ := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
 	cliCtx := kong.Parse(a,
 		kong.Name("git-age"),
 		kong.BindTo(ctx, (*context.Context)(nil)),
+		kong.BindTo(os.Stdout, (*ports.STDOUT)(nil)),
+		kong.BindTo(os.Stdin, (*ports.STDIN)(nil)),
+		kong.Bind(ports.CWD(wd)),
 		kong.Vars{
 			"XDG_CONFIG_HOME":     xdg.ConfigHome,
 			"file_path_separator": string(filepath.Separator),

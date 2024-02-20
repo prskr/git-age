@@ -13,6 +13,7 @@ require (
 	github.com/lmittmann/tint v1.0.4
 	github.com/minio/sha256-simd v1.0.1
 	golang.org/x/mod v0.15.0
+	gopkg.in/ini.v1 v1.67.0
 )
 
 replace github.com/go-git/go-git/v5 => github.com/prskr/go-git/v5 v5.0.0-20240205092825-798d9942c362

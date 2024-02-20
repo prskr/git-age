@@ -20,7 +20,7 @@ import (
 
 type ListFilesCliHandler struct{}
 
-func (ListFilesCliHandler) Run(repo ports.GitRepository) error {
+func (ListFilesCliHandler) Run(repo ports.GitRepository, stdout ports.STDOUT) error {
 	return repo.WalkAgeFiles(func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -30,7 +30,9 @@ func (ListFilesCliHandler) Run(repo ports.GitRepository) error {
 			return nil
 		}
 
-		fmt.Println(path)
+		if _, err := fmt.Fprintln(stdout, path); err != nil {
+			return fmt.Errorf("failed to write to stdout: %w", err)
+		}
 
 		return nil
 	})
@@ -44,9 +46,9 @@ type TrackFilesCliHandler struct {
 }
 
 func (h *TrackFilesCliHandler) Run(repoFS ports.ReadWriteFS) error {
-	attributesFile, err := repoFS.OpenRW(filepath.Join(h.WorkingDir, ".gitattributes"))
+	attributesFile, err := repoFS.Create(filepath.Join(h.WorkingDir, ports.GitAttributesFileName))
 	if err != nil {
-		return fmt.Errorf("failed to open .gitattributes file: %w", err)
+		return fmt.Errorf("failed to open %s file: %w", ports.GitAttributesFileName, err)
 	}
 
 	if _, err := attributesFile.Seek(0, io.SeekEnd); err != nil {
@@ -59,31 +61,28 @@ func (h *TrackFilesCliHandler) Run(repoFS ports.ReadWriteFS) error {
 
 	attributesLine := h.Pattern + " filter=age diff=age merge=age -text\n"
 	if _, err := attributesFile.WriteString(attributesLine); err != nil {
-		return fmt.Errorf("failed to write to .gitattributes file: %w", err)
+		return fmt.Errorf("failed to write to %s file: %w", ports.GitAttributesFileName, err)
 	}
 
 	return nil
 }
 
-func (h *TrackFilesCliHandler) AfterApply() (err error) {
-	wd, err := os.Getwd()
+func (h *TrackFilesCliHandler) AfterApply(cwd ports.CWD) (err error) {
+	repoRootPath, err := infrastructure.FindRepoRootFrom(cwd)
 	if err != nil {
 		return err
 	}
 
-	repoRootPath, err := infrastructure.FindRepoRootFrom(wd)
-	if err != nil {
-		return err
-	}
-
-	h.WorkingDir, err = filepath.Rel(repoRootPath, wd)
+	h.WorkingDir, err = filepath.Rel(repoRootPath, cwd.Value())
 
 	return err
 }
 
-type ReEncryptFilesCliHandler struct{}
+type ReEncryptFilesCliHandler struct {
+	Message string `help:"Message to be used for the commit" default:"chore: re-encrypt secret files" short:"m"`
+}
 
-func (ReEncryptFilesCliHandler) Run(
+func (h ReEncryptFilesCliHandler) Run(
 	repo ports.GitRepository,
 	repoFS ports.ReadWriteFS,
 	sealer ports.FileOpenSealer,
@@ -99,6 +98,11 @@ func (ReEncryptFilesCliHandler) Run(
 		return err
 	}
 
+	slog.Info("Committing changes")
+	if err := repo.Commit(h.Message); err != nil {
+		return fmt.Errorf("failed to commit changes: %w", err)
+	}
+
 	return nil
 }
 
@@ -109,13 +113,8 @@ type FilesCliHandler struct {
 	ReEncrypt ReEncryptFilesCliHandler `cmd:"" help:"Re-encrypt files tracked by git-age"`
 }
 
-func (h *FilesCliHandler) AfterApply(kctx *kong.Context) error {
-	wd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	repoRootPath, err := infrastructure.FindRepoRootFrom(wd)
+func (h *FilesCliHandler) AfterApply(kctx *kong.Context, cwd ports.CWD) error {
+	repoRootPath, err := infrastructure.FindRepoRootFrom(cwd)
 	if err != nil {
 		return err
 	}

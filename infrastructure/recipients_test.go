@@ -7,6 +7,7 @@ import (
 	"github.com/prskr/git-age/internal/fsx"
 
 	"filippo.io/age"
+
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/infrastructure"
 )
@@ -53,7 +54,7 @@ func TestRecipientsFile_All(t *testing.T) {
 			setup: func(tb testing.TB, rwfs ports.ReadWriteFS) {
 				tb.Helper()
 				publicKeys := make([]string, 0, 5)
-				for i := 0; i < 5; i++ {
+				for range 5 {
 					id, err := age.GenerateX25519Identity()
 					if err != nil {
 						tb.Fatalf("failed to create age identity: %v", err)
@@ -68,8 +69,9 @@ func TestRecipientsFile_All(t *testing.T) {
 			wantNum: 5,
 		},
 	}
+
+	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			tfs := infrastructure.NewReadWriteDirFS(t.TempDir())

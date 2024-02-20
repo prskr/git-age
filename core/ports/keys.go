@@ -6,7 +6,10 @@ import (
 	"filippo.io/age"
 )
 
-const RecipientsFileName = ".agerecipients"
+const (
+	RecipientsFileName    = ".agerecipients"
+	GitAttributesFileName = ".gitattributes"
+)
 
 type PeekReader interface {
 	Peek(n int) ([]byte, error)

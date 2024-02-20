@@ -6,6 +6,14 @@ linter-settings:
     statements: 50
   gci:
     local-prefixes: github.com/prskr/git-age
+    sections:
+      - standard
+      - default
+      - prefix(github.com/prskr/git-age)
+      - alias
+      - blank
+      - dot
+    custom-order: true
   goconst:
     min-len: 2
     min-occurrences: 2
@@ -51,6 +59,7 @@ linters:
     - goimports
     - gosec
     - interfacebloat
+    # - intrange
     - lll
     - maintidx
     - nakedret
@@ -75,13 +84,11 @@ linters:
 
 issues:
   exclude-rules:
-    - path: handlers/cli/
-      linters:
-        - paralleltest
     - path: _test\.go
       linters:
         - funlen
         - cyclop
+        - gocognit
         - goerr113
         - gochecknoinits
         - gochecknoglobals

@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/go-git/go-git/v5/config"
+
 	"github.com/prskr/git-age/core/ports"
 )
 

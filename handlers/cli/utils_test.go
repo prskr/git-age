@@ -1,6 +1,8 @@
 package cli_test
 
 import (
+	_ "embed"
+	"encoding/hex"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -8,6 +10,7 @@ import (
 	"time"
 
 	"github.com/adrg/xdg"
+
 	"github.com/alecthomas/kong"
 	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/go-git/go-git/v5"
@@ -23,12 +26,34 @@ import (
 	"github.com/prskr/git-age/internal/testx"
 )
 
-func newKong(tb testing.TB, grammar any) *kong.Kong {
+var (
+	expectedHash []byte
+
+	//go:embed testdata/sampleRepo/keys.txt
+	keys []byte
+
+	//go:embed testdata/sampleRepo/.agerecipients
+	recipients []byte
+)
+
+func init() {
+	s, err := hex.DecodeString("8a7d8f4374d752b3a46ef521c4b39325d1172211c487cc4ada4cd587dcce2cd5")
+	if err != nil {
+		panic(err)
+	}
+
+	expectedHash = s
+}
+
+func newKong(tb testing.TB, grammar any, opts ...kong.Option) *kong.Kong {
 	tb.Helper()
-	inst, err := kong.New(grammar, kong.Vars{
+
+	opts = append(opts, kong.Vars{
 		"XDG_CONFIG_HOME":     xdg.ConfigHome,
 		"file_path_separator": string(filepath.Separator),
 	})
+
+	inst, err := kong.New(grammar, opts...)
 	if err != nil {
 		tb.Fatalf("failed to create parser: %v", err)
 	}
@@ -40,28 +65,6 @@ type testSetup struct {
 	root   string
 	repo   *git.Repository
 	repoFS ports.ReadWriteFS
-}
-
-func stdoutTempFile(tb testing.TB) *os.File {
-	tb.Helper()
-
-	orig := os.Stdout
-	tb.Cleanup(func() {
-		os.Stdout = orig
-	})
-
-	f, err := os.CreateTemp(tb.TempDir(), "stdout")
-	if err != nil {
-		tb.Fatalf("failed to create temp file: %v", err)
-	}
-
-	tb.Cleanup(func() {
-		_ = f.Close()
-	})
-
-	os.Stdout = f
-
-	return f
 }
 
 func prepareTestRepo(tb testing.TB) (s *testSetup) {
@@ -78,7 +81,7 @@ func prepareTestRepo(tb testing.TB) (s *testSetup) {
 		}
 	})
 
-	srcFS := infrastructure.NewReadWriteDirFS(filepath.Join(wd, "testdata"))
+	srcFS := infrastructure.NewReadWriteDirFS(filepath.Join(wd, "testdata", "sampleRepo"))
 	s.repoFS = infrastructure.NewReadWriteDirFS(s.root)
 
 	recipients := infrastructure.NewRecipientsFile(srcFS)
@@ -141,9 +144,7 @@ func prepareTestRepo(tb testing.TB) (s *testSetup) {
 
 	_ = &git.CommitOptions{
 		Author: &object.Signature{
-			Name:  tb.Name(),
-			Email: "ci@git-age.io",
-			When:  time.Now().UTC(),
+			When: time.Now().UTC(),
 		},
 	}
 

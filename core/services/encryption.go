@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"filippo.io/age"
+
 	"github.com/prskr/git-age/core/ports"
 )
 

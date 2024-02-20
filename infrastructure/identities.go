@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"filippo.io/age"
+
 	"github.com/prskr/git-age/core/ports"
 )
 

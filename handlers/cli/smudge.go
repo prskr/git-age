@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"io"
 	"log/slog"
-	"os"
 
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
@@ -17,18 +16,18 @@ type SmudgeCliHandler struct {
 	FileToCleanPath string           `arg:"" name:"file" help:"Path to the file to clean"`
 }
 
-func (h *SmudgeCliHandler) Run() error {
-	if err := requireStdin(); err != nil {
+func (h *SmudgeCliHandler) Run(stdin ports.STDIN, stdout ports.STDOUT) error {
+	if err := requireStdin(stdin); err != nil {
 		return err
 	}
 
-	reader := bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(stdin)
 
 	if isEncrypted, err := h.Opener.IsEncrypted(reader); err != nil {
 		return err
 	} else if !isEncrypted {
 		slog.Warn("expected age-encrypted file, but got plaintext. Copying to stdout.")
-		_, err = io.Copy(os.Stdout, reader)
+		_, err = io.Copy(stdout, reader)
 		return err
 	}
 
@@ -37,7 +36,7 @@ func (h *SmudgeCliHandler) Run() error {
 		return err
 	}
 
-	_, err = io.Copy(os.Stdout, decryptedReader)
+	_, err = io.Copy(stdout, decryptedReader)
 
 	return err
 }

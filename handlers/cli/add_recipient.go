@@ -56,13 +56,8 @@ func (h *AddRecipientCliHandler) Run(
 	return nil
 }
 
-func (h *AddRecipientCliHandler) AfterApply(kctx *kong.Context) error {
-	wd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	repository, repoFS, err := infrastructure.NewGitRepositoryFromPath(wd)
+func (h *AddRecipientCliHandler) AfterApply(kctx *kong.Context, cwd ports.CWD) error {
+	repository, repoFS, err := infrastructure.NewGitRepositoryFromPath(cwd)
 	if err != nil {
 		return err
 	}

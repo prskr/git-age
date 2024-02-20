@@ -2,93 +2,123 @@ package cli_test
 
 import (
 	"bytes"
-	_ "embed"
-	"encoding/hex"
 	"io"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"filippo.io/age"
+	"github.com/alecthomas/kong"
 	"github.com/minio/sha256-simd"
 
+	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/handlers/cli"
 )
 
-var (
-	expectedHash []byte
-
-	//go:embed testdata/keys.txt
-	keys []byte
-)
-
-func init() {
-	s, err := hex.DecodeString("8a7d8f4374d752b3a46ef521c4b39325d1172211c487cc4ada4cd587dcce2cd5")
-	if err != nil {
-		panic(err)
-	}
-
-	expectedHash = s
-}
-
 func TestCleanCliHandler_Run(t *testing.T) {
-	setup := prepareTestRepo(t)
-	outFile := stdoutTempFile(t)
+	t.Parallel()
+	tests := []struct {
+		name           string
+		inFileModifier func(*os.File) error
+	}{
+		{
+			name: "Unmodified file",
+		},
+		{
+			name: "Modified file",
+			inFileModifier: func(f *os.File) error {
+				if _, err := f.Seek(0, io.SeekEnd); err != nil {
+					return err
+				}
 
-	parser := newKong(t, new(cli.CleanCliHandler))
+				if _, err := f.Write([]byte("test")); err != nil {
+					return err
+				}
 
-	args := []string{
-		"-k", filepath.Join(setup.root, "keys.txt"),
-		".env",
+				if _, err := f.Seek(0, io.SeekStart); err != nil {
+					return err
+				}
+
+				return nil
+			},
+		},
 	}
 
-	ctx, err := parser.Parse(args)
-	if err != nil {
-		t.Errorf("failed to parse arguments: %v", err)
-		return
-	}
+	//nolint:paralleltest // not necessary anymore in Go 1.22
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			setup := prepareTestRepo(t)
 
-	f, err := os.Open(filepath.Join(setup.root, ".env"))
-	if err != nil {
-		t.Errorf("failed to open file: %v", err)
-		return
-	}
+			out := new(bytes.Buffer)
 
-	os.Stdin = f
-	t.Cleanup(func() {
-		_ = f.Close()
-	})
+			inFile, err := os.OpenFile(filepath.Join(setup.root, ".env"), os.O_RDWR, 0o644)
+			if err != nil {
+				t.Errorf("failed to open file: %v", err)
+				return
+			}
 
-	if err := ctx.Run(); err != nil {
-		t.Errorf("failed to run command: %v", err)
-		return
-	}
+			t.Cleanup(func() {
+				_ = inFile.Close()
+			})
 
-	if _, err := outFile.Seek(0, io.SeekStart); err != nil {
-		t.Errorf("failed to seek to start: %v", err)
-		return
-	}
+			if tt.inFileModifier != nil {
+				if err := tt.inFileModifier(inFile); err != nil {
+					t.Errorf("failed to modify input file: %v", err)
+					return
+				}
+			}
 
-	ids, err := age.ParseIdentities(bytes.NewReader(keys))
-	if err != nil {
-		t.Errorf("failed to parse identities: %v", err)
-		return
-	}
+			parser := newKong(
+				t,
+				new(cli.CleanCliHandler),
+				kong.Bind(ports.CWD(setup.root)),
+				kong.BindTo(ports.STDIN(inFile), (*ports.STDIN)(nil)),
+				kong.BindTo(ports.STDOUT(out), (*ports.STDOUT)(nil)),
+			)
 
-	reader, err := age.Decrypt(outFile, ids...)
-	if err != nil {
-		t.Errorf("failed to decrypt file: %v", err)
-		return
-	}
+			args := []string{
+				"-k", filepath.Join(setup.root, "keys.txt"),
+				".env",
+			}
 
-	hash := sha256.New()
-	if _, err := io.Copy(hash, reader); err != nil {
-		t.Errorf("failed to copy file to hash: %v", err)
-		return
-	}
+			ctx, err := parser.Parse(args)
+			if err != nil {
+				t.Errorf("failed to parse arguments: %v", err)
+				return
+			}
 
-	outHash := hash.Sum(nil)
-	if !bytes.Equal(expectedHash, outHash) {
-		t.Errorf("input and output hashes do not match")
+			if err := ctx.Run(); err != nil {
+				t.Errorf("failed to run command: %v", err)
+				return
+			}
+
+			ids, err := age.ParseIdentities(bytes.NewReader(keys))
+			if err != nil {
+				t.Errorf("failed to parse identities: %v", err)
+				return
+			}
+
+			reader, err := age.Decrypt(out, ids...)
+			if err != nil {
+				t.Errorf("failed to decrypt file: %v", err)
+				return
+			}
+
+			if tt.inFileModifier != nil {
+				return
+			}
+
+			hash := sha256.New()
+			if _, err := io.Copy(hash, reader); err != nil {
+				t.Errorf("failed to copy file to hash: %v", err)
+				return
+			}
+
+			outHash := hash.Sum(nil)
+			if !bytes.Equal(expectedHash, outHash) {
+				t.Errorf("input and output hashes do not match")
+			}
+		})
 	}
 }

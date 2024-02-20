@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"filippo.io/age"
+
 	"github.com/prskr/git-age/infrastructure"
 )
 
@@ -51,7 +52,7 @@ func TestIdentities_All(t *testing.T) {
 			name: "multiple keys",
 			setup: func(tb testing.TB, writer io.StringWriter) {
 				tb.Helper()
-				for i := 0; i < 5; i++ {
+				for range 5 {
 					id, err := age.GenerateX25519Identity()
 					if err != nil {
 						tb.Fatalf("failed to create age identity: %v", err)
@@ -65,8 +66,9 @@ func TestIdentities_All(t *testing.T) {
 			wantNumber: 5,
 		},
 	}
+
+	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			keysFile, err := os.CreateTemp(t.TempDir(), "keys*.txt")
@@ -127,8 +129,9 @@ with multiple lines`,
 			},
 		},
 	}
+
+	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 

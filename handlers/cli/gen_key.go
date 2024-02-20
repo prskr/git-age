@@ -14,15 +14,15 @@ type GenKeyCliHandler struct {
 	Identities ports.Identities `kong:"-"`
 }
 
-func (h *GenKeyCliHandler) Run() (err error) {
+func (h *GenKeyCliHandler) Run(stdout ports.STDOUT) (err error) {
 	pubKey, err := h.Identities.Generate(h.Comment)
 	if err != nil {
 		return fmt.Errorf("failed to generate identity: %w", err)
 	}
 
-	fmt.Println(pubKey)
+	_, err = fmt.Fprintln(stdout, pubKey)
 
-	return nil
+	return err
 }
 
 func (h *GenKeyCliHandler) AfterApply() error {

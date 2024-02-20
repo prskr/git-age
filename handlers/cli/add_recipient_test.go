@@ -4,6 +4,10 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/alecthomas/kong"
+
+	"github.com/prskr/git-age/core/ports"
+
 	"filippo.io/age"
 
 	"github.com/prskr/git-age/handlers/cli"
@@ -11,6 +15,8 @@ import (
 )
 
 func TestAddRecipientCliHandler_Run(t *testing.T) {
+	t.Parallel()
+
 	setup := prepareTestRepo(t)
 
 	idToAdd, err := age.GenerateX25519Identity()
@@ -19,7 +25,11 @@ func TestAddRecipientCliHandler_Run(t *testing.T) {
 		return
 	}
 
-	parser := newKong(t, new(cli.AddRecipientCliHandler))
+	parser := newKong(
+		t,
+		new(cli.AddRecipientCliHandler),
+		kong.Bind(ports.CWD(setup.root)),
+	)
 
 	args := []string{
 		"-k", filepath.Join(setup.root, "keys.txt"),

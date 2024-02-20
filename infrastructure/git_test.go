@@ -12,6 +12,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/storage/memory"
+
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/infrastructure"
 	"github.com/prskr/git-age/internal/testx"
@@ -47,8 +48,9 @@ func TestNewGitRepositoryFromPath(t *testing.T) {
 			wantErr: true,
 		},
 	}
+
+	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			root := populateTestDirectory(t)
@@ -56,7 +58,7 @@ func TestNewGitRepositoryFromPath(t *testing.T) {
 				t.Fatalf("failed to initialize git repository: %v", err)
 			}
 
-			_, _, err := infrastructure.NewGitRepositoryFromPath(filepath.Join(root, tt.args.from))
+			_, _, err := infrastructure.NewGitRepositoryFromPath(ports.CWD(filepath.Join(root, tt.args.from)))
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewGitRepositoryFromPath() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -102,8 +104,9 @@ func TestGitRepository_OpenObjectAtHead(t *testing.T) {
 			wantErr: true,
 		},
 	}
+
+	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			root, repo := prepareTestRepo(t)
@@ -142,7 +145,7 @@ func TestGitRepository_IsStagingDirty(t *testing.T) {
 			setup: func(tb testing.TB, rwfs ports.ReadWriteFS, repo *git.Repository) {
 				tb.Helper()
 
-				f := testx.ResultOfA[ports.ReadWriteFile](tb, rwfs.OpenRW, "dir0/file0")
+				f := testx.ResultOfA[ports.ReadWriteFile](tb, rwfs.Create, "dir0/file0")
 
 				defer func() {
 					if err := f.Close(); err != nil {
@@ -160,7 +163,7 @@ func TestGitRepository_IsStagingDirty(t *testing.T) {
 			setup: func(tb testing.TB, rwfs ports.ReadWriteFS, repo *git.Repository) {
 				tb.Helper()
 
-				f := testx.ResultOfA[ports.ReadWriteFile](tb, rwfs.OpenRW, "dir0/file0")
+				f := testx.ResultOfA[ports.ReadWriteFile](tb, rwfs.Create, "dir0/file0")
 
 				defer func() {
 					if err := f.Close(); err != nil {
@@ -176,8 +179,9 @@ func TestGitRepository_IsStagingDirty(t *testing.T) {
 			},
 		},
 	}
+
+	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			root, repo := prepareTestRepo(t)

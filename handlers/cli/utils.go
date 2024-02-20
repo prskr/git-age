@@ -4,10 +4,21 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/prskr/git-age/core/ports"
 )
 
-func requireStdin() error {
-	stat, err := os.Stdin.Stat()
+func requireStdin(in ports.STDIN) error {
+	type stater interface {
+		Stat() (os.FileInfo, error)
+	}
+
+	s, ok := in.(stater)
+	if !ok {
+		return nil
+	}
+
+	stat, err := s.Stat()
 	if err != nil {
 		return fmt.Errorf("cannot read from STDIN: %w", err)
 	} else if (stat.Mode() & os.ModeCharDevice) != 0 {

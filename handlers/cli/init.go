@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/fs"
 	"log/slog"
-	"os"
 
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/infrastructure"
@@ -37,15 +36,10 @@ func (h *InitCliHandler) Run() (err error) {
 	return nil
 }
 
-func (h *InitCliHandler) AfterApply() error {
+func (h *InitCliHandler) AfterApply(cwd ports.CWD) error {
 	h.Identities = infrastructure.NewIdentities(h.Keys)
 
-	wd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	repoRootPath, err := infrastructure.FindRepoRootFrom(wd)
+	repoRootPath, err := infrastructure.FindRepoRootFrom(cwd)
 	if err != nil {
 		return err
 	}

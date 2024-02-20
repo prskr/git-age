@@ -7,8 +7,7 @@ git-age - Protect secrets required for development in your repository
 == DESCRIPTION
 
 `git-age` is a smudge/clean filter for git that encrypts and decrypts files in your repository.
-It is designed to be used in a team environment where you want to protect secrets required for development, such as API
-keys, passwords, etc.
+It is designed to be used in a team environment where you want to protect secrets required for development, such as API keys, passwords, etc.
 
 It is based on the great tool age(1) by Filippo Valsorda.
 Every file encrypted by `git-age` is a valid age(1) file, and can be decrypted using the age(1) tool.
@@ -65,8 +64,7 @@ This allows to verify that the files that should be encrypted are actually track
 `git age files track` <PATTERN>
 
 Add a file pattern to the `.gitattributes` file to track the file with `git-age`.
-`git-age` will either append the pattern to the already present `.gitattributes` file in the *current* directory or
-create a new `.gitattributes` file if it does not exist.
+`git-age` will either append the pattern to the already present `.gitattributes` file in the *current* directory or create a new `.gitattributes` file if it does not exist.
 
 === git age files re-encrypt
 
@@ -74,8 +72,7 @@ create a new `.gitattributes` file if it does not exist.
 
 Re-encrypt all files that are tracked by `git-age`.
 This is useful if you want to change the recipients of the files e.g. if a developer leaves the team.
-It can also be used to onboard a new developer to the team but it's recommended to use `git age add-recipient` for that
-as it is specifically designed for this use case.
+It can also be used to onboard a new developer to the team but it's recommended to use `git age add-recipient` for that as it is specifically designed for this use case.
 
 === git age version
 

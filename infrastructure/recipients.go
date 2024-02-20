@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"filippo.io/age"
+
 	"github.com/prskr/git-age/core/ports"
 )
 
@@ -53,7 +54,7 @@ func (r RecipientsFile) Append(pubKey string, comment string) (recipients []age.
 		return nil, nil
 	}
 
-	recipientsFile, err := r.FS.OpenRW(ports.RecipientsFileName)
+	recipientsFile, err := r.FS.Create(ports.RecipientsFileName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open recipients file: %w", err)
 	}

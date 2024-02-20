@@ -18,6 +18,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/storage/filesystem"
 	"github.com/minio/sha256-simd"
+
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
 	"github.com/prskr/git-age/infrastructure"
@@ -63,7 +64,7 @@ func TestReEncryptWalkFunc(t *testing.T) {
 			return err
 		}
 
-		if d.IsDir() || filepath.Ext(path) == ".gitattributes" {
+		if d.IsDir() || filepath.Ext(path) == ports.GitAttributesFileName {
 			return nil
 		}
 

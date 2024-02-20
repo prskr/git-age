@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/go-git/go-git/v5/plumbing"
+
 	"github.com/prskr/git-age/core/ports"
 )
 
@@ -56,7 +57,7 @@ func ReEncryptWalkFunc(repo ports.GitRepository, rwfs ports.ReadWriteFS, sealer 
 			}
 		}()
 
-		f, err := rwfs.OpenRW(path)
+		f, err := rwfs.Create(path)
 		if err != nil {
 			return err
 		}

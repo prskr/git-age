@@ -16,7 +16,7 @@ func WriteTo(rwfs ports.ReadWriteFS, filePath string, data []byte) (err error) {
 		}
 	}
 
-	file, err := rwfs.OpenRW(filePath)
+	file, err := rwfs.Create(filePath)
 	if err != nil {
 		return err
 	}

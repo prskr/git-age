@@ -6,6 +6,7 @@ import (
 	"github.com/prskr/git-age/internal/testx"
 
 	"filippo.io/age"
+
 	"github.com/prskr/git-age/core/services"
 )
 
@@ -37,8 +38,9 @@ func TestAgeSealer_AddRecipients(t *testing.T) {
 			wantCanSeal: true,
 		},
 	}
+
+	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			h, err := services.NewAgeSealer()
@@ -90,8 +92,9 @@ func TestAgeSealer_AddIdentities(t *testing.T) {
 			wantCanOpen: true,
 		},
 	}
+
+	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			h, err := services.NewAgeSealer()

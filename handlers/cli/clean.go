@@ -15,6 +15,7 @@ import (
 	"github.com/prskr/git-age/internal/fsx"
 
 	"github.com/go-git/go-git/v5/plumbing/object"
+
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
 	"github.com/prskr/git-age/infrastructure"
@@ -27,8 +28,8 @@ type CleanCliHandler struct {
 	FileToCleanPath string               `arg:"" name:"file" help:"Path to the file to clean"`
 }
 
-func (h *CleanCliHandler) Run() error {
-	if err := requireStdin(); err != nil {
+func (h *CleanCliHandler) Run(stdin ports.STDIN, stdout ports.STDOUT) error {
+	if err := requireStdin(stdin); err != nil {
 		return err
 	}
 
@@ -36,14 +37,14 @@ func (h *CleanCliHandler) Run() error {
 
 	if !h.OpenSealer.CanSeal() {
 		logger.Warn("No recipients specified - file will be staged as plain text")
-		if _, err := io.Copy(os.Stdout, os.Stdin); err != nil {
+		if _, err := io.Copy(stdout, stdin); err != nil {
 			return fmt.Errorf("failed to copy file to stdout: %w", err)
 		}
 		return nil
 	}
 
 	logger.Info("Copying file to temp")
-	fileToClean, err := copyToTemp(os.Stdin)
+	fileToClean, err := copyToTemp(stdin)
 	if err != nil {
 		return err
 	}
@@ -58,7 +59,7 @@ func (h *CleanCliHandler) Run() error {
 	if err != nil {
 		if errors.Is(err, plumbing.ErrObjectNotFound) || errors.Is(err, plumbing.ErrReferenceNotFound) {
 			logger.Info("Could not compare file to HEAD, handling as new")
-			return h.copyEncryptedFileToStdout(fileToClean)
+			return h.copyEncryptedFileToStdout(fileToClean, stdout)
 		}
 
 		return fmt.Errorf("failed to hash file at HEAD: %w", err)
@@ -76,22 +77,17 @@ func (h *CleanCliHandler) Run() error {
 
 	if bytes.Equal(headHash, currentHash) {
 		logger.Info("File has not changed, returning original")
-		return h.copyGitObjectToStdout(obj)
+		return h.copyGitObjectTo(obj, stdout)
 	}
 
 	logger.Info("File has changed since last commit")
-	return h.copyEncryptedFileToStdout(fileToClean)
+	return h.copyEncryptedFileToStdout(fileToClean, stdout)
 }
 
-func (h *CleanCliHandler) AfterApply() error {
-	wd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
+func (h *CleanCliHandler) AfterApply(cwd ports.CWD) (err error) {
 	var repoFS ports.ReadWriteFS
 
-	h.Repository, repoFS, err = infrastructure.NewGitRepositoryFromPath(wd)
+	h.Repository, repoFS, err = infrastructure.NewGitRepositoryFromPath(cwd)
 	if err != nil {
 		return err
 	}
@@ -104,8 +100,8 @@ func (h *CleanCliHandler) AfterApply() error {
 	return err
 }
 
-func (h *CleanCliHandler) copyEncryptedFileToStdout(reader io.Reader) (err error) {
-	encryptWriter, err := h.OpenSealer.SealFile(os.Stdout)
+func (h *CleanCliHandler) copyEncryptedFileToStdout(reader io.Reader, out io.Writer) (err error) {
+	encryptWriter, err := h.OpenSealer.SealFile(out)
 	if err != nil {
 		return err
 	}
@@ -119,7 +115,7 @@ func (h *CleanCliHandler) copyEncryptedFileToStdout(reader io.Reader) (err error
 	return err
 }
 
-func (h *CleanCliHandler) copyGitObjectToStdout(obj *object.File) error {
+func (h *CleanCliHandler) copyGitObjectTo(obj *object.File, out io.Writer) error {
 	r, err := obj.Blob.Reader()
 	if err != nil {
 		return err
@@ -129,9 +125,9 @@ func (h *CleanCliHandler) copyGitObjectToStdout(obj *object.File) error {
 		_ = r.Close()
 	}()
 
-	_, err = io.Copy(os.Stdout, r)
+	_, err = io.Copy(out, r)
 
-	return errors.Join(err, os.Stdout.Sync())
+	return err
 }
 
 func (h *CleanCliHandler) hashFileAtHead(

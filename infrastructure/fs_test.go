@@ -55,8 +55,8 @@ func TestReadWriteDirFS_Rename(t *testing.T) {
 		},
 	}
 
+	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			root := populateTestDirectory(t)
@@ -126,8 +126,9 @@ func TestReadWriteDirFS_TempFile(t *testing.T) {
 			},
 		},
 	}
+
+	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			dir := t.TempDir()
@@ -172,8 +173,8 @@ func TestReadWriteDirFS_Remove(t *testing.T) {
 		},
 	}
 
+	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			root := populateTestDirectory(t)
@@ -239,16 +240,17 @@ func TestReadWriteDirFS_OpenRW(t *testing.T) {
 			},
 		},
 	}
+
+	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			root := populateTestDirectory(t)
 			f := infrastructure.NewReadWriteDirFS(root)
 
-			got, err := f.OpenRW(tt.args.filePath)
+			got, err := f.Create(tt.args.filePath)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("OpenRW() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
@@ -277,7 +279,7 @@ func TestReadWriteDirFS_Walk(t *testing.T) {
 			return nil
 		}
 
-		f, err := rwfs.OpenRW(path)
+		f, err := rwfs.Create(path)
 		if err != nil {
 			return err
 		}

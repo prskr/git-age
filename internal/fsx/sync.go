@@ -2,6 +2,7 @@ package fsx
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"io/fs"
 	"path/filepath"
@@ -82,16 +83,16 @@ func (s Syncer) Sync() error {
 
 		f, err := s.Source.Open(path)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to open file: %w, path: %s", err, path)
 		}
 
 		defer func() {
 			err = errors.Join(err, f.Close())
 		}()
 
-		dst, err := s.Destination.OpenRW(path, ports.WithTruncate)
+		dst, err := s.Destination.Create(path, ports.WithTruncate)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to create file: %w, path: %s", err, path)
 		}
 
 		var w io.WriteCloser = dst

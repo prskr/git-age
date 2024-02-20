@@ -11,6 +11,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/format/gitattributes"
 	"github.com/go-git/go-git/v5/plumbing/object"
+
 	"github.com/prskr/git-age/core/ports"
 )
 
@@ -23,7 +24,7 @@ var (
 	_ ports.HeadObjectOpener = (*GitRepository)(nil)
 )
 
-func NewGitRepositoryFromPath(from string) (*GitRepository, *ReadWriteDirFS, error) {
+func NewGitRepositoryFromPath(from ports.CWD) (*GitRepository, *ReadWriteDirFS, error) {
 	repoRootPath, err := FindRepoRootFrom(from)
 	if err != nil {
 		return nil, nil, err
@@ -151,7 +152,9 @@ func (g GitRepository) IsStagingDirty() (bool, error) {
 	return false, nil
 }
 
-func FindRepoRootFrom(currentDir string) (string, error) {
+func FindRepoRootFrom(cwd ports.CWD) (string, error) {
+	currentDir := cwd.Value()
+
 	if !filepath.IsAbs(currentDir) {
 		abs, err := filepath.Abs(currentDir)
 		if err != nil {
