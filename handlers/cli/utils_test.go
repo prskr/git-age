@@ -75,12 +75,6 @@ func prepareTestRepo(tb testing.TB) (s *testSetup) {
 	s.root = tb.TempDir()
 	wd := testx.ResultOf(tb, os.Getwd)
 
-	tb.Cleanup(func() {
-		if err := os.Chdir(wd); err != nil {
-			tb.Errorf("failed to restore working directory: %v", err)
-		}
-	})
-
 	srcFS := infrastructure.NewReadWriteDirFS(filepath.Join(wd, "testdata", "sampleRepo"))
 	s.repoFS = infrastructure.NewReadWriteDirFS(s.root)
 
@@ -153,10 +147,6 @@ func prepareTestRepo(tb testing.TB) (s *testSetup) {
 	err = fsx.NewSyncer(srcFS, s.repoFS).Sync()
 	if err != nil {
 		tb.Fatalf("failed to populate test directory: %v", err)
-	}
-
-	if err := os.Chdir(s.root); err != nil {
-		tb.Errorf("failed to change directory: %v", err)
 	}
 
 	return s
