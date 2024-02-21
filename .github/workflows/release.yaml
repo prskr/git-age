@@ -70,8 +70,22 @@ jobs:
           GH_TAP_PAT: ${{ secrets.GH_TAP_PAT }}
           GH_WINGET_PAT: ${{ secrets.GH_WINGET_PAT }}
           NFPM_GIT_AGE_PASSPHRASE: ${{ secrets.NFPM_GIT_AGE_PASSPHRASE }}
-          UPLOAD_RPM_SECRET: ${{ secrets.UPLOAD_RPM_SECRET }}
-          UPLOAD_DEB_SECRET: ${{ secrets.UPLOAD_DEB_SECRET }}
+
+      - name: Upload RPM packages
+        run: |
+          for rpm in dist/*.rpm; do
+            curl --user prskr:${{ secrets.UPLOAD_RPM_SECRET }} \
+                --upload-file "${rpm}" \
+                https://code.icb4dc0.de/api/packages/prskr/rpm/upload
+          done
+
+      - name: Upload DEB packages
+        run: |
+          for deb in dist/*.deb; do
+            curl --user prskr:${{ secrets.UPLOAD_DEB_SECRET }} \
+                --upload-file "${deb}" \
+                https://code.icb4dc0.de/api/packages/prskr/debian/pool/bookworm/main/upload
+          done
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

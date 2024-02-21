@@ -15,7 +15,7 @@ builds:
       - CGO_ENABLED=0
     binary: git-age
     ldflags:
-      - '-s -w -X github.com/prskr/git-age/handlers/cli.version={{.Tag}} -X github.com/prskr/git-age/handlers/cli.commit={{.Commit}} -X github.com/prskr/git-age/handlers/cli.date={{.Date}}'
+      - "-s -w -X github.com/prskr/git-age/handlers/cli.version={{.Tag}} -X github.com/prskr/git-age/handlers/cli.commit={{.Commit}} -X github.com/prskr/git-age/handlers/cli.date={{.Date}}"
     goos:
       - linux
       - windows
@@ -140,24 +140,3 @@ winget:
           owner: microsoft
           name: winget-pkgs
           branch: master
-
-uploads:
-  - name: RPM
-    method: PUT
-    target: https://code.icb4dc0.de/api/packages/prskr/rpm/upload
-    exts:
-      - rpm
-    username: prskr
-    checksum: false
-    signature: false
-    custom_artifact_name: true
-
-  - name: DEB
-    method: PUT
-    target: https://code.icb4dc0.de/api/packages/prskr/debian/pool/bookworm/main/upload
-    exts:
-      - deb
-    username: prskr
-    checksum: false
-    signature: false
-    custom_artifact_name: true
