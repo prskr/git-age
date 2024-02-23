@@ -71,6 +71,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TAP_PAT: ${{ secrets.GH_TAP_PAT }}
           GH_WINGET_PAT: ${{ secrets.GH_WINGET_PAT }}
+          GH_SCOOP_PAT: ${{ secrets.GH_SCOOP_PAT }}
           NFPM_GIT_AGE_PASSPHRASE: ${{ secrets.NFPM_GIT_AGE_PASSPHRASE }}
 
       - name: Upload RPM packages

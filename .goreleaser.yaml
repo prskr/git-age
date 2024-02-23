@@ -100,7 +100,7 @@ brews:
     commit_author:
       name: goreleaserbot
       email: bot@goreleaser.com
-    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+    commit_msg_template: "chore: update {{ .ProjectName }} to version {{ .Tag }}"
     skip_upload: auto
     folder: Formula
     dependencies:
@@ -117,6 +117,21 @@ brews:
       pull_request:
         enabled: true
 
+scoops:
+  - commit_msg_template: "chore: update {{ .ProjectName }} to version {{ .Tag }}"
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    license: "MIT"
+    depends: ["git"]
+    repository:
+      owner: prskr
+      name: scoop-the-prancing-package
+      token: "{{ .Env.GH_SCOOP_PAT }}"
+      pull_request:
+        enabled: true
+
+
 winget:
   - name: git-age
     publisher: prskr
@@ -132,7 +147,7 @@ winget:
     commit_author:
       name: goreleaserbot
       email: bot@goreleaser.com
-    commit_msg_template: "{{ .PackageIdentifier }}: {{ .Tag }}"
+    commit_msg_template: "chore: update {{ .ProjectName }} to version {{ .Tag }}"
     license_url: "https://raw.githubusercontent.com/prskr/git-age/main/LICENSE"
     release_notes: "{{.Changelog}}"
     tags:
