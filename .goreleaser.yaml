@@ -123,6 +123,7 @@ scoops:
       name: goreleaserbot
       email: bot@goreleaser.com
     license: "MIT"
+    homepage: https://github.com/prskr/git-age
     depends: ["git"]
     repository:
       owner: prskr
@@ -130,6 +131,10 @@ scoops:
       token: "{{ .Env.GH_SCOOP_PAT }}"
       pull_request:
         enabled: true
+        base:
+          owner: prskr
+          name: scoop-the-prancing-package
+          branch: main
 
 
 winget:

@@ -66,3 +66,17 @@ sudo apt update
 
 sudo apt install git-age
 ```
+
+## Windows
+
+To install `git-age` on Windows, you can use [Scoop](https://scoop.sh/).
+
+### Scoop
+
+I maintain a bucket for `git-age` at [prskr/scoop-the-prancing-package](https://github.com/prskr/scoop-the-prancing-package).
+To add the bucket and install `git-age`, run the following commands:
+
+```powershell
+scoop bucket add the-prancing-package https://github.com/prskr/scoop-the-prancing-package
+scoop install git-age
+```
