@@ -143,8 +143,6 @@ winget:
     short_description: |-
       git-age is a smudge/clean filter to encrypt/decrypt files in a git repository transparently
     license: mit
-    # disable for now, would probably require code signing
-    skip_upload: true
     homepage: https://github.com/prskr/git-age
     publisher_support_url: "https://github.com/prskr/git-age/issues/new"
     package_identifier: prskr.git-age
