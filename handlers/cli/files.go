@@ -108,9 +108,9 @@ func (h ReEncryptFilesCliHandler) Run(
 
 type FilesCliHandler struct {
 	KeysFlag  `embed:""`
-	List      ListFilesCliHandler      `cmd:"" help:"List files" aliases:"ls"`
-	Track     TrackFilesCliHandler     `cmd:"" help:"Track files"`
-	ReEncrypt ReEncryptFilesCliHandler `cmd:"" help:"Re-encrypt files tracked by git-age"`
+	List      ListFilesCliHandler      `cmd:"" name:"list" help:"List files" aliases:"ls"`
+	Track     TrackFilesCliHandler     `cmd:"" name:"track" help:"Track files"`
+	ReEncrypt ReEncryptFilesCliHandler `cmd:"" name:"re-encrypt" help:"Re-encrypt files tracked by git-age"`
 }
 
 func (h *FilesCliHandler) AfterApply(kctx *kong.Context, cwd ports.CWD) error {

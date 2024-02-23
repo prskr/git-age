@@ -23,14 +23,14 @@ type App struct {
 		Level slog.Level `env:"GIT_AGE_LOG_LEVEL" help:"Log level" default:"warn"`
 	} `embed:""`
 
-	Clean        clih.CleanCliHandler        `cmd:"" hidden:"" help:"clean should only be invoked by Git"`
-	Smudge       clih.SmudgeCliHandler       `cmd:"" hidden:"" help:"smudge should only be invoked by Git"`
-	Files        clih.FilesCliHandler        `cmd:"" help:"Interact with repo files"`
-	AddRecipient clih.AddRecipientCliHandler `cmd:"" help:"Add a recipient to the list of recipients"`
-	GenKey       clih.GenKeyCliHandler       `cmd:"" help:"Generate a new key pair"`
-	Init         clih.InitCliHandler         `cmd:"" help:"Initialize a repository"`
-	Install      clih.InstallCliHandler      `cmd:"" help:"Install git-age hooks in global git config"`
-	Version      clih.VersionCliHandler      `cmd:"" help:"Print version information"`
+	Clean        clih.CleanCliHandler        `cmd:"" name:"clean" hidden:"" help:"clean should only be invoked by Git"`
+	Smudge       clih.SmudgeCliHandler       `cmd:"" name:"smudge" hidden:"" help:"smudge should only be invoked by Git"`
+	Files        clih.FilesCliHandler        `cmd:"" name:"files" help:"Interact with repo files"`
+	AddRecipient clih.AddRecipientCliHandler `cmd:"" name:"add-recipient" help:"Add a recipient to the list of recipients"`
+	GenKey       clih.GenKeyCliHandler       `cmd:"" name:"gen-key" help:"Generate a new key pair"`
+	Init         clih.InitCliHandler         `cmd:"" name:"init" help:"Initialize a repository"`
+	Install      clih.InstallCliHandler      `cmd:"" name:"install" help:"Install git-age hooks in global git config"`
+	Version      clih.VersionCliHandler      `cmd:"" name:"version" help:"Print version information"`
 }
 
 func (a *App) Execute() error {
