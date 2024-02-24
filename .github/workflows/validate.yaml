@@ -42,6 +42,12 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v4
 
+      - id: govulncheck
+        uses: golang/govulncheck-action@v1
+        with:
+          go-version-input: ${{ matrix.go-version }}
+          go-package: ./...
+
       - name: Test
         run: |
           gotestsum --format pkgname -- -race -shuffle=on -covermode=atomic ./...
