@@ -123,6 +123,7 @@ scoops:
       name: goreleaserbot
       email: bot@goreleaser.com
     license: "MIT"
+    folder: bucket
     homepage: https://github.com/prskr/git-age
     depends: ["git"]
     repository:
