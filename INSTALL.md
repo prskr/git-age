@@ -69,7 +69,13 @@ sudo apt install git-age
 
 ## Windows
 
-To install `git-age` on Windows, you can use [Scoop](https://scoop.sh/).
+To install `git-age` on Windows, you can use [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) or [scoop](https://scoop.sh/).
+
+### Winget
+
+```powershell
+winget install --id=prskr.git-age
+```
 
 ### Scoop
 
