@@ -16,7 +16,10 @@ require (
 	gopkg.in/ini.v1 v1.67.0
 )
 
-replace github.com/go-git/go-git/v5 => github.com/prskr/go-git/v5 v5.0.0-20240205092825-798d9942c362
+replace (
+	github.com/go-git/go-git/v5 => github.com/prskr/go-git/v5 v5.0.0-20240205092825-798d9942c362
+	golang.org/x/crypto => golang.org/x/crypto v0.21.0
+)
 
 require (
 	dario.cat/mergo v1.0.0 // indirect
@@ -34,9 +37,9 @@ require (
 	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect
 	github.com/skeema/knownhosts v1.2.1 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
-	golang.org/x/crypto v0.18.0 // indirect
-	golang.org/x/net v0.20.0 // indirect
-	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/crypto v0.21.0 // indirect
+	golang.org/x/net v0.21.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
