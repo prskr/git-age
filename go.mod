@@ -17,7 +17,7 @@ require (
 )
 
 replace (
-	github.com/go-git/go-git/v5 => github.com/prskr/go-git/v5 v5.0.0-20240205092825-798d9942c362
+	github.com/go-git/go-git/v5 => github.com/prskr/go-git/v5 v5.0.0-20240126144236-03a57f8f5179
 	golang.org/x/crypto => golang.org/x/crypto v0.21.0
 )
 
