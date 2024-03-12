@@ -57,7 +57,7 @@ func (h *CleanCliHandler) Run(stdin ports.STDIN, stdout ports.STDOUT) error {
 	logger.Info("Hashing file at HEAD")
 	obj, headHash, err := h.hashFileAtHead(h.FileToCleanPath, true)
 	if err != nil {
-		if errors.Is(err, plumbing.ErrObjectNotFound) || errors.Is(err, plumbing.ErrReferenceNotFound) {
+		if isFileNotFound(err) {
 			logger.Info("Could not compare file to HEAD, handling as new")
 			return h.copyEncryptedFileToStdout(fileToClean, stdout)
 		}
@@ -175,4 +175,17 @@ func (h *CleanCliHandler) hashFileAt(f io.ReadSeeker) (hash []byte, err error) {
 	}()
 
 	return fsx.HashFile(f)
+}
+
+func isFileNotFound(err error) bool {
+	switch {
+	case errors.Is(err, plumbing.ErrObjectNotFound):
+		return true
+	case errors.Is(err, plumbing.ErrReferenceNotFound):
+		return true
+	case errors.Is(err, object.ErrFileNotFound):
+		return true
+	default:
+		return false
+	}
 }

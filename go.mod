@@ -2,7 +2,7 @@ module github.com/prskr/git-age
 
 go 1.22
 
-toolchain go1.22.0
+toolchain go1.22.1
 
 require (
 	filippo.io/age v1.1.1
