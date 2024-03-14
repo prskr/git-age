@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"golang.org/x/mod/semver"
 )
@@ -15,7 +14,7 @@ const defaultVersion = "v0.0.0"
 var (
 	version = defaultVersion
 	commit  = ""
-	date    = time.Now().UTC().Format(time.RFC3339)
+	date    = ""
 )
 
 type VersionCliHandler struct {
