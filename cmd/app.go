@@ -30,7 +30,7 @@ type App struct {
 	GenKey       clih.GenKeyCliHandler       `cmd:"" name:"gen-key" help:"Generate a new key pair"`
 	Init         clih.InitCliHandler         `cmd:"" name:"init" help:"Initialize a repository"`
 	Install      clih.InstallCliHandler      `cmd:"" name:"install" help:"Install git-age hooks in global git config"`
-	Version      clih.VersionCliHandler      `cmd:"" name:"version" help:"Print version information"`
+	Version      clih.VersionCliHandler      `cmd:"" name:"version" help:"Print version information" default:"1"`
 }
 
 func (a *App) Execute() error {
