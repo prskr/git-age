@@ -92,9 +92,14 @@ func (h *CleanCliHandler) AfterApply(cwd ports.CWD) (err error) {
 		return err
 	}
 
+	keysStore, err := infrastructure.KeysStoreFor(h.Keys)
+	if err != nil {
+		return err
+	}
+
 	h.OpenSealer, err = services.NewAgeSealer(
 		services.WithRecipients(infrastructure.NewRecipientsFile(repoFS)),
-		services.WithIdentities(infrastructure.NewIdentities(h.Keys)),
+		services.WithIdentities(infrastructure.NewIdentities(keysStore)),
 	)
 
 	return err

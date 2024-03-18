@@ -37,7 +37,12 @@ func (h *InitCliHandler) Run() (err error) {
 }
 
 func (h *InitCliHandler) AfterApply(cwd ports.CWD) error {
-	h.Identities = infrastructure.NewIdentities(h.Keys)
+	keysStore, err := infrastructure.KeysStoreFor(h.Keys)
+	if err != nil {
+		return fmt.Errorf("failed to create keys reader: %w", err)
+	}
+
+	h.Identities = infrastructure.NewIdentities(keysStore)
 
 	repoRootPath, err := infrastructure.FindRepoRootFrom(cwd)
 	if err != nil {

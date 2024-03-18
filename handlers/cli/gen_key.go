@@ -26,6 +26,11 @@ func (h *GenKeyCliHandler) Run(stdout ports.STDOUT) (err error) {
 }
 
 func (h *GenKeyCliHandler) AfterApply() error {
-	h.Identities = infrastructure.NewIdentities(h.Keys)
+	keysStore, err := infrastructure.KeysStoreFor(h.Keys)
+	if err != nil {
+		return fmt.Errorf("failed to create keys reader: %w", err)
+	}
+
+	h.Identities = infrastructure.NewIdentities(keysStore)
 	return nil
 }

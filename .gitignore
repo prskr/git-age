@@ -1,6 +1,6 @@
 .idea/
 out/
 dist/
+.gnupg/
 docs/*.1*
 docs/*.html
-.gnupg/

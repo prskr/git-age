@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package agent.v1;
+
+message Stanza {
+    string type = 1;
+    repeated string args = 2;
+    bytes body = 3;
+}
+
+message UnwrapRequest {
+    repeated string origins = 1;
+    repeated agent.v1.Stanza stanzas = 2;
+}
+
+message UnwrapResponse {
+    bytes file_key = 1;
+}
+
+service RemoteIdentityService {
+    rpc Unwrap(UnwrapRequest) returns (UnwrapResponse);
+}
