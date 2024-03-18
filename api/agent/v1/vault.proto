@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package agent.v1;
+
+message GetKeysRequest {
+    repeated string origins = 1;
+}
+
+message GetKeysResponse {
+  repeated string keys = 1;
+}
+
+service KeyVaultService {
+  rpc GetKeys(GetKeysRequest) returns (GetKeysResponse);
+}

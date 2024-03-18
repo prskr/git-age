@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"log/slog"
 
@@ -42,6 +43,11 @@ func (h *SmudgeCliHandler) Run(stdin ports.STDIN, stdout ports.STDOUT) error {
 }
 
 func (h *SmudgeCliHandler) AfterApply() (err error) {
-	h.Opener, err = services.NewAgeSealer(services.WithIdentities(infrastructure.NewIdentities(h.Keys)))
+	keysStore, err := infrastructure.KeysStoreFor(h.Keys)
+	if err != nil {
+		return fmt.Errorf("failed to create keys reader: %w", err)
+	}
+
+	h.Opener, err = services.NewAgeSealer(services.WithIdentities(infrastructure.NewIdentities(keysStore)))
 	return err
 }

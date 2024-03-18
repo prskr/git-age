@@ -1,0 +1,11 @@
+version: v1
+name: buf.build/git-age/agent
+breaking:
+  use:
+    - FILE
+lint:
+  use:
+    - DEFAULT
+  except:
+    - PACKAGE_DIRECTORY_MATCH
+  allow_comment_ignores: true

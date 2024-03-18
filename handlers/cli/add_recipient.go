@@ -64,8 +64,13 @@ func (h *AddRecipientCliHandler) AfterApply(kctx *kong.Context, cwd ports.CWD) e
 
 	recipients := infrastructure.NewRecipientsFile(repoFS)
 
+	keysStore, err := infrastructure.KeysStoreFor(h.Keys)
+	if err != nil {
+		return fmt.Errorf("failed to create keys reader: %w", err)
+	}
+
 	openSealer, err := services.NewAgeSealer(
-		services.WithIdentities(infrastructure.NewIdentities(h.Keys)),
+		services.WithIdentities(infrastructure.NewIdentities(keysStore)),
 		services.WithRecipients(recipients),
 	)
 	if err != nil {

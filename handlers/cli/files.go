@@ -131,8 +131,13 @@ func (h *FilesCliHandler) AfterApply(kctx *kong.Context, cwd ports.CWD) error {
 		return err
 	}
 
+	keysStore, err := infrastructure.KeysStoreFor(h.Keys)
+	if err != nil {
+		return err
+	}
+
 	sealer, err := services.NewAgeSealer(
-		services.WithIdentities(infrastructure.NewIdentities(h.Keys)),
+		services.WithIdentities(infrastructure.NewIdentities(keysStore)),
 		services.WithRecipients(infrastructure.NewRecipientsFile(repoFS)),
 	)
 	if err != nil {

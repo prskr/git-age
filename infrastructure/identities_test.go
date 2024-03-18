@@ -2,6 +2,7 @@ package infrastructure_test
 
 import (
 	"io"
+	"net/url"
 	"os"
 	"testing"
 
@@ -86,7 +87,7 @@ func TestIdentities_All(t *testing.T) {
 				return
 			}
 
-			i := infrastructure.NewIdentities(keysFile.Name())
+			i := infrastructure.NewIdentities((*infrastructure.FileKeysStore)(mustParseUrl(t, keysFile.Name())))
 
 			got, err := i.All()
 			if (err != nil) != tt.wantErr {
@@ -146,7 +147,7 @@ with multiple lines`,
 				return
 			}
 
-			i := infrastructure.NewIdentities(keysFile.Name())
+			i := infrastructure.NewIdentities((*infrastructure.FileKeysStore)(mustParseUrl(t, keysFile.Name())))
 
 			if _, err := i.Generate(tt.args.comment); (err != nil) != tt.wantErr {
 				t.Errorf("Generate() error = %v, wantErr %v", err, tt.wantErr)
@@ -169,4 +170,15 @@ with multiple lines`,
 			}
 		})
 	}
+}
+
+func mustParseUrl(tb testing.TB, raw string) *url.URL {
+	tb.Helper()
+
+	u, err := url.Parse(raw)
+	if err != nil {
+		tb.Fatalf("failed to parse url: %v", err)
+	}
+
+	return u
 }

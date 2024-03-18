@@ -1,0 +1,27 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+tab_width = 4
+indent_style = space
+insert_final_newline = false
+max_line_length = 120
+trim_trailing_whitespace = true
+
+[*.go]
+indent_style = tab
+ij_smart_tabs = true
+ij_go_GROUP_CURRENT_PROJECT_IMPORTS = true
+ij_go_group_stdlib_imports = true
+ij_go_import_sorting = goimports
+ij_go_local_group_mode = project
+ij_go_move_all_imports_in_one_declaration = true
+ij_go_move_all_stdlib_imports_in_one_group = true
+ij_go_remove_redundant_import_aliases = true
+
+[{*.yaml,*.yml}]
+indent_size = 2
+tab_width = 2
+insert_final_newline = true
