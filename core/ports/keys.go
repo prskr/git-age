@@ -32,9 +32,3 @@ type FileOpener interface {
 	AddIdentities(identities ...age.Identity)
 	OpenFile(reader io.Reader) (io.Reader, error)
 }
-
-type KeysStore interface {
-	Reader() (io.ReadCloser, error)
-	Write(id *age.X25519Identity, comment string) error
-	Clear() error
-}

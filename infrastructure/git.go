@@ -22,6 +22,7 @@ var (
 	_ ports.RepoWalker       = (*GitRepository)(nil)
 	_ ports.Comitter         = (*GitRepository)(nil)
 	_ ports.HeadObjectOpener = (*GitRepository)(nil)
+	_ ports.RemotesLister    = (*GitRepository)(nil)
 )
 
 func NewGitRepositoryFromPath(from ports.CWD) (*GitRepository, *ReadWriteDirFS, error) {
@@ -62,6 +63,23 @@ type GitRepository struct {
 	RepoFS     fs.FS
 	Repository *git.Repository
 	Worktree   *git.Worktree
+}
+
+func (g GitRepository) Remotes() ([]string, error) {
+	remotes, err := g.Repository.Remotes()
+	if err != nil {
+		return nil, err
+	}
+
+	urls := make([]string, 0, len(remotes))
+	for _, remote := range remotes {
+		repoUrls := remote.Config().URLs
+		if len(repoUrls) >= 1 {
+			urls = append(urls, repoUrls[0])
+		}
+	}
+
+	return urls, nil
 }
 
 func (g GitRepository) OpenObjectAtHead(filePath string) (*object.File, error) {

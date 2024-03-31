@@ -13,7 +13,6 @@ import (
 	"github.com/prskr/git-age/internal/fsx"
 )
 
-//nolint:paralleltest // The tests are not parallelizable due to the use of a global environment variable
 func TestInstallCliHandler_Run(t *testing.T) {
 	tests := []struct {
 		name           string

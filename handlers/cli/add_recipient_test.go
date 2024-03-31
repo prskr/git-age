@@ -1,12 +1,14 @@
 package cli_test
 
 import (
+	"context"
 	"path/filepath"
 	"testing"
 
 	"github.com/alecthomas/kong"
 
 	"github.com/prskr/git-age/core/ports"
+	"github.com/prskr/git-age/internal/testx"
 
 	"filippo.io/age"
 
@@ -29,6 +31,7 @@ func TestAddRecipientCliHandler_Run(t *testing.T) {
 		t,
 		new(cli.AddRecipientCliHandler),
 		kong.Bind(ports.CWD(setup.root)),
+		kong.BindTo(testx.Context(t), (*context.Context)(nil)),
 	)
 
 	args := []string{

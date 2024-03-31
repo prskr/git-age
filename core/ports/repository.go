@@ -29,11 +29,16 @@ type HeadObjectOpener interface {
 	OpenObjectAtHead(objectPath string) (*object.File, error)
 }
 
+type RemotesLister interface {
+	Remotes() ([]string, error)
+}
+
 type GitRepository interface {
 	RepoStater
 	RepoWalker
 	Comitter
 	HeadObjectOpener
+	RemotesLister
 }
 
 func GlobalGitConfigPath() (string, error) {

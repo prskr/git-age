@@ -32,14 +32,9 @@ func WithRecipients(r ports.Recipients) AgeSealerOption {
 	}
 }
 
-func WithIdentities(id ports.Identities) AgeSealerOption {
+func WithIdentities(ids ...age.Identity) AgeSealerOption {
 	return func(sealer *AgeSealer) error {
-		identities, err := id.All()
-		if err != nil {
-			return err
-		}
-
-		sealer.Identities = identities
+		sealer.Identities = ids
 		return nil
 	}
 }

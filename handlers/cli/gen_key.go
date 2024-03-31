@@ -1,8 +1,10 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/prskr/git-age/core/dto"
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/infrastructure"
 )
@@ -10,12 +12,18 @@ import (
 type GenKeyCliHandler struct {
 	KeysFlag    `embed:""`
 	CommentFlag `embed:""`
+	RemoteFlag  `embed:""`
 
-	Identities ports.Identities `kong:"-"`
+	Identities ports.IdentitiesStore `kong:"-"`
 }
 
-func (h *GenKeyCliHandler) Run(stdout ports.STDOUT) (err error) {
-	pubKey, err := h.Identities.Generate(h.Comment)
+func (h *GenKeyCliHandler) Run(ctx context.Context, stdout ports.STDOUT) (err error) {
+	cmd := dto.GenerateIdentityCommand{
+		Comment: h.Comment,
+		Remote:  h.Remote,
+	}
+
+	pubKey, err := h.Identities.Generate(ctx, cmd)
 	if err != nil {
 		return fmt.Errorf("failed to generate identity: %w", err)
 	}
@@ -25,12 +33,16 @@ func (h *GenKeyCliHandler) Run(stdout ports.STDOUT) (err error) {
 	return err
 }
 
-func (h *GenKeyCliHandler) AfterApply() error {
-	keysStore, err := infrastructure.KeysStoreFor(h.Keys)
+func (h *GenKeyCliHandler) AfterApply(ctx context.Context) error {
+	idStore, err := infrastructure.IdentitiesStore(
+		ctx,
+		infrastructure.NewAgentIdentitiesStoreSource(),
+		infrastructure.NewFileIdentityStoreSource(h.Keys),
+	)
 	if err != nil {
-		return fmt.Errorf("failed to create keys reader: %w", err)
+		return fmt.Errorf("failed to init identities store: %w", err)
 	}
 
-	h.Identities = infrastructure.NewIdentities(keysStore)
+	h.Identities = idStore
 	return nil
 }
