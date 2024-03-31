@@ -49,7 +49,6 @@ func TestNewGitRepositoryFromPath(t *testing.T) {
 		},
 	}
 
-	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
@@ -105,7 +104,6 @@ func TestGitRepository_OpenObjectAtHead(t *testing.T) {
 		},
 	}
 
-	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
@@ -180,7 +178,6 @@ func TestGitRepository_IsStagingDirty(t *testing.T) {
 		},
 	}
 
-	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()

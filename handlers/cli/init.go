@@ -1,10 +1,12 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	"io/fs"
 	"log/slog"
 
+	"github.com/prskr/git-age/core/dto"
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/infrastructure"
 )
@@ -12,19 +14,25 @@ import (
 type InitCliHandler struct {
 	CommentFlag `embed:""`
 	KeysFlag    `embed:""`
+	RemoteFlag  `embed:""`
 
-	Identities ports.Identities  `kong:"-"`
-	Recipients ports.Recipients  `kong:"-"`
-	RepoFS     ports.ReadWriteFS `kong:"-"`
+	Identities ports.IdentitiesStore `kong:"-"`
+	Recipients ports.Recipients      `kong:"-"`
+	RepoFS     ports.ReadWriteFS     `kong:"-"`
 }
 
-func (h *InitCliHandler) Run() (err error) {
+func (h *InitCliHandler) Run(ctx context.Context) (err error) {
 	if _, err := fs.Stat(h.RepoFS, ports.RecipientsFileName); err == nil {
 		slog.Info("Repository already initialized")
 		return nil
 	}
 
-	pubKey, err := h.Identities.Generate(h.Comment)
+	cmd := dto.GenerateIdentityCommand{
+		Comment: h.Comment,
+		Remote:  h.Remote,
+	}
+
+	pubKey, err := h.Identities.Generate(ctx, cmd)
 	if err != nil {
 		return fmt.Errorf("failed to generate identity: %w", err)
 	}
@@ -36,13 +44,17 @@ func (h *InitCliHandler) Run() (err error) {
 	return nil
 }
 
-func (h *InitCliHandler) AfterApply(cwd ports.CWD) error {
-	keysStore, err := infrastructure.KeysStoreFor(h.Keys)
+func (h *InitCliHandler) AfterApply(ctx context.Context, cwd ports.CWD) error {
+	idStore, err := infrastructure.IdentitiesStore(
+		ctx,
+		infrastructure.NewAgentIdentitiesStoreSource(),
+		infrastructure.NewFileIdentityStoreSource(h.Keys),
+	)
 	if err != nil {
-		return fmt.Errorf("failed to create keys reader: %w", err)
+		return fmt.Errorf("failed to init identities store: %w", err)
 	}
 
-	h.Identities = infrastructure.NewIdentities(keysStore)
+	h.Identities = idStore
 
 	repoRootPath, err := infrastructure.FindRepoRootFrom(cwd)
 	if err != nil {

@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 
+	"github.com/prskr/git-age/core/dto"
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
 	"github.com/prskr/git-age/infrastructure"
@@ -113,7 +115,7 @@ type FilesCliHandler struct {
 	ReEncrypt ReEncryptFilesCliHandler `cmd:"" name:"re-encrypt" help:"Re-encrypt files tracked by git-age"`
 }
 
-func (h *FilesCliHandler) AfterApply(kctx *kong.Context, cwd ports.CWD) error {
+func (h *FilesCliHandler) AfterApply(ctx context.Context, kongCtx *kong.Context, cwd ports.CWD) error {
 	repoRootPath, err := infrastructure.FindRepoRootFrom(cwd)
 	if err != nil {
 		return err
@@ -126,27 +128,45 @@ func (h *FilesCliHandler) AfterApply(kctx *kong.Context, cwd ports.CWD) error {
 
 	repoFS := infrastructure.NewReadWriteDirFS(repoRootPath)
 
-	gr, err := infrastructure.NewGitRepository(repoFS, repo)
+	gitRepo, err := infrastructure.NewGitRepository(repoFS, repo)
 	if err != nil {
 		return err
 	}
 
-	keysStore, err := infrastructure.KeysStoreFor(h.Keys)
+	idStore, err := infrastructure.IdentitiesStore(
+		ctx,
+		infrastructure.NewAgentIdentitiesStoreSource(),
+		infrastructure.NewFileIdentityStoreSource(h.Keys),
+	)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to init identities store: %w", err)
+	}
+
+	remotes, err := gitRepo.Remotes()
+	if err != nil {
+		return fmt.Errorf("failed to determine Git remotes: %w", err)
+	}
+
+	query := dto.IdentitiesQuery{
+		Remotes: remotes,
+	}
+
+	ids, err := idStore.Identities(ctx, query)
+	if err != nil {
+		return fmt.Errorf("failed to get identities: %w", err)
 	}
 
 	sealer, err := services.NewAgeSealer(
-		services.WithIdentities(infrastructure.NewIdentities(keysStore)),
+		services.WithIdentities(ids...),
 		services.WithRecipients(infrastructure.NewRecipientsFile(repoFS)),
 	)
 	if err != nil {
 		return err
 	}
 
-	kctx.BindTo(repoFS, (*ports.ReadWriteFS)(nil))
-	kctx.BindTo(gr, (*ports.GitRepository)(nil))
-	kctx.BindTo(sealer, (*ports.FileOpenSealer)(nil))
+	kongCtx.BindTo(repoFS, (*ports.ReadWriteFS)(nil))
+	kongCtx.BindTo(gitRepo, (*ports.GitRepository)(nil))
+	kongCtx.BindTo(sealer, (*ports.FileOpenSealer)(nil))
 
 	return nil
 }

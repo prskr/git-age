@@ -1,6 +1,7 @@
 package cli_test
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/handlers/cli"
+	"github.com/prskr/git-age/internal/testx"
 )
 
 func TestInitCliHandler_Run(t *testing.T) {
@@ -27,6 +29,7 @@ func TestInitCliHandler_Run(t *testing.T) {
 		t,
 		new(cli.InitCliHandler),
 		kong.Bind(ports.CWD(setup.root)),
+		kong.BindTo(testx.Context(t), (*context.Context)(nil)),
 	)
 
 	keysFilePath := filepath.Join(tmpDir, "keys.txt")

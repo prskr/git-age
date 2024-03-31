@@ -39,7 +39,6 @@ func TestAgeSealer_AddRecipients(t *testing.T) {
 		},
 	}
 
-	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
@@ -93,7 +92,6 @@ func TestAgeSealer_AddIdentities(t *testing.T) {
 		},
 	}
 
-	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()

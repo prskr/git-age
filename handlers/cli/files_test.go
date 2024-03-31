@@ -3,6 +3,7 @@ package cli_test
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"io"
 	"os"
 	"path/filepath"
@@ -16,6 +17,7 @@ import (
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/handlers/cli"
 	"github.com/prskr/git-age/infrastructure"
+	"github.com/prskr/git-age/internal/testx"
 )
 
 func TestListFilesCliHandler_Run(t *testing.T) {
@@ -27,6 +29,7 @@ func TestListFilesCliHandler_Run(t *testing.T) {
 		t,
 		new(cli.FilesCliHandler),
 		kong.Bind(ports.CWD(setup.root)),
+		kong.BindTo(testx.Context(t), (*context.Context)(nil)),
 		kong.BindTo(ports.STDOUT(out), (*ports.STDOUT)(nil)),
 	)
 
@@ -69,6 +72,7 @@ func TestTrackFilesCliHandler_Run(t *testing.T) {
 		t,
 		new(cli.FilesCliHandler),
 		kong.Bind(ports.CWD(setup.root)),
+		kong.BindTo(testx.Context(t), (*context.Context)(nil)),
 	)
 
 	args := []string{
@@ -146,6 +150,7 @@ func TestReEncryptFilesCliHandler_Run(t *testing.T) {
 		t,
 		new(cli.FilesCliHandler),
 		kong.Bind(ports.CWD(setup.root)),
+		kong.BindTo(testx.Context(t), (*context.Context)(nil)),
 	)
 
 	args := []string{

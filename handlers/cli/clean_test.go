@@ -2,6 +2,7 @@ package cli_test
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"os"
 	"path/filepath"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/handlers/cli"
+	"github.com/prskr/git-age/internal/testx"
 )
 
 func TestCleanCliHandler_Run(t *testing.T) {
@@ -44,7 +46,6 @@ func TestCleanCliHandler_Run(t *testing.T) {
 		},
 	}
 
-	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
@@ -73,6 +74,7 @@ func TestCleanCliHandler_Run(t *testing.T) {
 				t,
 				new(cli.CleanCliHandler),
 				kong.Bind(ports.CWD(setup.root)),
+				kong.BindTo(testx.Context(t), (*context.Context)(nil)),
 				kong.BindTo(ports.STDIN(inFile), (*ports.STDIN)(nil)),
 				kong.BindTo(ports.STDOUT(out), (*ports.STDOUT)(nil)),
 			)

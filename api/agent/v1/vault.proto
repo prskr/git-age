@@ -2,14 +2,25 @@ syntax = "proto3";
 
 package agent.v1;
 
-message GetKeysRequest {
-    repeated string origins = 1;
+message GetIdentitiesRequest {
+    repeated string remotes = 1;
 }
 
-message GetKeysResponse {
+message GetIdentitiesResponse {
   repeated string keys = 1;
 }
 
-service KeyVaultService {
-  rpc GetKeys(GetKeysRequest) returns (GetKeysResponse);
+message StoreIdentityRequest {
+    string public_key = 1;
+    string private_key = 2;
+    string comment = 3;
+    string remote = 4;
+}
+
+message StoreIdentityResponse {
+}
+
+service IdentitiesStoreService {
+  rpc GetIdentities(GetIdentitiesRequest) returns (GetIdentitiesResponse);
+  rpc StoreIdentity(StoreIdentityRequest) returns (StoreIdentityResponse);
 }

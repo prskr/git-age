@@ -3,6 +3,7 @@ package cli
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/go-git/go-git/v5/plumbing"
 
+	"github.com/prskr/git-age/core/dto"
 	"github.com/prskr/git-age/internal/fsx"
 
 	"github.com/go-git/go-git/v5/plumbing/object"
@@ -84,7 +86,7 @@ func (h *CleanCliHandler) Run(stdin ports.STDIN, stdout ports.STDOUT) error {
 	return h.copyEncryptedFileToStdout(fileToClean, stdout)
 }
 
-func (h *CleanCliHandler) AfterApply(cwd ports.CWD) (err error) {
+func (h *CleanCliHandler) AfterApply(ctx context.Context, cwd ports.CWD) (err error) {
 	var repoFS ports.ReadWriteFS
 
 	h.Repository, repoFS, err = infrastructure.NewGitRepositoryFromPath(cwd)
@@ -92,14 +94,32 @@ func (h *CleanCliHandler) AfterApply(cwd ports.CWD) (err error) {
 		return err
 	}
 
-	keysStore, err := infrastructure.KeysStoreFor(h.Keys)
+	idStore, err := infrastructure.IdentitiesStore(
+		ctx,
+		infrastructure.NewAgentIdentitiesStoreSource(),
+		infrastructure.NewFileIdentityStoreSource(h.Keys),
+	)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to init identities store: %w", err)
+	}
+
+	remotes, err := h.Repository.Remotes()
+	if err != nil {
+		return fmt.Errorf("failed to determine Git remotes: %w", err)
+	}
+
+	query := dto.IdentitiesQuery{
+		Remotes: remotes,
+	}
+
+	ids, err := idStore.Identities(ctx, query)
+	if err != nil {
+		return fmt.Errorf("failed to get identities: %w", err)
 	}
 
 	h.OpenSealer, err = services.NewAgeSealer(
 		services.WithRecipients(infrastructure.NewRecipientsFile(repoFS)),
-		services.WithIdentities(infrastructure.NewIdentities(keysStore)),
+		services.WithIdentities(ids...),
 	)
 
 	return err

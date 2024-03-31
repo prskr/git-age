@@ -10,3 +10,7 @@ type KeysFlag struct {
 type CommentFlag struct {
 	Comment string `short:"c" name:"comment" help:"Comment to add in file"`
 }
+
+type RemoteFlag struct {
+	Remote string `short:"r" name:"remote" help:"Remote for which this key should be considered"`
+}

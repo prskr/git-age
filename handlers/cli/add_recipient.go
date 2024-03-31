@@ -1,12 +1,14 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"os"
 
 	"github.com/alecthomas/kong"
 
+	"github.com/prskr/git-age/core/dto"
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
 	"github.com/prskr/git-age/infrastructure"
@@ -56,31 +58,49 @@ func (h *AddRecipientCliHandler) Run(
 	return nil
 }
 
-func (h *AddRecipientCliHandler) AfterApply(kctx *kong.Context, cwd ports.CWD) error {
-	repository, repoFS, err := infrastructure.NewGitRepositoryFromPath(cwd)
+func (h *AddRecipientCliHandler) AfterApply(ctx context.Context, kongCtx *kong.Context, cwd ports.CWD) error {
+	gitRepo, repoFS, err := infrastructure.NewGitRepositoryFromPath(cwd)
 	if err != nil {
 		return err
 	}
 
 	recipients := infrastructure.NewRecipientsFile(repoFS)
 
-	keysStore, err := infrastructure.KeysStoreFor(h.Keys)
+	idStore, err := infrastructure.IdentitiesStore(
+		ctx,
+		infrastructure.NewAgentIdentitiesStoreSource(),
+		infrastructure.NewFileIdentityStoreSource(h.Keys),
+	)
 	if err != nil {
-		return fmt.Errorf("failed to create keys reader: %w", err)
+		return fmt.Errorf("failed to init identities store: %w", err)
+	}
+
+	remotes, err := gitRepo.Remotes()
+	if err != nil {
+		return fmt.Errorf("failed to determine Git remotes: %w", err)
+	}
+
+	query := dto.IdentitiesQuery{
+		Remotes: remotes,
+	}
+
+	ids, err := idStore.Identities(ctx, query)
+	if err != nil {
+		return fmt.Errorf("failed to get identities: %w", err)
 	}
 
 	openSealer, err := services.NewAgeSealer(
-		services.WithIdentities(infrastructure.NewIdentities(keysStore)),
+		services.WithIdentities(ids...),
 		services.WithRecipients(recipients),
 	)
 	if err != nil {
 		return err
 	}
 
-	kctx.BindTo(repoFS, (*ports.ReadWriteFS)(nil))
-	kctx.BindTo(repository, (*ports.GitRepository)(nil))
-	kctx.BindTo(recipients, (*ports.Recipients)(nil))
-	kctx.BindTo(openSealer, (*ports.FileOpenSealer)(nil))
+	kongCtx.BindTo(repoFS, (*ports.ReadWriteFS)(nil))
+	kongCtx.BindTo(gitRepo, (*ports.GitRepository)(nil))
+	kongCtx.BindTo(recipients, (*ports.Recipients)(nil))
+	kongCtx.BindTo(openSealer, (*ports.FileOpenSealer)(nil))
 
 	return nil
 }

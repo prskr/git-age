@@ -4,3 +4,5 @@ dist/
 .gnupg/
 docs/*.1*
 docs/*.html
+
+git-age

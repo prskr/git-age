@@ -2,10 +2,12 @@ package cli
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"log/slog"
 
+	"github.com/prskr/git-age/core/dto"
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
 	"github.com/prskr/git-age/infrastructure"
@@ -42,12 +44,35 @@ func (h *SmudgeCliHandler) Run(stdin ports.STDIN, stdout ports.STDOUT) error {
 	return err
 }
 
-func (h *SmudgeCliHandler) AfterApply() (err error) {
-	keysStore, err := infrastructure.KeysStoreFor(h.Keys)
+func (h *SmudgeCliHandler) AfterApply(ctx context.Context, cwd ports.CWD) (err error) {
+	gitRepo, _, err := infrastructure.NewGitRepositoryFromPath(cwd)
 	if err != nil {
-		return fmt.Errorf("failed to create keys reader: %w", err)
+		return fmt.Errorf("failed to init git repository: %w", err)
 	}
 
-	h.Opener, err = services.NewAgeSealer(services.WithIdentities(infrastructure.NewIdentities(keysStore)))
+	idStore, err := infrastructure.IdentitiesStore(
+		ctx,
+		infrastructure.NewAgentIdentitiesStoreSource(),
+		infrastructure.NewFileIdentityStoreSource(h.Keys),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to init identities store: %w", err)
+	}
+
+	remotes, err := gitRepo.Remotes()
+	if err != nil {
+		return fmt.Errorf("failed to determine Git remotes: %w", err)
+	}
+
+	query := dto.IdentitiesQuery{
+		Remotes: remotes,
+	}
+
+	ids, err := idStore.Identities(ctx, query)
+	if err != nil {
+		return fmt.Errorf("failed to get identities: %w", err)
+	}
+
+	h.Opener, err = services.NewAgeSealer(services.WithIdentities(ids...))
 	return err
 }

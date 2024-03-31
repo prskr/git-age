@@ -2,6 +2,7 @@ package cli_test
 
 import (
 	"bytes"
+	"context"
 	"os"
 	"testing"
 
@@ -10,6 +11,7 @@ import (
 
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/handlers/cli"
+	"github.com/prskr/git-age/internal/testx"
 )
 
 func TestGenKeyCliHandler_Run(t *testing.T) {
@@ -31,6 +33,7 @@ func TestGenKeyCliHandler_Run(t *testing.T) {
 	parser := newKong(
 		t,
 		new(cli.GenKeyCliHandler),
+		kong.BindTo(testx.Context(t), (*context.Context)(nil)),
 		kong.BindTo(ports.STDOUT(outBuf), (*ports.STDOUT)(nil)),
 	)
 

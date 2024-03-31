@@ -55,7 +55,6 @@ func TestReadWriteDirFS_Rename(t *testing.T) {
 		},
 	}
 
-	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
@@ -127,7 +126,6 @@ func TestReadWriteDirFS_TempFile(t *testing.T) {
 		},
 	}
 
-	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
@@ -173,7 +171,6 @@ func TestReadWriteDirFS_Remove(t *testing.T) {
 		},
 	}
 
-	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
@@ -241,7 +238,6 @@ func TestReadWriteDirFS_OpenRW(t *testing.T) {
 		},
 	}
 
-	//nolint:paralleltest // not necessary anymore in Go 1.22
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
