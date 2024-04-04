@@ -12,7 +12,7 @@ require (
 	github.com/go-git/go-git/v5 v5.11.0
 	github.com/lmittmann/tint v1.0.4
 	github.com/minio/sha256-simd v1.0.1
-	golang.org/x/mod v0.16.0
+	golang.org/x/mod v0.17.0
 	gopkg.in/ini.v1 v1.67.0
 )
 
