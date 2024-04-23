@@ -7,7 +7,7 @@ message GetIdentitiesRequest {
 }
 
 message GetIdentitiesResponse {
-  repeated string keys = 1;
+    repeated string keys = 1;
 }
 
 message StoreIdentityRequest {
@@ -15,12 +15,13 @@ message StoreIdentityRequest {
     string private_key = 2;
     string comment = 3;
     string remote = 4;
+    bool  overwrite = 5;
 }
 
 message StoreIdentityResponse {
 }
 
 service IdentitiesStoreService {
-  rpc GetIdentities(GetIdentitiesRequest) returns (GetIdentitiesResponse);
-  rpc StoreIdentity(StoreIdentityRequest) returns (StoreIdentityResponse);
+    rpc GetIdentities(GetIdentitiesRequest) returns (GetIdentitiesResponse);
+    rpc StoreIdentity(StoreIdentityRequest) returns (StoreIdentityResponse);
 }

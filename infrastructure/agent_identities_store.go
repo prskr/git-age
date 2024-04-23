@@ -61,12 +61,12 @@ func (a *AgentIdentitiesStoreSource) IsValid(ctx context.Context) (bool, error) 
 
 func (a *AgentIdentitiesStoreSource) GetStore() (ports.IdentitiesStore, error) {
 	return &AgentIdentitiesStore{
-		identitiesClient: agentv1connect.NewIdentitiesStoreServiceClient(a.Client, a.BaseUrl),
+		IdentitiesClient: agentv1connect.NewIdentitiesStoreServiceClient(a.Client, a.BaseUrl),
 	}, nil
 }
 
 type AgentIdentitiesStore struct {
-	identitiesClient agentv1connect.IdentitiesStoreServiceClient
+	IdentitiesClient agentv1connect.IdentitiesStoreServiceClient
 }
 
 func (a AgentIdentitiesStore) Generate(
@@ -91,7 +91,7 @@ func (a AgentIdentitiesStore) Generate(
 		Remote:     cmd.Remote,
 	}
 
-	if _, err = a.identitiesClient.StoreIdentity(ctx, connect.NewRequest(req)); err != nil {
+	if _, err = a.IdentitiesClient.StoreIdentity(ctx, connect.NewRequest(req)); err != nil {
 		return "", err
 	}
 
@@ -103,7 +103,7 @@ func (a AgentIdentitiesStore) Identities(ctx context.Context, query dto.Identiti
 		Remotes: query.Remotes,
 	}
 
-	resp, err := a.identitiesClient.GetIdentities(ctx, connect.NewRequest(req))
+	resp, err := a.IdentitiesClient.GetIdentities(ctx, connect.NewRequest(req))
 	if err != nil {
 		return nil, err
 	}
