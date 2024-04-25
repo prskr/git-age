@@ -50,7 +50,7 @@ jobs:
           go generate .
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v5
 
       - id: govulncheck
         uses: golang/govulncheck-action@v1
