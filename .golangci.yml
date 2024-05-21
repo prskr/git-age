@@ -43,6 +43,7 @@ linters:
     - decorder
     - dogsled
     - dupl
+    - err113
     - errname
     - errorlint
     - exhaustive
@@ -54,7 +55,6 @@ linters:
     - goconst
     - gocritic
     - gocyclo
-    - goerr113
     - gofumpt
     - goimports
     - gosec
@@ -86,10 +86,10 @@ issues:
   exclude-rules:
     - path: _test\.go
       linters:
+        - err113
         - funlen
         - cyclop
         - gocognit
-        - goerr113
         - gochecknoinits
         - gochecknoglobals
 
