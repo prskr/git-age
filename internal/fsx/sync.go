@@ -10,18 +10,6 @@ import (
 	"github.com/prskr/git-age/core/ports"
 )
 
-func NopeWriteCloser(w io.Writer) io.WriteCloser {
-	return nopWriteCloser{w}
-}
-
-type nopWriteCloser struct {
-	io.Writer
-}
-
-func (nopWriteCloser) Close() error {
-	return nil
-}
-
 func SealingMiddleware(sealer ports.FileSealer, pattern string) MiddlewareProvider {
 	return func(filePath string, w io.Writer) (io.Writer, error) {
 		match, err := filepath.Match(pattern, filePath)

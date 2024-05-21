@@ -102,7 +102,7 @@ brews:
       email: bot@goreleaser.com
     commit_msg_template: "chore: update {{ .ProjectName }} to version {{ .Tag }}"
     skip_upload: auto
-    folder: Formula
+    directory: Formula
     dependencies:
       - name: git
         os: mac
