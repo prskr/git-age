@@ -3,6 +3,7 @@ package cli_test
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -80,7 +81,7 @@ func TestCleanCliHandler_Run(t *testing.T) {
 			)
 
 			args := []string{
-				"-k", filepath.Join(setup.root, "keys.txt"),
+				"-k", fmt.Sprintf("file:///%s/keys.txt", filepath.ToSlash(setup.root)),
 				".env",
 			}
 

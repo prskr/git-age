@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -39,7 +40,7 @@ func (f *FileIdentityStoreSource) GetStore() (ports.IdentitiesStore, error) {
 type FileIdentityStore url.URL
 
 func (f *FileIdentityStore) Identities(context.Context, dto.IdentitiesQuery) ([]age.Identity, error) {
-	keysFile, err := os.Open(f.Path)
+	keysFile, err := os.Open(f.identitiesFilePath())
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return nil, nil
@@ -66,12 +67,13 @@ func (f *FileIdentityStore) Generate(_ context.Context, cmd dto.GenerateIdentity
 		cmd.Comment = "# generated on " + time.Now().Format(time.RFC3339)
 	}
 
-	identitiesDir, _ := filepath.Split(f.Path)
+	ifp := f.identitiesFilePath()
+	identitiesDir, _ := filepath.Split(ifp)
 	if err := os.MkdirAll(identitiesDir, 0o700); err != nil {
 		return "", fmt.Errorf("failed to create identities directory: %w", err)
 	}
 
-	identitiesFile, err := os.OpenFile(f.Path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o600)
+	identitiesFile, err := os.OpenFile(ifp, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o600)
 	if err != nil {
 		return "", fmt.Errorf("failed to open identities file: %w", err)
 	}
@@ -100,4 +102,12 @@ func (f *FileIdentityStore) Generate(_ context.Context, cmd dto.GenerateIdentity
 	}
 
 	return publicKey, nil
+}
+
+func (f *FileIdentityStore) identitiesFilePath() string {
+	if runtime.GOOS == "windows" {
+		return strings.TrimLeft(f.Path, "/")
+	}
+
+	return f.Path
 }

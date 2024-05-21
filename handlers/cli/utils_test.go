@@ -49,8 +49,7 @@ func newKong(tb testing.TB, grammar any, opts ...kong.Option) *kong.Kong {
 	tb.Helper()
 
 	opts = append(opts, kong.Vars{
-		"XDG_CONFIG_HOME":     xdg.ConfigHome,
-		"file_path_separator": string(filepath.Separator),
+		"XDG_CONFIG_HOME": filepath.ToSlash(xdg.ConfigHome),
 	})
 
 	inst, err := kong.New(grammar, opts...)

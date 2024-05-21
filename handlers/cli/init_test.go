@@ -2,6 +2,7 @@ package cli_test
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -34,7 +35,7 @@ func TestInitCliHandler_Run(t *testing.T) {
 
 	keysFilePath := filepath.Join(tmpDir, "keys.txt")
 	args := []string{
-		"-k", keysFilePath,
+		"-k", fmt.Sprintf("file:///%s/keys.txt", filepath.ToSlash(tmpDir)),
 	}
 
 	ctx, err := parser.Parse(args)

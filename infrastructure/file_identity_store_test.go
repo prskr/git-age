@@ -62,7 +62,7 @@ func TestFileIdentityStoreSource_IsValid(t *testing.T) {
 		{
 			name: "Valid URL - with scheme",
 			url: &url.URL{
-				Scheme: "file://",
+				Scheme: "file:/",
 				Path:   "/home/prskr/.config/git-age/keys.txt",
 			},
 			want:    true,
