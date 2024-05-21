@@ -38,7 +38,7 @@ func TestGenKeyCliHandler_Run(t *testing.T) {
 	)
 
 	args := []string{
-		"-k", f.Name(),
+		"-k", "file:///" + f.Name(),
 		"-c", "test",
 	}
 
