@@ -6,9 +6,9 @@ before:
     - rm -rf out/man
     - mkdir -p out/man
     - mkdir -p out/html
-    - asciidoctor -a reproducible -b manpage -o out/man/git-age.1 docs/git-age.adoc
+    - asciidoctor -a reproducible -b manpage -o out/man/git-age.1 docs/man/git-age.adoc
     - gzip out/man/git-age.1
-    - asciidoctor -a reproducible -b html5 -o out/html/git-age.html docs/git-age.adoc
+    - asciidoctor -a reproducible -b html5 -o out/html/git-age.html docs/man/git-age.adoc
 
 builds:
   - id: unix
@@ -136,7 +136,6 @@ scoops:
           owner: prskr
           name: scoop-the-prancing-package
           branch: main
-
 
 winget:
   - name: git-age

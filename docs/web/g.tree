@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE instance-profile
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/product-profile.dtd">
+
+<instance-profile id="g"
+                 name="git-age"
+                 start-page="getting-started.md">
+
+    <toc-element topic="getting-started.md"/>
+    <toc-element topic="install.md"/>
+    <toc-element topic="tips-tricks.md"/>
+    <toc-element topic="configuration.md"/>
+    <toc-element topic="alternatives.md"/>
+    <toc-element topic="internals.md">
+        <toc-element topic="identities-agent.md"/>
+        <toc-element topic="development.md"/>
+    </toc-element>
+</instance-profile>
