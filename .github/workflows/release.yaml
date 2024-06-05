@@ -68,7 +68,7 @@ jobs:
           echo "${{ secrets.GPG_SIGNING_KEY }}" | base64 -d > $GITHUB_WORKSPACE/.gnupg/gpg.key
 
       - name: Release
-        uses: goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: latest

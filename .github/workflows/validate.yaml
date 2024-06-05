@@ -73,7 +73,7 @@ jobs:
         if: ${{ !contains(matrix.os, 'windows') }}
 
       - name: Snapshot release
-        uses: goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v6
         if: ${{ !contains(matrix.os, 'windows') }}
         with:
           distribution: goreleaser
