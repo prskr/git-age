@@ -7,8 +7,15 @@
     </variables>
     <build-profile instance="g">
         <variables>
-            <noindex-content>true</noindex-content>
+            <web-root>https://docs.git-age.icb4dc0.de</web-root>
+            <download-title>git-age docs</download-title>
+            <showDownloadButton>true</showDownloadButton>
+            <search-endpoint>https://my.search/endpoint</search-endpoint>
         </variables>
+
+        <footer>
+            <link href="https://github.com/prskr/git-age">GitHub repository</link>
+        </footer>
     </build-profile>
 
 </buildprofiles>
