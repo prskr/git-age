@@ -10,6 +10,8 @@ buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.34.1-20240430201511-d9455265c5d
 buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.34.1-20240430201511-d9455265c5d4.1/go.mod h1:CJ6DXxhPOUPCz1ordpc5w1KsnLKmo9olDkrVsQ3/BLg=
 buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.34.2-20240430201511-d9455265c5d4.2 h1:rDnVFu60AdUvHEm3UITG40ynYTLhWtbfZmOoS21+bJA=
 buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.34.2-20240430201511-d9455265c5d4.2/go.mod h1:yfwX9p+RB0+7f+eWgJ4TfbjBIwblQI1hY3/4pSwYzI4=
+buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.34.2-20240617172854-9d87e32e5325.2 h1:DU3vU7KxOqIIF8jGAMB0IFC3e8Ds1CqR/BnsdIV/DRA=
+buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.34.2-20240617172854-9d87e32e5325.2/go.mod h1:yfwX9p+RB0+7f+eWgJ4TfbjBIwblQI1hY3/4pSwYzI4=
 connectrpc.com/connect v1.16.2 h1:ybd6y+ls7GOlb7Bh5C8+ghA6SvCBajHwxssO2CGFjqE=
 connectrpc.com/connect v1.16.2/go.mod h1:n2kgwskMHXC+lVqb18wngEpF95ldBHXjZYJussz5FRc=
 connectrpc.com/grpchealth v1.3.0 h1:FA3OIwAvuMokQIXQrY5LbIy8IenftksTP/lG4PbYN+E=
