@@ -79,6 +79,7 @@ jobs:
           GH_WINGET_PAT: ${{ secrets.GH_WINGET_PAT }}
           GH_SCOOP_PAT: ${{ secrets.GH_SCOOP_PAT }}
           NFPM_GIT_AGE_PASSPHRASE: ${{ secrets.NFPM_GIT_AGE_PASSPHRASE }}
+          AUR_KEY: ${{ secrets.AUR_SSH_KEY }}
 
       - name: Upload RPM packages
         run: |

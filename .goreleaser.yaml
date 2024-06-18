@@ -53,6 +53,7 @@ archives:
     files:
       - src: out/man/git-age.1.gz
         dst: docs/git-age.1.gz
+      - LICENSE
 
 sboms:
   - artifacts: binary
@@ -170,3 +171,33 @@ winget:
           owner: microsoft
           name: winget-pkgs
           branch: master
+
+aurs:
+  - name: git-age-bin
+    homepage: https://github.com/prskr/git-age
+    description: |
+      git-age is a smudge/clean filter to encrypt/decrypt files in a git repository transparently
+    maintainers:
+      - "Peter Kurfer <peter.kurfer@gmail.com>"
+    contributors:
+      - "Peter Kurfer <peter.kurfer@gmail.com>"
+    license: "MIT"
+    private_key: "{{ .Env.AUR_KEY }}"
+    git_url: "ssh://aur@aur.archlinux.org/git-age-bin.git"
+    provides:
+      - git-age
+    optdepends:
+      - git
+    package: |-
+      # bin
+      install -Dm755 "./git-age" "${pkgdir}/usr/bin/git-age"
+
+      # license
+      install -Dm644 "./LICENSE" "${pkgdir}/usr/share/licenses/git-age/LICENSE"
+
+      # man pages
+      install -Dm644 "./docs/git-age.1.gz" "${pkgdir}/usr/share/man/man1/git-age.1.gz"
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    commit_msg_template: 'chore: update to {{ .Tag }}'
