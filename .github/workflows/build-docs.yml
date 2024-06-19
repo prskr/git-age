@@ -6,7 +6,7 @@ on:
 
 env:
   INSTANCE: 'web/g'
-  ARTIFACT: 'webHelpHI2-all.zip'
+  ARTIFACT: 'webHelpG2-all.zip'
 
 jobs:
   build-docs:
@@ -45,3 +45,26 @@ jobs:
         uses: JetBrains/writerside-checker-action@v1
         with:
           instance: ${{ env.INSTANCE }}
+
+  deploy:
+    needs:
+      - build-docs
+      - test-docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: docs
+
+      - name: Unzip artifact
+        run: unzip -O UTF-8 -qq '${{ env.ARTIFACT }}' -d docs-dist
+
+      - name: Copy files to the s3 website content bucket
+        run:
+          aws s3 sync docs-dist s3://${{ secrets.GARAGE_BUCKET_NAME }} --delete
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.GARAGE_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.GARAGE_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: hel1
+          AWS_ENDPOINT_URL: ${{ secrets.GARAGE_ENDPOINT }}
