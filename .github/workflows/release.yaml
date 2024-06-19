@@ -96,14 +96,3 @@ jobs:
                 --upload-file "${deb}" \
                 https://code.icb4dc0.de/api/packages/prskr/debian/pool/bookworm/main/upload
           done
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: "out/html/"
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
