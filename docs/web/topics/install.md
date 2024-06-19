@@ -1,14 +1,4 @@
-# Installation
-
-## OS independent
-
-### `go install`
-
-If you have a current Go installation, you can install _git-age_ with:
-
-```Bash
-go install github.com/prskr/git-age@latest
-```
+# Installations
 
 ### GitHub releases
 
@@ -69,6 +59,25 @@ sudo curl https://code.icb4dc0.de/api/packages/prskr/debian/repository.key -o /e
 sudo apt update
 
 sudo apt install git-age
+```
+
+### Arch Linux
+
+As part of the release process an AUR (Arch User Repository) package is published.
+You can either install it via the default mechanism:
+
+```Bash
+git clone https://aur.archlinux.org/git-age-bin.git /tmp/git-age-bin
+cd /tmp/git-age-bin
+makepkg -si
+cd
+rm -rf /tmp/git-age-bin
+```
+
+or of course with your AUR wrapper like [`yay`](https://github.com/Jguer/yay)
+
+```Bash
+yay -S git-age-bin
 ```
 
 ## Windows
