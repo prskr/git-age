@@ -37,13 +37,17 @@ type AgentIdentitiesStoreSource struct {
 	Client  connect.HTTPClient
 }
 
-func (a *AgentIdentitiesStoreSource) IsValid(ctx context.Context) (bool, error) {
+func (a *AgentIdentitiesStoreSource) IsValid(ctx context.Context) (isValid bool, err error) {
 	if a.BaseUrl == "" {
+		slog.DebugContext(ctx, "Skipping agent because url is empty")
 		return false, nil
 	}
 
 	if a.Client == nil {
-		a.BaseUrl, a.Client = prepareClient(a.BaseUrl)
+		a.BaseUrl, a.Client, err = prepareClient(a.BaseUrl)
+		if err != nil {
+			return false, err
+		}
 	}
 
 	healthClient := healthv1connect.NewHealthClient(a.Client, a.BaseUrl)
@@ -103,6 +107,12 @@ func (a AgentIdentitiesStore) Identities(ctx context.Context, query dto.Identiti
 		Remotes: query.Remotes,
 	}
 
+	slog.DebugContext(
+		ctx,
+		"Fetching identities from remote agent",
+		slog.String("remotes", strings.Join(query.Remotes, ",")),
+	)
+
 	resp, err := a.IdentitiesClient.GetIdentities(ctx, connect.NewRequest(req))
 	if err != nil {
 		return nil, err
@@ -121,8 +131,13 @@ func (a AgentIdentitiesStore) Identities(ctx context.Context, query dto.Identiti
 	return ids, nil
 }
 
-func prepareClient(rawUrl string) (baseUrl string, client *http.Client) {
-	const unixNetwork = "unix://"
+func prepareClient(rawUrl string) (baseUrl string, client *http.Client, err error) {
+	const unixScheme = "unix"
+	parsed, err := url.Parse(rawUrl)
+	if err != nil {
+		return "", nil, err
+	}
+
 	dialer := &net.Dialer{
 		Timeout:   30 * time.Second,
 		KeepAlive: 30 * time.Second,
@@ -137,24 +152,25 @@ func prepareClient(rawUrl string) (baseUrl string, client *http.Client) {
 		ExpectContinueTimeout: 1 * time.Second,
 	}
 
-	if strings.HasPrefix(rawUrl, unixNetwork) {
+	if parsed.Scheme == unixScheme {
+		slog.Debug("Trying to connect to unix socket", slog.String("path", parsed.Path))
+
 		transport.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
-			path := rawUrl[len(unixNetwork):]
-			unescaped, err := url.PathUnescape(path)
+			unescaped, err := url.PathUnescape(parsed.Path)
 			if err != nil {
 				return nil, err
 			}
-			return dialer.DialContext(ctx, "unix", unescaped)
+			return dialer.DialContext(ctx, unixScheme, unescaped)
 		}
 
 		return "http://localhost", &http.Client{
 			Transport: transport,
-		}
+		}, nil
 	} else {
 		transport.DialContext = dialer.DialContext
 	}
 
 	return rawUrl, &http.Client{
 		Transport: transport,
-	}
+	}, nil
 }
