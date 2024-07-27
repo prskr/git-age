@@ -6,7 +6,7 @@ toolchain go1.22.4
 
 require (
 	buf.build/gen/go/git-age/agent/connectrpc/go v1.16.2-20240411154421-ccdd2e6e6f4f.1
-	buf.build/gen/go/git-age/agent/protocolbuffers/go v1.34.2-20240411154421-ccdd2e6e6f4f.2
+	buf.build/gen/go/git-age/agent/protocolbuffers/go v1.34.2-20240316114246-f87464bfe857.1
 	buf.build/gen/go/grpc/grpc/connectrpc/go v1.16.2-20240617172854-9d87e32e5325.1
 	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.34.2-20240617172854-9d87e32e5325.2
 	connectrpc.com/connect v1.16.2
