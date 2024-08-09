@@ -6,6 +6,8 @@ buf.build/gen/go/grpc/grpc/connectrpc/go v1.16.2-20240617172854-9d87e32e5325.1 h
 buf.build/gen/go/grpc/grpc/connectrpc/go v1.16.2-20240617172854-9d87e32e5325.1/go.mod h1:V+RZmdZ/kleb4jwgJI4XKPSLpVFNsn1FCNqmChGt2fE=
 buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.34.2-20240617172854-9d87e32e5325.2 h1:DU3vU7KxOqIIF8jGAMB0IFC3e8Ds1CqR/BnsdIV/DRA=
 buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.34.2-20240617172854-9d87e32e5325.2/go.mod h1:yfwX9p+RB0+7f+eWgJ4TfbjBIwblQI1hY3/4pSwYzI4=
+buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.34.2-20240809200651-8507e5a24938.2 h1:ZskOZlSfBtCst1oTKC7VO7GsQnoyii4ft/kWypcMX9g=
+buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.34.2-20240809200651-8507e5a24938.2/go.mod h1:yfwX9p+RB0+7f+eWgJ4TfbjBIwblQI1hY3/4pSwYzI4=
 c2sp.org/CCTV/age v0.0.0-20240306222714-3ec4d716e805 h1:u2qwJeEvnypw+OCPUHmoZE3IqwfuN5kgDfo5MLzpNM0=
 c2sp.org/CCTV/age v0.0.0-20240306222714-3ec4d716e805/go.mod h1:FomMrUJ2Lxt5jCLmZkG3FHa72zUprnhd3v/Z18Snm4w=
 connectrpc.com/connect v1.16.2 h1:ybd6y+ls7GOlb7Bh5C8+ghA6SvCBajHwxssO2CGFjqE=
