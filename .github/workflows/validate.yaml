@@ -15,7 +15,7 @@ jobs:
   build:
     strategy:
       matrix:
-        go-version: [ 1.22.4 ]
+        go-version: [ 1.22 ]
         os: [ ubuntu-latest, macos-latest, windows-latest ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -28,6 +28,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
+          check-latest: true
 
       - name: Install Go tools
         run: |

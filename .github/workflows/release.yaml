@@ -28,7 +28,8 @@ jobs:
         uses: actions/setup-go@v5
         with:
           # Semantic version range syntax or exact version of Go
-          go-version: "1.22.4"
+          go-version: '1.22'
+          check-latest: true
 
       - name: Setup Syft
         run: curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
