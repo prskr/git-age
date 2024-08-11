@@ -86,7 +86,7 @@ func (h *CleanCliHandler) Run(stdin ports.STDIN, stdout ports.STDOUT) error {
 	return h.copyEncryptedFileToStdout(fileToClean, stdout)
 }
 
-func (h *CleanCliHandler) AfterApply(ctx context.Context, cwd ports.CWD) (err error) {
+func (h *CleanCliHandler) AfterApply(ctx context.Context, cwd ports.CWD, env ports.OSEnv) (err error) {
 	var repoFS ports.ReadWriteFS
 
 	h.Repository, repoFS, err = infrastructure.NewGitRepositoryFromPath(cwd)
@@ -96,7 +96,7 @@ func (h *CleanCliHandler) AfterApply(ctx context.Context, cwd ports.CWD) (err er
 
 	idStore, err := infrastructure.IdentitiesStore(
 		ctx,
-		infrastructure.NewAgentIdentitiesStoreSource(),
+		infrastructure.NewAgentIdentitiesStoreSource(env),
 		infrastructure.NewFileIdentityStoreSource(h.Keys),
 	)
 	if err != nil {

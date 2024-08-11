@@ -33,6 +33,7 @@ func TestAddRecipientCliHandler_Run(t *testing.T) {
 		new(cli.AddRecipientCliHandler),
 		kong.Bind(ports.CWD(setup.root)),
 		kong.BindTo(testx.Context(t), (*context.Context)(nil)),
+		kong.Bind(ports.NewOSEnv()),
 	)
 
 	args := []string{

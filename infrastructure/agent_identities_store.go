@@ -26,9 +26,9 @@ var (
 	_ identityStoreSource   = (*AgentIdentitiesStoreSource)(nil)
 )
 
-func NewAgentIdentitiesStoreSource() *AgentIdentitiesStoreSource {
+func NewAgentIdentitiesStoreSource(env ports.OSEnv) *AgentIdentitiesStoreSource {
 	return &AgentIdentitiesStoreSource{
-		BaseUrl: os.ExpandEnv(os.Getenv("GIT_AGE_AGENT_HOST")),
+		BaseUrl: os.ExpandEnv(env.Get("GIT_AGE_AGENT_HOST")),
 	}
 }
 

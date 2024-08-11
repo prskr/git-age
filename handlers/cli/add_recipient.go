@@ -58,7 +58,12 @@ func (h *AddRecipientCliHandler) Run(
 	return nil
 }
 
-func (h *AddRecipientCliHandler) AfterApply(ctx context.Context, kongCtx *kong.Context, cwd ports.CWD) error {
+func (h *AddRecipientCliHandler) AfterApply(
+	ctx context.Context,
+	kongCtx *kong.Context,
+	cwd ports.CWD,
+	env ports.OSEnv,
+) error {
 	gitRepo, repoFS, err := infrastructure.NewGitRepositoryFromPath(cwd)
 	if err != nil {
 		return err
@@ -68,7 +73,7 @@ func (h *AddRecipientCliHandler) AfterApply(ctx context.Context, kongCtx *kong.C
 
 	idStore, err := infrastructure.IdentitiesStore(
 		ctx,
-		infrastructure.NewAgentIdentitiesStoreSource(),
+		infrastructure.NewAgentIdentitiesStoreSource(env),
 		infrastructure.NewFileIdentityStoreSource(h.Keys),
 	)
 	if err != nil {

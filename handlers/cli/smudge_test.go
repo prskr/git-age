@@ -31,6 +31,7 @@ func TestSmudgeCliHandler_Run(t *testing.T) {
 		kong.BindTo(testx.Context(t), (*context.Context)(nil)),
 		kong.BindTo(ports.STDIN(io.NopCloser(inBuf)), (*ports.STDIN)(nil)),
 		kong.BindTo(ports.STDOUT(outBuf), (*ports.STDOUT)(nil)),
+		kong.Bind(ports.NewOSEnv()),
 	)
 
 	args := []string{

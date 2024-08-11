@@ -44,7 +44,7 @@ func (h *SmudgeCliHandler) Run(stdin ports.STDIN, stdout ports.STDOUT) error {
 	return err
 }
 
-func (h *SmudgeCliHandler) AfterApply(ctx context.Context, cwd ports.CWD) (err error) {
+func (h *SmudgeCliHandler) AfterApply(ctx context.Context, cwd ports.CWD, env ports.OSEnv) (err error) {
 	gitRepo, _, err := infrastructure.NewGitRepositoryFromPath(cwd)
 	if err != nil {
 		return fmt.Errorf("failed to init git repository: %w", err)
@@ -52,7 +52,7 @@ func (h *SmudgeCliHandler) AfterApply(ctx context.Context, cwd ports.CWD) (err e
 
 	idStore, err := infrastructure.IdentitiesStore(
 		ctx,
-		infrastructure.NewAgentIdentitiesStoreSource(),
+		infrastructure.NewAgentIdentitiesStoreSource(env),
 		infrastructure.NewFileIdentityStoreSource(h.Keys),
 	)
 	if err != nil {

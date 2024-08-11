@@ -35,6 +35,7 @@ func TestGenKeyCliHandler_Run(t *testing.T) {
 		new(cli.GenKeyCliHandler),
 		kong.BindTo(testx.Context(t), (*context.Context)(nil)),
 		kong.BindTo(ports.STDOUT(outBuf), (*ports.STDOUT)(nil)),
+		kong.Bind(ports.NewOSEnv()),
 	)
 
 	args := []string{

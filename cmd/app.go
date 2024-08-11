@@ -47,6 +47,7 @@ func (a *App) Execute() error {
 		kong.BindTo(os.Stdout, (*ports.STDOUT)(nil)),
 		kong.BindTo(os.Stdin, (*ports.STDIN)(nil)),
 		kong.Bind(ports.CWD(wd)),
+		kong.Bind(ports.HostEnv()),
 		kong.Vars{
 			"XDG_CONFIG_HOME": filepath.ToSlash(xdg.ConfigHome),
 		})

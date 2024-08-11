@@ -44,10 +44,10 @@ func (h *InitCliHandler) Run(ctx context.Context) (err error) {
 	return nil
 }
 
-func (h *InitCliHandler) AfterApply(ctx context.Context, cwd ports.CWD) error {
+func (h *InitCliHandler) AfterApply(ctx context.Context, cwd ports.CWD, env ports.OSEnv) error {
 	idStore, err := infrastructure.IdentitiesStore(
 		ctx,
-		infrastructure.NewAgentIdentitiesStoreSource(),
+		infrastructure.NewAgentIdentitiesStoreSource(env),
 		infrastructure.NewFileIdentityStoreSource(h.Keys),
 	)
 	if err != nil {

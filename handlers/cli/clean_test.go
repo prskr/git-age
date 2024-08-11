@@ -78,6 +78,7 @@ func TestCleanCliHandler_Run(t *testing.T) {
 				kong.BindTo(testx.Context(t), (*context.Context)(nil)),
 				kong.BindTo(ports.STDIN(inFile), (*ports.STDIN)(nil)),
 				kong.BindTo(ports.STDOUT(out), (*ports.STDOUT)(nil)),
+				kong.Bind(ports.NewOSEnv()),
 			)
 
 			args := []string{

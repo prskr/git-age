@@ -33,10 +33,10 @@ func (h *GenKeyCliHandler) Run(ctx context.Context, stdout ports.STDOUT) (err er
 	return err
 }
 
-func (h *GenKeyCliHandler) AfterApply(ctx context.Context) error {
+func (h *GenKeyCliHandler) AfterApply(ctx context.Context, env ports.OSEnv) error {
 	idStore, err := infrastructure.IdentitiesStore(
 		ctx,
-		infrastructure.NewAgentIdentitiesStoreSource(),
+		infrastructure.NewAgentIdentitiesStoreSource(env),
 		infrastructure.NewFileIdentityStoreSource(h.Keys),
 	)
 	if err != nil {

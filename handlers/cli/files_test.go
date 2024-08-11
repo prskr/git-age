@@ -32,6 +32,7 @@ func TestListFilesCliHandler_Run(t *testing.T) {
 		kong.Bind(ports.CWD(setup.root)),
 		kong.BindTo(testx.Context(t), (*context.Context)(nil)),
 		kong.BindTo(ports.STDOUT(out), (*ports.STDOUT)(nil)),
+		kong.Bind(ports.NewOSEnv()),
 	)
 
 	ctx, err := parser.Parse([]string{"ls"})
@@ -74,6 +75,7 @@ func TestTrackFilesCliHandler_Run(t *testing.T) {
 		new(cli.FilesCliHandler),
 		kong.Bind(ports.CWD(setup.root)),
 		kong.BindTo(testx.Context(t), (*context.Context)(nil)),
+		kong.Bind(ports.NewOSEnv()),
 	)
 
 	args := []string{
@@ -152,6 +154,7 @@ func TestReEncryptFilesCliHandler_Run(t *testing.T) {
 		new(cli.FilesCliHandler),
 		kong.Bind(ports.CWD(setup.root)),
 		kong.BindTo(testx.Context(t), (*context.Context)(nil)),
+		kong.Bind(ports.NewOSEnv()),
 	)
 
 	args := []string{

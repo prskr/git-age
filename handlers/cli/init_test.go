@@ -31,6 +31,7 @@ func TestInitCliHandler_Run(t *testing.T) {
 		new(cli.InitCliHandler),
 		kong.Bind(ports.CWD(setup.root)),
 		kong.BindTo(testx.Context(t), (*context.Context)(nil)),
+		kong.Bind(ports.NewOSEnv()),
 	)
 
 	keysFilePath := filepath.Join(tmpDir, "keys.txt")

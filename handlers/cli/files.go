@@ -115,7 +115,7 @@ type FilesCliHandler struct {
 	ReEncrypt ReEncryptFilesCliHandler `cmd:"" name:"re-encrypt" help:"Re-encrypt files tracked by git-age"`
 }
 
-func (h *FilesCliHandler) AfterApply(ctx context.Context, kongCtx *kong.Context, cwd ports.CWD) error {
+func (h *FilesCliHandler) AfterApply(ctx context.Context, kongCtx *kong.Context, cwd ports.CWD, env ports.OSEnv) error {
 	repoRootPath, err := infrastructure.FindRepoRootFrom(cwd)
 	if err != nil {
 		return err
@@ -135,7 +135,7 @@ func (h *FilesCliHandler) AfterApply(ctx context.Context, kongCtx *kong.Context,
 
 	idStore, err := infrastructure.IdentitiesStore(
 		ctx,
-		infrastructure.NewAgentIdentitiesStoreSource(),
+		infrastructure.NewAgentIdentitiesStoreSource(env),
 		infrastructure.NewFileIdentityStoreSource(h.Keys),
 	)
 	if err != nil {
