@@ -23,7 +23,7 @@ require (
 	gopkg.in/ini.v1 v1.67.0
 )
 
-replace golang.org/x/crypto => golang.org/x/crypto v0.24.0
+replace golang.org/x/crypto => golang.org/x/crypto v0.26.0
 
 require (
 	dario.cat/mergo v1.0.0 // indirect
