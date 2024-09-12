@@ -15,20 +15,20 @@ jobs:
   build:
     strategy:
       matrix:
-        go-version: [ 1.22 ]
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: '0'
-          fetch-tags: 'true'
+          fetch-depth: "0"
+          fetch-tags: "true"
 
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.go-version }}
-          check-latest: true
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+          cache: true
 
       - name: Install Go tools
         run: |
@@ -46,7 +46,7 @@ jobs:
       - id: govulncheck
         uses: golang/govulncheck-action@v1
         with:
-          go-version-input: ${{ matrix.go-version }}
+          go-version-file: go.mod
           go-package: ./...
 
       - name: Test
@@ -57,7 +57,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         if: ${{ !contains(matrix.os, 'windows') }}
         with:
-          ruby-version: '3.3'
+          ruby-version: "3.3"
           bundler-cache: true
 
       - run: gem install asciidoctor
