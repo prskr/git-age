@@ -16,7 +16,7 @@ builds:
       - CGO_ENABLED=0
     binary: git-age
     ldflags:
-      - "-s -w -X github.com/prskr/git-age/handlers/cli.version={{.Tag}} -X github.com/prskr/git-age/handlers/cli.commit={{.Commit}} -X github.com/prskr/git-age/handlers/cli.date={{.Date}}"
+      - "-s -w -X github.com/prskr/git-age/handlers/cli.Version={{.Tag}} -X github.com/prskr/git-age/handlers/cli.Commit={{.Commit}} -X github.com/prskr/git-age/handlers/cli.Date={{.Date}}"
     goos:
       - linux
       - darwin
@@ -29,7 +29,7 @@ builds:
       - CGO_ENABLED=0
     binary: git-age
     ldflags:
-      - "-s -w -X github.com/prskr/git-age/handlers/cli.version={{.Tag}} -X github.com/prskr/git-age/handlers/cli.commit={{.Commit}} -X github.com/prskr/git-age/handlers/cli.date={{.Date}}"
+      - "-s -w -X github.com/prskr/git-age/handlers/cli.Version={{.Tag}} -X github.com/prskr/git-age/handlers/cli.Commit={{.Commit}} -X github.com/prskr/git-age/handlers/cli.Date={{.Date}}"
     goos:
       - windows
     goarch:
@@ -200,4 +200,4 @@ aurs:
     commit_author:
       name: goreleaserbot
       email: bot@goreleaser.com
-    commit_msg_template: 'chore: update to {{ .Tag }}'
+    commit_msg_template: "chore: update to {{ .Tag }}"

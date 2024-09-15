@@ -5,16 +5,17 @@ import (
 	"fmt"
 	"net/http"
 
-	"golang.org/x/mod/semver"
+	"github.com/Masterminds/semver/v3"
+	"github.com/prskr/git-age/core/ports"
 )
 
-const defaultVersion = "v0.0.0"
+const DefaultVersion = "v0.0.0"
 
 //nolint:gochecknoglobals // are set during build
 var (
-	version = defaultVersion
-	commit  = ""
-	date    = ""
+	Version = DefaultVersion
+	Commit  = ""
+	Date    = ""
 )
 
 type VersionCliHandler struct {
@@ -23,27 +24,50 @@ type VersionCliHandler struct {
 	Client           *http.Client `kong:"-"`
 }
 
-func (h VersionCliHandler) Run() error {
+func (h VersionCliHandler) Run(stdout ports.STDOUT) error {
 	if h.Short {
-		fmt.Println(version)
+		_, _ = fmt.Fprintln(stdout, Version)
 		return nil
 	}
 
-	if version == defaultVersion {
-		fmt.Println("Version is not set. This is a development build.")
+	if Version == DefaultVersion {
+		_, _ = fmt.Fprintln(stdout, "Version is not set. This is a development build.")
 
 		return nil
 	}
 
-	fmt.Printf(`%s
+	_, _ = fmt.Fprintf(stdout,
+		`%s
 Commit: %s
 Built at %s
-`, version, commit, date)
+`, Version, Commit, Date)
 
 	if h.SkipVersionCheck {
 		return nil
 	}
 
+	currentVersion, err := semver.NewVersion(Version)
+	if err != nil {
+		return fmt.Errorf("failed to parse current version: %w", err)
+	}
+
+	release, err := h.checkLatestVersion()
+	if err != nil {
+		return err
+	}
+
+	if result := release.TagName.Compare(currentVersion); result > 0 {
+		_, _ = fmt.Fprintf(stdout, "A new version is available: %s 👉\n", release.TagName)
+	} else if result == 0 {
+		_, _ = fmt.Fprintln(stdout, "You are using the latest version 🎉")
+	} else {
+		_, _ = fmt.Fprintln(stdout, "You're using a version that is somewhat newer than the latest release! 👻")
+	}
+
+	return nil
+}
+
+func (h VersionCliHandler) checkLatestVersion() (*releaseInfo, error) {
 	client := h.Client
 	if client == nil {
 		client = http.DefaultClient
@@ -51,7 +75,7 @@ Built at %s
 
 	resp, err := client.Get("https://api.github.com/repos/prskr/git-age/releases/latest")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	defer func() {
@@ -60,27 +84,19 @@ Built at %s
 
 	//nolint:goerr113 // no need to wrap - there's no point to wrap this error
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
 	decoder := json.NewDecoder(resp.Body)
 	var release releaseInfo
 
 	if err := decoder.Decode(&release); err != nil {
-		return err
+		return nil, err
 	}
 
-	if result := semver.Compare(release.TagName, version); result > 0 {
-		fmt.Printf("A new version is available: %s 👉\n", release.TagName)
-	} else if result == 0 {
-		fmt.Println("You are using the latest version 🎉")
-	} else {
-		fmt.Println("You're using a version that is somewhat newer than the latest release! 👻")
-	}
-
-	return nil
+	return &release, nil
 }
 
 type releaseInfo struct {
-	TagName string `json:"tag_name"`
+	TagName semver.Version `json:"tag_name"`
 }

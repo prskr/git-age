@@ -1,4 +1,8 @@
+# IDEs
 .idea/
+.zed/
+
+# Development
 out/
 dist/
 .gnupg/

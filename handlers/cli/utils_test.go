@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/adrg/xdg"
 
@@ -16,7 +15,6 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/cache"
-	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/storage/filesystem"
 
 	"github.com/prskr/git-age/core/ports"
@@ -133,12 +131,6 @@ func prepareTestRepo(tb testing.TB) (s *testSetup) {
 	})
 	if err != nil {
 		tb.Fatalf("failed to stage files: %v", err)
-	}
-
-	_ = &git.CommitOptions{
-		Author: &object.Signature{
-			When: time.Now().UTC(),
-		},
 	}
 
 	testx.ResultOfA[plumbing.Hash](tb, wt.Commit, "initial commit", new(git.CommitOptions))
