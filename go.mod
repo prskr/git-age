@@ -9,7 +9,7 @@ require (
 	buf.build/gen/go/git-age/agent/protocolbuffers/go v1.34.2-20240411154421-ccdd2e6e6f4f.2
 	buf.build/gen/go/grpc/grpc/connectrpc/go v1.16.2-20240904201038-e0425cfebb28.1
 	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.34.2-20240904201038-e0425cfebb28.2
-	connectrpc.com/connect v1.16.2
+	connectrpc.com/connect v1.17.0
 	connectrpc.com/grpchealth v1.3.0
 	filippo.io/age v1.2.0
 	github.com/Masterminds/semver/v3 v3.3.0
