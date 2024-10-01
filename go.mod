@@ -2,7 +2,7 @@ module github.com/prskr/git-age
 
 go 1.23
 
-toolchain go1.23.1
+toolchain go1.23.2
 
 require (
 	buf.build/gen/go/git-age/agent/connectrpc/go v1.16.2-20240411154421-ccdd2e6e6f4f.1
