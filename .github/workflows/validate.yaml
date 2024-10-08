@@ -32,6 +32,7 @@ jobs:
           check-latest: true
 
       - name: Install Go tools
+        shell: bash
         run: |
           set -x
           go clean -modcache

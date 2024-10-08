@@ -42,6 +42,7 @@ jobs:
       - run: gem install asciidoctor
 
       - name: Install Go tools
+        shell: bash
         run: |
           go clean -modcache
           which garble && rm -f $(which garble)
