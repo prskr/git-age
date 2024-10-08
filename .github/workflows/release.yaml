@@ -29,7 +29,6 @@ jobs:
         with:
           go-version-file: go.mod
           cache-dependency-path: go.sum
-          cache: true
           check-latest: true
 
       - name: Setup Syft
@@ -42,10 +41,7 @@ jobs:
       - run: gem install asciidoctor
 
       - name: Install Go tools
-        shell: bash
         run: |
-          go clean -modcache
-          which garble && rm -f $(which garble)
           go install -a gotest.tools/gotestsum@latest
           go install -a mvdan.cc/garble@latest
 
