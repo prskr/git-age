@@ -2,7 +2,7 @@
 
 # git hook pre commit
 pre-commit = [
-    "go mod tidy -go=1.22",
+    "go mod tidy -go=1.23",
     "husky lint-staged",
     "golangci-lint run",
 ]
