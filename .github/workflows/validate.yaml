@@ -44,6 +44,8 @@ jobs:
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
+        env:
+          GOPROXY: direct
 
       - id: govulncheck
         uses: golang/govulncheck-action@v1
