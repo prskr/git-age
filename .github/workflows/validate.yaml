@@ -34,6 +34,7 @@ jobs:
       - name: Install Go tools
         run: |
           go clean -modcache
+          which garble && rm -f $(which garble)
           go install gotest.tools/gotestsum@latest
           go install mvdan.cc/garble@latest
 
