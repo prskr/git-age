@@ -33,6 +33,7 @@ jobs:
 
       - name: Install Go tools
         run: |
+          set -x
           go clean -modcache
           which garble && rm -f $(which garble)
           go install -a gotest.tools/gotestsum@latest
