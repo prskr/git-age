@@ -40,15 +40,18 @@ jobs:
           bundler-cache: true
       - run: gem install asciidoctor
 
-      - name: Install Go tools
-        run: |
-          go install -a gotest.tools/gotestsum@latest
-          go install -a mvdan.cc/garble@latest
-
       - name: Init go
         run: |
           go mod download
           go generate .
+
+      - name: Install goteestsum
+        run: |
+          go install -a gotest.tools/gotestsum@latest
+
+      - name: Install garble
+        run: |
+          go install -a mvdan.cc/garble@latest
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
