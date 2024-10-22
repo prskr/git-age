@@ -15,7 +15,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.3.0
 	github.com/adrg/xdg v0.5.0
 	github.com/alecthomas/kong v1.2.1
-	github.com/go-git/go-billy/v5 v5.5.0
+	github.com/go-git/go-billy/v5 v5.6.0
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/lmittmann/tint v1.0.5
 	github.com/minio/sha256-simd v1.0.1
