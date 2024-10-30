@@ -24,7 +24,7 @@ jobs:
       - run: pip install mkdocs-material
 
       - name: Copy files to the s3 website content bucket
-        run: aws s3 sync site s3://${{ secrets.HCLOUD_BUCKET }} --delete
+        run: aws s3 sync dist s3://${{ secrets.HCLOUD_BUCKET }} --delete
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.HCLOUD_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.HCLOUD_SECRET_KEY }}
