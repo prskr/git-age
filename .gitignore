@@ -5,6 +5,8 @@
 # Development
 out/
 dist/
+site/
+.venv/
 .gnupg/
 docs/*.1*
 docs/*.html

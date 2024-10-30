@@ -1,0 +1,12 @@
+site_name: git-age
+site_url: https:// docs.git-age.icb4dc0.de
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - search.suggest
+    - search.highlight
+    - toc.integrate
+
+plugins:
+  - search
