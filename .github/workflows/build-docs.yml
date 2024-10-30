@@ -23,6 +23,8 @@ jobs:
 
       - run: pip install mkdocs-material
 
+      - run: mkdocs build
+
       - name: Copy files to the s3 website content bucket
         run: aws s3 sync dist s3://${{ secrets.HCLOUD_BUCKET }} --delete
         env:
