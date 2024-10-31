@@ -13,7 +13,7 @@ require (
 	connectrpc.com/grpchealth v1.3.0
 	filippo.io/age v1.2.0
 	github.com/Masterminds/semver/v3 v3.3.0
-	github.com/adrg/xdg v0.5.0
+	github.com/adrg/xdg v0.5.3
 	github.com/alecthomas/kong v1.2.1
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-git/go-git/v5 v5.12.0
