@@ -7,7 +7,7 @@ toolchain go1.23.2
 require (
 	buf.build/gen/go/git-age/agent/connectrpc/go v1.17.0-20240411154421-ccdd2e6e6f4f.1
 	buf.build/gen/go/git-age/agent/protocolbuffers/go v1.35.1-20240411154421-ccdd2e6e6f4f.1
-	buf.build/gen/go/grpc/grpc/connectrpc/go v1.17.0-20241008202529-8d9460c5df7a.1
+	buf.build/gen/go/grpc/grpc/connectrpc/go v1.17.0-20241114200633-5197c4709c1b.1
 	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.35.1-20241008202529-8d9460c5df7a.1
 	connectrpc.com/connect v1.17.0
 	connectrpc.com/grpchealth v1.3.0
