@@ -64,6 +64,8 @@ func (i IdentitiesStoreChain) Identities(
 			result = append(result, ids...)
 		case e := <-errs:
 			err = errors.Join(err, e)
+		case <-ctx.Done():
+			return nil, ctx.Err()
 		}
 	}
 

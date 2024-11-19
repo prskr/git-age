@@ -30,11 +30,21 @@ This will:
 . add the public key to the `.agerecipients` file, optionally with a comment
 . add the private key to the keys file, optionally with a comment
 
-=== git age gen-key
+=== git age add-recipient
 
-`git age gen-key` [`--comment` <COMMENT> `--keys` <KEYS_TXT>]
+`git age add-recipient` [`--comment` <COMMENT> `--keys` <KEYS_TXT> `--message` <COMMIT_MESSAGE>]
+<PUBLIC_KEY> +
 
-To quickly prepare your environment to participate at a project that already uses _git-age_, you can use the `gen-key`
+=== git age keys
+
+`keys` is the main command to manage the keys that are used to encrypt and decrypt the files.
+Subcommands allow to generate new key pairs and list the known keys.
+
+=== git age keys generate
+
+`git age keys generate` [`--comment` <COMMENT> `--keys` <KEYS_TXT>]
+
+To quickly prepare your environment to participate at a project that already uses _git-age_, you can use the `keys generate`
 command to:
 
 . generate a new keypair for the current user
@@ -43,10 +53,15 @@ command to:
 
 The keys file can either be specified as flag or be read from the environment variable `GIT_AGE_KEYS`.
 
-=== git age add-recipient
+=== git age keys list
 
-`git age add-recipient` [`--comment` <COMMENT> `--keys` <KEYS_TXT> `--message` <COMMIT_MESSAGE>]
-<PUBLIC_KEY> +
+`git age keys list` [`--keys` <KEYS_TXT>]
+
+List all known keys.
+The keys file can either be specified as flag or be read from the environment variable `GIT_AGE_KEYS`.
+The default path for the keys file is `$HOME/.git-age/keys.txt`.
+Additionally, `git-age` will use an agent if configured via the environment variable `GIT_AGE_AGENT_HOST`.
+Only the *public keys* of all known identities are listed.
 
 === git age files
 
@@ -72,7 +87,7 @@ Add a file pattern to the `.gitattributes` file to track the file with `git-age`
 
 Re-encrypt all files that are tracked by `git-age`.
 This is useful if you want to change the recipients of the files e.g. if a developer leaves the team.
-It can also be used to onboard a new developer to the team but it's recommended to use `git age add-recipient` for that as it is specifically designed for this use case.
+It can also be used to onboard a new developer to the team, but it's recommended to use `git age add-recipient` for that as it is specifically designed for this use case.
 
 === git age version
 
@@ -95,7 +110,7 @@ git age init --comment "Alice"
 === Add a new recipient
 
 Bob: +
-git age gen-key --comment "Bob" > bob.pub
+git age keys generate --comment "Bob" > bob.pub
 
 Alice: +
 git age add-recipient --comment "Bob" $(cat bob.pub)

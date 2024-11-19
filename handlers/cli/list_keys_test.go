@@ -15,33 +15,36 @@ import (
 	"github.com/prskr/git-age/internal/testx"
 )
 
-func TestGenKeyCliHandler_Run(t *testing.T) {
+func TestListKeysCliHandler_Run(t *testing.T) {
 	t.Parallel()
 
-	f, err := os.CreateTemp(t.TempDir(), "keys")
-	if err != nil {
-		t.Errorf("failed to create temp file: %v", err)
-		return
-	}
-
-	if err := f.Close(); err != nil {
-		t.Errorf("failed to close temp file: %v", err)
-		return
-	}
-
 	outBuf := new(bytes.Buffer)
+	keysFile, err := os.CreateTemp(t.TempDir(), "keys.txt")
+	if err != nil {
+		t.Errorf("failed to create temporary keys.txt file: %v", err)
+		return
+	}
+
+	id := testx.ResultOf(t, age.GenerateX25519Identity)
+	if _, err = keysFile.Write([]byte(id.String() + "\n")); err != nil {
+		t.Errorf("failed to write identity to keys.txt file: %v", err)
+		return
+	}
+
+	if !assert.NoError(t, keysFile.Close(), "failed to close keys.txt file") {
+		return
+	}
 
 	parser := newKong(
 		t,
-		new(cli.GenKeyCliHandler),
+		new(cli.ListKeysCliHandler),
 		kong.BindTo(testx.Context(t), (*context.Context)(nil)),
 		kong.BindTo(ports.STDOUT(outBuf), (*ports.STDOUT)(nil)),
 		kong.Bind(ports.NewOSEnv()),
 	)
 
 	args := []string{
-		"-k", "file:///" + f.Name(),
-		"-c", "test",
+		"-k", "file:///" + keysFile.Name(),
 	}
 
 	kongCtx, err := parser.Parse(args)
@@ -53,22 +56,6 @@ func TestGenKeyCliHandler_Run(t *testing.T) {
 		return
 	}
 
-	if _, err := age.ParseRecipients(outBuf); err != nil {
-		t.Errorf("failed to parse identities: %v", err)
-		return
-	}
-
-	f, err = os.OpenFile(f.Name(), os.O_RDONLY, 0o644)
-	if err != nil {
-		t.Errorf("failed to open file: %v", err)
-		return
-	}
-
-	t.Cleanup(func() {
-		_ = f.Close()
-	})
-
-	if _, err := age.ParseIdentities(f); err != nil {
-		t.Errorf("failed to parse recipients: %v", err)
-	}
+	assert.Contains(t, outBuf.String(), "Public Key")
+	assert.Contains(t, outBuf.String(), id.Recipient().String())
 }

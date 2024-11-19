@@ -28,7 +28,7 @@ type App struct {
 	Smudge       clih.SmudgeCliHandler       `cmd:"" name:"smudge" hidden:"" help:"smudge should only be invoked by Git"`
 	Files        clih.FilesCliHandler        `cmd:"" name:"files" help:"Interact with repo files"`
 	AddRecipient clih.AddRecipientCliHandler `cmd:"" name:"add-recipient" help:"Generate a recipient to the list of recipients"`
-	GenKey       clih.GenKeyCliHandler       `cmd:"" name:"gen-key" help:"Generate a new key pair"`
+	Keys         clih.KeysCliHandler         `cmd:"" name:"keys" help:"Manage keys"`
 	Init         clih.InitCliHandler         `cmd:"" name:"init" help:"Initialize a repository"`
 	Install      clih.InstallCliHandler      `cmd:"" name:"install" help:"Install git-age hooks in global git config"`
 	Version      clih.VersionCliHandler      `cmd:"" name:"version" help:"Print version information" default:"1"`
