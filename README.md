@@ -1,7 +1,7 @@
 # git-age
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/prskr/git-age)](https://goreportcard.com/report/github.com/prskr/git-age)
-[![Go build](https://github.com/prskr/git-age/actions/workflows/validate.yaml/badge.svg)](https://github.com/prskr/git-age/actions/workflows/validate.yaml)
+[![Go](https://github.com/prskr/git-age/actions/workflows/go.yaml/badge.svg)](https://github.com/prskr/git-age/actions/workflows/go.yaml)
 
 ## Disclaimer
 
