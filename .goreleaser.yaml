@@ -19,17 +19,6 @@ builds:
     goos:
       - linux
       - darwin
-    goarch:
-      - amd64
-      - arm64
-  - id: windows
-    gobinary: garble
-    env:
-      - CGO_ENABLED=0
-    binary: git-age
-    ldflags:
-      - "-s -w -X github.com/prskr/git-age/handlers/cli.Version={{.Tag}} -X github.com/prskr/git-age/handlers/cli.Commit={{.Commit}} -X github.com/prskr/git-age/handlers/cli.Date={{.Date}}"
-    goos:
       - windows
     goarch:
       - amd64
