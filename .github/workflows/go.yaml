@@ -40,26 +40,24 @@ jobs:
       - name: Init go
         run: |
           go mod download
-          go generate .
-
-      - name: Install goteestsum
-        run: |
-          go install -a gotest.tools/gotestsum@latest
+          go mod download -modfile tools/go.mod
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         env:
           GOPROXY: direct
 
       - id: govulncheck
         uses: golang/govulncheck-action@v1
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         with:
           go-version-file: go.mod
           go-package: ./...
 
       - name: Test
         run: |
-          gotestsum --format pkgname -- -race -shuffle=on -covermode=atomic ./...
+          go run -modfile ./tools/go.mod gotest.tools/gotestsum --format pkgname -- -race -shuffle=on -covermode=atomic ./...
 
       # Do not run release on windows
       - uses: ruby/setup-ruby@v1
