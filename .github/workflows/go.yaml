@@ -57,7 +57,15 @@ jobs:
 
       - name: Test
         run: |
-          go run -modfile ./tools/go.mod gotest.tools/gotestsum --format pkgname -- -race -shuffle=on -covermode=atomic ./...
+          go run -modfile ./tools/go.mod gotest.tools/gotestsum --format pkgname --junitfile out/junit.xml -- -race -shuffle=on -covermode=atomic ./...
+
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: git-age@${{ matrix.os }}
+          path: out/junit.xml
+          reporter: java-junit
 
       # Do not run release on windows
       - uses: ruby/setup-ruby@v1
