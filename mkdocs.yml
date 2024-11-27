@@ -1,7 +1,8 @@
 site_name: git-age
-site_url: https:// docs.git-age.icb4dc0.de
+site_url: https://docs.git-age.icb4dc0.de
 theme:
   name: material
+  custom_dir: docs/overrides
   features:
     - navigation.instant
     - search.suggest

@@ -6,15 +6,15 @@
 
 ## Disclaimer
 
-This project is based on [age](/FiloSottile/age).
+This project is based on [age](https://github.com/FiloSottile/age).
 I'm in no way affiliated with the original project.
 
 A big shoutout to Filippo Valsorda for creating `age` and making it available to the public.
 
 ## Install
 
-See [installation docs](/install)
+See [installation docs](install.md)
 
 ## Getting started
 
-See [getting started docs](/getting-started)
+See [getting started docs](getting-started.md)

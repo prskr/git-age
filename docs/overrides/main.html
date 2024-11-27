@@ -1,0 +1,11 @@
+{% extends "base.html" %} {% block extrahead %}
+<!-- Add scripts that need to run before here -->
+{{ super() }}
+<!-- Add scripts that need to run afterwards here -->
+<script
+    defer
+    data-domain="docs.git-age.icb4dc0.de"
+    src="https://plausible.icb4dc0.de/js/script.js"
+></script>
+
+{% endblock %}
