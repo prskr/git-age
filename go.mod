@@ -6,7 +6,7 @@ toolchain go1.23.4
 
 require (
 	buf.build/gen/go/git-age/agent/connectrpc/go v1.17.0-20240411154421-ccdd2e6e6f4f.1
-	buf.build/gen/go/git-age/agent/protocolbuffers/go v1.35.2-20240411154421-ccdd2e6e6f4f.1
+	buf.build/gen/go/git-age/agent/protocolbuffers/go v1.36.0-20240411154421-ccdd2e6e6f4f.1
 	buf.build/gen/go/grpc/grpc/connectrpc/go v1.17.0-20241114200633-5197c4709c1b.1
 	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.35.2-20241114200633-5197c4709c1b.1
 	connectrpc.com/connect v1.17.0
@@ -46,7 +46,7 @@ require (
 	golang.org/x/crypto v0.29.0 // indirect
 	golang.org/x/net v0.31.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
-	google.golang.org/protobuf v1.35.2 // indirect
+	google.golang.org/protobuf v1.36.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
