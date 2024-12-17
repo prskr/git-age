@@ -17,17 +17,17 @@ type STDIN io.ReadCloser
 
 type STDOUT io.Writer
 
-func HostEnv() OSEnv {
+func HostEnv() (OSEnv, error) {
 	env := make(OSEnv)
 	for _, v := range os.Environ() {
 		key, value, found := strings.Cut(v, "=")
 		if !found {
-			panic(fmt.Sprintf("unexpected environment variable %s", v))
+			return nil, fmt.Errorf("unexpected environment variable %q", v)
 		}
 		env[key] = value
 	}
 
-	return env
+	return env, nil
 }
 
 func NewOSEnv() OSEnv {

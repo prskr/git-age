@@ -40,6 +40,11 @@ func (a *App) Execute() error {
 		return err
 	}
 
+	env, err := ports.HostEnv()
+	if err != nil {
+		return err
+	}
+
 	ctx, _ := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
 	cliCtx := kong.Parse(a,
 		kong.Name("git-age"),
@@ -47,7 +52,7 @@ func (a *App) Execute() error {
 		kong.BindTo(os.Stdout, (*ports.STDOUT)(nil)),
 		kong.BindTo(os.Stdin, (*ports.STDIN)(nil)),
 		kong.Bind(ports.CWD(wd)),
-		kong.Bind(ports.HostEnv()),
+		kong.Bind(env),
 		kong.Vars{
 			"XDG_CONFIG_HOME": filepath.ToSlash(xdg.ConfigHome),
 		})
