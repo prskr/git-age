@@ -1,11 +1,14 @@
 package ports
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"strings"
 )
+
+var ErrUnexpectedEnvVar = errors.New("unexpected environment variable")
 
 type CWD string
 
@@ -22,7 +25,7 @@ func HostEnv() (OSEnv, error) {
 	for _, v := range os.Environ() {
 		key, value, found := strings.Cut(v, "=")
 		if !found {
-			return nil, fmt.Errorf("unexpected environment variable %q", v)
+			return nil, fmt.Errorf("%w: %q", ErrUnexpectedEnvVar, v)
 		}
 		env[key] = value
 	}
