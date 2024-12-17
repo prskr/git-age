@@ -20,11 +20,11 @@ type STDOUT io.Writer
 func HostEnv() OSEnv {
 	env := make(OSEnv)
 	for _, v := range os.Environ() {
-		keyValue := strings.Split(v, "=")
-		if len(keyValue) != 2 {
-			panic(fmt.Sprintf("unexpected environment variable %s", keyValue))
+		key, value, found := strings.Cut(v, "=")
+		if !found {
+			panic(fmt.Sprintf("unexpected environment variable %s", v))
 		}
-		env[keyValue[0]] = keyValue[1]
+		env[key] = value
 	}
 
 	return env
