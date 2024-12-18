@@ -11,7 +11,7 @@ require (
 	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.0-20241114200633-5197c4709c1b.1
 	connectrpc.com/connect v1.17.0
 	connectrpc.com/grpchealth v1.3.0
-	filippo.io/age v1.2.0
+	filippo.io/age v1.2.1
 	github.com/Masterminds/semver/v3 v3.3.1
 	github.com/adrg/xdg v0.5.3
 	github.com/alecthomas/kong v1.6.0
