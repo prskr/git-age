@@ -17,7 +17,7 @@ require (
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/lmittmann/tint v1.0.6
 	github.com/minio/sha256-simd v1.0.1
-	github.com/prskr/git-age v0.2.1
+	github.com/prskr/git-age v0.2.3
 	github.com/stretchr/testify v1.10.0
 	gopkg.in/ini.v1 v1.67.0
 )

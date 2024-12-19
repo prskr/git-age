@@ -111,6 +111,7 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/prskr/git-age v0.2.1 h1:wZwtKSBIkY2XTOruJEIm7uuqfAdAPps/pTSHoatd8+o=
 github.com/prskr/git-age v0.2.1/go.mod h1:+AklxYBzOZY7FRMRC7Ld77GzG2WEnHzQk1jTANyWX4A=
+github.com/prskr/git-age v0.2.3/go.mod h1:f/FrHa1052QhMU9X3IkqkVgcHrf6ZGuOThONGV2TDyU=
 github.com/rogpeppe/go-internal v1.11.0/go.mod h1:ddIwULY96R17DhadqLgMfk9H9tvdUzkipdSkR5nkCZA=
 github.com/rogpeppe/go-internal v1.12.0 h1:exVL4IDcn6na9z1rAb56Vxr+CgyK3nn3O+epU5NdKM8=
 github.com/rogpeppe/go-internal v1.12.0/go.mod h1:E+RYuTGaKKdloAfM02xzb0FW3Paa99yedzYV+kq4uf4=
