@@ -5,6 +5,7 @@ buf.build/gen/go/git-age/agent/protocolbuffers/go v1.36.0-20240411154421-ccdd2e6
 buf.build/gen/go/git-age/agent/protocolbuffers/go v1.36.1-20240411154421-ccdd2e6e6f4f.1/go.mod h1:g5Mv77tLqq9qM3G0U7jebMCuJgk/TBvQz6FxKjttG9w=
 buf.build/gen/go/grpc/grpc/connectrpc/go v1.17.0-20241114200633-5197c4709c1b.1 h1:cDtMHCuY+DMmEMISw2wR9P92V1WkgGG9fVSP2/y11Bk=
 buf.build/gen/go/grpc/grpc/connectrpc/go v1.17.0-20241114200633-5197c4709c1b.1/go.mod h1:9rw5qMCUAGwYt3uH3lGST5zW2l8BLmxPSx6Hfa6RQBk=
+buf.build/gen/go/grpc/grpc/connectrpc/go v1.17.0-20241224201141-c591cbb6df8a.1/go.mod h1:lAXrbRE1Dci3wfRFHqUPBW/eR2miYitgRMC5K9VTXec=
 buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.0-20241114200633-5197c4709c1b.1 h1:q6RZW04eWwCHIMx1NCpNOFhzrTyyG+/WP5djbsDJtkg=
 buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.0-20241114200633-5197c4709c1b.1/go.mod h1:lwkUKDLqlPMmAHiivGPP5xqOfU82ziQ9HugRdw2fWBc=
 buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.1-20241224201141-c591cbb6df8a.1/go.mod h1:or05ZDGRbmT+fPGJJxLDw9+AvPxRTKd/fEfz5XI3dww=
