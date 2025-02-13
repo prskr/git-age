@@ -38,7 +38,6 @@ jobs:
       - name: Init go
         run: |
           go mod download
-          go mod download -modfile tools/go.mod
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
@@ -55,7 +54,7 @@ jobs:
 
       - name: Test
         run: |
-          go run -modfile ./tools/go.mod gotest.tools/gotestsum --format pkgname --junitfile out/junit.xml -- -race -shuffle=on -covermode=atomic ./...
+          go tool gotestsum --format pkgname --junitfile out/junit.xml -- -race -shuffle=on -covermode=atomic ./...
 
       - name: Test Report
         uses: dorny/test-reporter@v1
@@ -85,7 +84,6 @@ jobs:
       - name: Init go
         run: |
           go mod download
-          go mod download -modfile tools/go.mod
 
       - uses: ruby/setup-ruby@v1
         with:

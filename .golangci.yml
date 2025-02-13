@@ -72,12 +72,12 @@ linters:
     - prealloc
     - predeclared
     - sloglint
-    - tenv
     - testpackage
     - thelper
     - tparallel
     - unconvert
     - unparam
+    - usetesting
     - usestdlibvars
     - wastedassign
     - whitespace
@@ -94,6 +94,6 @@ issues:
         - gochecknoglobals
 
 run:
-  skip-files: [ ]
+  skip-files: []
   modules-download-mode: readonly
   timeout: 5m

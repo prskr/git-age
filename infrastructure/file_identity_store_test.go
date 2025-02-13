@@ -1,7 +1,6 @@
 package infrastructure_test
 
 import (
-	"context"
 	"io"
 	"net/url"
 	"os"
@@ -225,7 +224,7 @@ func TestFileIdentityStore_Generate(t *testing.T) {
 				assert.NoError(t, err, "failed to get store")
 			}
 
-			pubKey, err := store.Generate(context.Background(), tt.cmd)
+			pubKey, err := store.Generate(t.Context(), tt.cmd)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Generate() error = %v, wantErr %v", err, tt.wantErr)
 				return
