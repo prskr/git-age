@@ -8,9 +8,10 @@ import (
 	"testing/fstest"
 
 	"github.com/alecthomas/kong"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/handlers/cli"
-	"github.com/stretchr/testify/assert"
 )
 
 //nolint:paralleltest // requires global state and cannot be executed in parallel

@@ -18,7 +18,6 @@ import (
 	clih "github.com/prskr/git-age/handlers/cli"
 )
 
-//nolint:lll // cannot break struct tags
 type App struct {
 	Logging struct {
 		Level slog.Level `env:"GIT_AGE_LOG_LEVEL" help:"Log level" default:"warn"`

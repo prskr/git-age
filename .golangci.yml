@@ -1,11 +1,10 @@
-linter-settings:
+linters-settings:
   dupl:
     threshold: 100
   funlen:
     lines: 100
     statements: 50
   gci:
-    local-prefixes: github.com/prskr/git-age
     sections:
       - standard
       - default
@@ -21,8 +20,6 @@ linter-settings:
     min-complexity: 15
   goimports:
     local-prefixes: github.com/prskr/git-age
-  golint:
-    min-confidence: 0
   importas:
     no-unaliased: true
   lll:
@@ -59,7 +56,7 @@ linters:
     - goimports
     - gosec
     - interfacebloat
-    # - intrange
+    - intrange
     - lll
     - maintidx
     - nakedret
@@ -87,6 +84,7 @@ issues:
     - path: _test\.go
       linters:
         - err113
+        - dupl
         - funlen
         - cyclop
         - gocognit
@@ -94,6 +92,5 @@ issues:
         - gochecknoglobals
 
 run:
-  skip-files: []
   modules-download-mode: readonly
   timeout: 5m

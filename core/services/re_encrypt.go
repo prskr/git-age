@@ -13,7 +13,6 @@ import (
 	"github.com/prskr/git-age/core/ports"
 )
 
-//nolint:funlen // cannot split this function further
 func ReEncryptWalkFunc(repo ports.GitRepository, rwfs ports.ReadWriteFS, sealer ports.FileOpenSealer) fs.WalkDirFunc {
 	return func(path string, d fs.DirEntry, err error) error {
 		if err != nil {

@@ -58,7 +58,7 @@ func (i IdentitiesStoreChain) Identities(
 		}()
 	}
 
-	for range len(i) {
+	for range i {
 		select {
 		case ids := <-out:
 			result = append(result, ids...)
