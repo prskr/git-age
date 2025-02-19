@@ -38,7 +38,8 @@ archives:
     # use zip for windows archives
     format_overrides:
       - goos: windows
-        format: zip
+        formats:
+          - zip
     files:
       - src: out/man/git-age.1.gz
         dst: docs/git-age.1.gz
@@ -121,11 +122,7 @@ scoops:
       name: scoop-the-prancing-package
       token: "{{ .Env.GH_SCOOP_PAT }}"
       pull_request:
-        enabled: true
-        base:
-          owner: prskr
-          name: scoop-the-prancing-package
-          branch: main
+        enabled: false
 
 winget:
   - name: git-age

@@ -72,7 +72,9 @@ func prepareTestRepo(tb testing.TB) (s *testSetup) {
 	s.root = tb.TempDir()
 	wd := testx.ResultOf(tb, os.Getwd)
 
-	srcFS := infrastructure.NewReadWriteDirFS(filepath.Join(wd, "testdata", "sampleRepo"))
+	sampleRepoPath := filepath.Join(wd, "testdata", "sampleRepo")
+
+	srcFS := infrastructure.NewReadWriteDirFS(sampleRepoPath)
 	s.repoFS = infrastructure.NewReadWriteDirFS(s.root)
 
 	recipients := infrastructure.NewRecipientsFile(srcFS)
@@ -138,6 +140,16 @@ func prepareTestRepo(tb testing.TB) (s *testSetup) {
 	err = fsx.NewSyncer(srcFS, s.repoFS).Sync()
 	if err != nil {
 		tb.Fatalf("failed to populate test directory: %v", err)
+	}
+
+	outDirPath := filepath.Join(s.root, "out")
+
+	if err := os.MkdirAll(outDirPath, os.ModePerm); err != nil {
+		tb.Fatalf("failed to create out directory: %v", err)
+	}
+
+	if err := fsx.CopyFile(filepath.Join(sampleRepoPath, ".env"), filepath.Join(outDirPath, ".env")); err != nil {
+		tb.Fatalf("failed to copy .env file: %v", err)
 	}
 
 	return s
