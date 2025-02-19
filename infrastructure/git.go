@@ -4,12 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/format/gitattributes"
+	"github.com/go-git/go-git/v5/plumbing/format/gitignore"
 	"github.com/go-git/go-git/v5/plumbing/object"
 
 	"github.com/prskr/git-age/core/ports"
@@ -113,17 +115,24 @@ func (g GitRepository) Commit(message string) error {
 
 //nolint:cyclop // can't split this function
 func (g GitRepository) WalkAgeFiles(onMatch fs.WalkDirFunc) error {
+	ignorePatterns, err := gitignore.ReadPatterns(g.Worktree.Filesystem, nil)
+	if err != nil {
+		return fmt.Errorf("parsing ignore patterns: %w", err)
+	}
 	matchAttrs, err := gitattributes.ReadPatterns(g.Worktree.Filesystem, nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("reading gitattributes: %w", err)
 	}
 
-	matcher := gitattributes.NewMatcher(matchAttrs)
+	ignoreMatcher := gitignore.NewMatcher(ignorePatterns)
+	attributesMatcher := gitattributes.NewMatcher(matchAttrs)
 	wantedAttributes := []string{"age"}
+
+	logger := slog.Default()
 
 	return fs.WalkDir(g.RepoFS, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
-			return err
+			return fmt.Errorf("walk error: %w", err)
 		}
 
 		if d.IsDir() {
@@ -133,8 +142,16 @@ func (g GitRepository) WalkAgeFiles(onMatch fs.WalkDirFunc) error {
 			return nil
 		}
 
-		matches, matched := matcher.Match(strings.Split(filepath.ToSlash(path), "/"), wantedAttributes)
+		filePathSplit := strings.Split(filepath.ToSlash(path), "/")
+
+		matches, matched := attributesMatcher.Match(filePathSplit, wantedAttributes)
 		if !matched {
+			logger.Debug("file does not match .gitattributes", slog.String("path", path))
+			return nil
+		}
+
+		if matched := ignoreMatcher.Match(strings.Split(filepath.ToSlash(path), "/"), d.IsDir()); matched {
+			logger.Debug("file is ignored", slog.String("path", path))
 			return nil
 		}
 

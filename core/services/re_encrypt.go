@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"io/fs"
 	"log/slog"
@@ -29,12 +30,12 @@ func ReEncryptWalkFunc(repo ports.GitRepository, rwfs ports.ReadWriteFS, sealer 
 			if errors.Is(err, plumbing.ErrObjectNotFound) {
 				return nil
 			}
-			return err
+			return fmt.Errorf("opening object at path %s at HEAD: %w", path, err)
 		}
 
 		objReader, err := fileObj.Reader()
 		if err != nil {
-			return err
+			return fmt.Errorf("opening object reader at path %s at HEAD: %w", path, err)
 		}
 
 		defer func() {
@@ -44,7 +45,7 @@ func ReEncryptWalkFunc(repo ports.GitRepository, rwfs ports.ReadWriteFS, sealer 
 		dir, fileName := filepath.Split(path)
 		tmp, err := rwfs.TempFile(dir, fileName)
 		if err != nil {
-			return err
+			return fmt.Errorf("creating temp file: %w", err)
 		}
 		logger.Debug("Preserve decrypted file in temp file", slog.String("tmp_file_path", tmp.Name()))
 
@@ -59,7 +60,7 @@ func ReEncryptWalkFunc(repo ports.GitRepository, rwfs ports.ReadWriteFS, sealer 
 
 		f, err := rwfs.Create(path)
 		if err != nil {
-			return err
+			return fmt.Errorf("creating file at path %s: %w", path, err)
 		}
 
 		defer func() {
@@ -68,12 +69,12 @@ func ReEncryptWalkFunc(repo ports.GitRepository, rwfs ports.ReadWriteFS, sealer 
 
 		plainTextReader, err := sealer.OpenFile(objReader)
 		if err != nil {
-			return err
+			return fmt.Errorf("opening file for decryption: %w", err)
 		}
 
 		encryptWriter, err := sealer.SealFile(f)
 		if err != nil {
-			return err
+			return fmt.Errorf("opening file for encryption: %w", err)
 		}
 
 		defer func() {
