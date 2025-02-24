@@ -23,7 +23,7 @@ require (
 	gopkg.in/ini.v1 v1.67.0
 )
 
-replace golang.org/x/crypto => golang.org/x/crypto v0.33.0
+replace golang.org/x/crypto => golang.org/x/crypto v0.35.0
 
 tool (
 	github.com/go-courier/husky/cmd/husky
