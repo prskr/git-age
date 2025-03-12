@@ -57,7 +57,7 @@ jobs:
           go tool gotestsum --format pkgname --junitfile out/junit.xml -- -race -shuffle=on -covermode=atomic ./...
 
       - name: Test Report
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v2
         if: success() || failure()
         with:
           name: git-age@${{ matrix.os }}
