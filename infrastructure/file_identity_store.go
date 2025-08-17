@@ -84,7 +84,7 @@ func (f *FileIdentityStore) Generate(_ context.Context, cmd dto.GenerateIdentity
 
 	scanner := bufio.NewScanner(strings.NewReader(cmd.Comment))
 	for scanner.Scan() {
-		if _, err := identitiesFile.WriteString(fmt.Sprintf("# %s\n", scanner.Text())); err != nil {
+		if _, err := fmt.Fprintf(identitiesFile, "# %s\n", scanner.Text()); err != nil {
 			return "", fmt.Errorf("failed to write comment to identities file: %w", err)
 		}
 	}
@@ -93,7 +93,7 @@ func (f *FileIdentityStore) Generate(_ context.Context, cmd dto.GenerateIdentity
 		return "", fmt.Errorf("failed to write comment: %w", err)
 	}
 
-	if _, err := identitiesFile.WriteString(fmt.Sprintf("# public key: %s\n", publicKey)); err != nil {
+	if _, err := fmt.Fprintf(identitiesFile, "# public key: %s\n", publicKey); err != nil {
 		return "", fmt.Errorf("failed to write public key to identities file: %w", err)
 	}
 

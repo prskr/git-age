@@ -141,7 +141,7 @@ func (h *CleanCliHandler) copyEncryptedFileToStdout(reader io.Reader, out io.Wri
 }
 
 func (h *CleanCliHandler) copyGitObjectTo(obj *object.File, out io.Writer) error {
-	r, err := obj.Blob.Reader()
+	r, err := obj.Reader()
 	if err != nil {
 		return err
 	}
@@ -164,7 +164,7 @@ func (h *CleanCliHandler) hashFileAtHead(
 		return nil, nil, err
 	}
 
-	fileObjReader, err := fileObjAtHead.Blob.Reader()
+	fileObjReader, err := fileObjAtHead.Reader()
 	if err != nil {
 		return nil, nil, err
 	}

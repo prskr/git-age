@@ -83,7 +83,7 @@ func (h VersionCliHandler) checkLatestVersion() (*releaseInfo, error) {
 		_ = resp.Body.Close()
 	}()
 
-	//nolint:goerr113 // no need to wrap - there's no point to wrap this error
+	//nolint:err113 // no need to wrap - there's no point to wrap this error
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}

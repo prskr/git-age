@@ -68,7 +68,7 @@ func (r RecipientsFile) Append(pubKey string, comment string) (recipients []age.
 	}()
 
 	if comment != "" {
-		if _, err := recipientsFile.WriteString(fmt.Sprintf("# %s\n", comment)); err != nil {
+		if _, err := fmt.Fprintf(recipientsFile, "# %s\n", comment); err != nil {
 			return nil, fmt.Errorf("failed to write comment to recipients file: %w", err)
 		}
 	}
