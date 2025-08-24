@@ -19,7 +19,7 @@ require (
 	github.com/go-git/go-git/v5 v5.16.2
 	github.com/lmittmann/tint v1.1.2
 	github.com/minio/sha256-simd v1.0.1
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.0
 	gopkg.in/ini.v1 v1.67.0
 )
 
