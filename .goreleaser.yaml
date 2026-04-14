@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 version: 2
 
 before:
@@ -29,12 +30,7 @@ archives:
       - tar.gz
     # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
-      {{ .ProjectName }}_
-      {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}v{{ .Arm }}{{ end }}
+      {{ .ProjectName }}_ {{- title .Os }}_ {{- if eq .Arch "amd64" }}x86_64 {{- else if eq .Arch "386" }}i386 {{- else }}{{ .Arch }}{{ end }} {{- if .Arm }}v{{ .Arm }}{{ end }}
     # use zip for windows archives
     format_overrides:
       - goos: windows
@@ -82,8 +78,10 @@ nfpms:
       signature:
         key_file: '{{ envOrDefault "GITHUB_WORKSPACE" "." }}/.gnupg/gpg.key'
 
-brews:
+homebrew_casks:
   - name: git-age
+    binaries:
+      - git-age
     homepage: https://github.com/prskr/git-age
     description: |-
       git-age is a smudge/clean filter to encrypt/decrypt files in a git repository transparently
@@ -95,12 +93,9 @@ brews:
     skip_upload: auto
     directory: Formula
     dependencies:
-      - name: git
-        os: mac
-    extra_install: |
-      man1.install "docs/git-age.1.gz"
-    test: |
-      system "#{bin}/git-age --help"
+      - formula: git
+    manpages:
+      - out/man/git-age.1
     repository:
       owner: prskr
       name: homebrew-the-prancing-package
@@ -116,7 +111,7 @@ scoops:
     license: "MIT"
     directory: bucket
     homepage: https://github.com/prskr/git-age
-    depends: ["git"]
+    depends: [ "git" ]
     repository:
       owner: prskr
       name: scoop-the-prancing-package

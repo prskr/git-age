@@ -1,6 +1,6 @@
 module github.com/prskr/git-age
 
-go 1.25.0
+go 1.26.2
 
 require (
 	buf.build/gen/go/git-age/agent/connectrpc/go v1.19.1-20240411154421-ccdd2e6e6f4f.2
