@@ -21,7 +21,7 @@ require (
 	gopkg.in/ini.v1 v1.67.1
 )
 
-replace golang.org/x/crypto => golang.org/x/crypto v0.41.0
+replace golang.org/x/crypto => golang.org/x/crypto v0.50.0
 
 tool (
 	golang.org/x/tools/cmd/goimports
