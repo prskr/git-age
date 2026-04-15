@@ -13,7 +13,7 @@ import (
 	"connectrpc.com/grpchealth"
 	"filippo.io/age"
 
-	"github.com/prskr/git-age/core/dto"
+	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/infrastructure"
 	"github.com/prskr/git-age/internal/testx"
 )
@@ -65,7 +65,7 @@ func TestAgentIdentitiesStore_Generate(t *testing.T) {
 			t.Cleanup(server.Close)
 
 			storeSource := infrastructure.AgentIdentitiesStoreSource{
-				BaseUrl: server.URL,
+				BaseURL: server.URL,
 				Client:  server.Client(),
 			}
 
@@ -83,7 +83,7 @@ func TestAgentIdentitiesStore_Generate(t *testing.T) {
 				return
 			}
 
-			pubKey, err := identitiesStore.Generate(testx.Context(t), dto.GenerateIdentityCommand{})
+			pubKey, err := identitiesStore.Generate(testx.Context(t), ports.GenerateIdentityCommand{})
 			if (err != nil) != tt.wantErr {
 				t.Errorf("failed to generate identity store pubkey: %v", err)
 			}
@@ -174,7 +174,7 @@ func TestAgentIdentitiesStore_Identities(t *testing.T) {
 			t.Cleanup(server.Close)
 
 			storeSource := infrastructure.AgentIdentitiesStoreSource{
-				BaseUrl: server.URL,
+				BaseURL: server.URL,
 				Client:  server.Client(),
 			}
 
@@ -192,7 +192,7 @@ func TestAgentIdentitiesStore_Identities(t *testing.T) {
 				return
 			}
 
-			query := dto.IdentitiesQuery{Remotes: tt.args.remotes}
+			query := ports.IdentitiesQuery{Remotes: tt.args.remotes}
 			identities, err := identitiesStore.Identities(testx.Context(t), query)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("failed to generate identity store pubkey: %v", err)

@@ -8,7 +8,6 @@ import (
 
 	"github.com/alecthomas/kong"
 
-	"github.com/prskr/git-age/core/dto"
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
 	"github.com/prskr/git-age/infrastructure"
@@ -85,7 +84,7 @@ func (h *AddRecipientCliHandler) AfterApply(
 		return fmt.Errorf("failed to determine Git remotes: %w", err)
 	}
 
-	query := dto.IdentitiesQuery{
+	query := ports.IdentitiesQuery{
 		Remotes: remotes,
 	}
 

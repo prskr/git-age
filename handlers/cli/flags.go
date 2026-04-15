@@ -1,6 +1,10 @@
 package cli
 
-import "net/url"
+import (
+	"net/url"
+
+	"github.com/prskr/git-age/core/ports"
+)
 
 type KeysFlag struct {
 	Keys *url.URL `env:"GIT_AGE_KEYS" name:"keys" short:"k" default:"file:///${XDG_CONFIG_HOME}/git-age/keys.txt"`
@@ -12,4 +16,8 @@ type CommentFlag struct {
 
 type RemoteFlag struct {
 	Remote string `short:"r" name:"remote" help:"Remote for which this key should be considered"`
+}
+
+type AlgorithmFlag struct {
+	Algorithm ports.IdentityAlgorithm `short:"a" name:"algorithm" help:"Algorithm to use for key generation" default:"hybrid"`
 }

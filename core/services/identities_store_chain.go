@@ -7,7 +7,6 @@ import (
 
 	"filippo.io/age"
 
-	"github.com/prskr/git-age/core/dto"
 	"github.com/prskr/git-age/core/ports"
 )
 
@@ -23,7 +22,7 @@ type IdentitiesStoreChain []ports.IdentitiesStore
 
 func (i IdentitiesStoreChain) Generate(
 	ctx context.Context,
-	cmd dto.GenerateIdentityCommand,
+	cmd ports.GenerateIdentityCommand,
 ) (publicKey string, err error) {
 	for _, store := range i {
 		return store.Generate(ctx, cmd)
@@ -34,7 +33,7 @@ func (i IdentitiesStoreChain) Generate(
 
 func (i IdentitiesStoreChain) Identities(
 	ctx context.Context,
-	query dto.IdentitiesQuery,
+	query ports.IdentitiesQuery,
 ) (result []age.Identity, err error) {
 	var (
 		out  = make(chan []age.Identity)

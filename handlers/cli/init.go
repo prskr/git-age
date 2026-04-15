@@ -6,15 +6,15 @@ import (
 	"io/fs"
 	"log/slog"
 
-	"github.com/prskr/git-age/core/dto"
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/infrastructure"
 )
 
 type InitCliHandler struct {
-	CommentFlag `embed:""`
-	KeysFlag    `embed:""`
-	RemoteFlag  `embed:""`
+	CommentFlag   `embed:""`
+	KeysFlag      `embed:""`
+	RemoteFlag    `embed:""`
+	AlgorithmFlag `embed:""`
 
 	Identities ports.IdentitiesStore `kong:"-"`
 	Recipients ports.Recipients      `kong:"-"`
@@ -27,9 +27,10 @@ func (h *InitCliHandler) Run(ctx context.Context) (err error) {
 		return nil
 	}
 
-	cmd := dto.GenerateIdentityCommand{
-		Comment: h.Comment,
-		Remote:  h.Remote,
+	cmd := ports.GenerateIdentityCommand{
+		Comment:   h.Comment,
+		Remote:    h.Remote,
+		Algorithm: h.Algorithm,
 	}
 
 	pubKey, err := h.Identities.Generate(ctx, cmd)

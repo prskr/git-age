@@ -17,7 +17,6 @@ import (
 	"connectrpc.com/connect"
 	"filippo.io/age"
 
-	"github.com/prskr/git-age/core/dto"
 	"github.com/prskr/git-age/core/ports"
 )
 
@@ -28,29 +27,29 @@ var (
 
 func NewAgentIdentitiesStoreSource(env ports.OSEnv) *AgentIdentitiesStoreSource {
 	return &AgentIdentitiesStoreSource{
-		BaseUrl: os.ExpandEnv(env.Get("GIT_AGE_AGENT_HOST")),
+		BaseURL: os.ExpandEnv(env.Get("GIT_AGE_AGENT_HOST")),
 	}
 }
 
 type AgentIdentitiesStoreSource struct {
-	BaseUrl string
+	BaseURL string
 	Client  connect.HTTPClient
 }
 
 func (a *AgentIdentitiesStoreSource) IsValid(ctx context.Context) (isValid bool, err error) {
-	if a.BaseUrl == "" {
+	if a.BaseURL == "" {
 		slog.DebugContext(ctx, "Skipping agent because url is empty")
 		return false, nil
 	}
 
 	if a.Client == nil {
-		a.BaseUrl, a.Client, err = prepareClient(a.BaseUrl)
+		a.BaseURL, a.Client, err = prepareClient(a.BaseURL)
 		if err != nil {
 			return false, err
 		}
 	}
 
-	healthClient := healthv1connect.NewHealthClient(a.Client, a.BaseUrl)
+	healthClient := healthv1connect.NewHealthClient(a.Client, a.BaseURL)
 	healthRequest := &healthv1.HealthCheckRequest{Service: agentv1connect.IdentitiesStoreServiceName}
 	resp, err := healthClient.Check(ctx, connect.NewRequest(healthRequest))
 	if err != nil {
@@ -65,7 +64,7 @@ func (a *AgentIdentitiesStoreSource) IsValid(ctx context.Context) (isValid bool,
 
 func (a *AgentIdentitiesStoreSource) GetStore() (ports.IdentitiesStore, error) {
 	return &AgentIdentitiesStore{
-		IdentitiesClient: agentv1connect.NewIdentitiesStoreServiceClient(a.Client, a.BaseUrl),
+		IdentitiesClient: agentv1connect.NewIdentitiesStoreServiceClient(a.Client, a.BaseURL),
 	}, nil
 }
 
@@ -75,9 +74,9 @@ type AgentIdentitiesStore struct {
 
 func (a AgentIdentitiesStore) Generate(
 	ctx context.Context,
-	cmd dto.GenerateIdentityCommand,
+	cmd ports.GenerateIdentityCommand,
 ) (publicKey string, err error) {
-	newId, err := age.GenerateX25519Identity()
+	newID, err := cmd.Algorithm.Generate()
 	if err != nil {
 		return "", err
 	}
@@ -86,11 +85,11 @@ func (a AgentIdentitiesStore) Generate(
 		cmd.Comment = "Generated on " + time.Now().Format(time.RFC3339)
 	}
 
-	publicKey = newId.Recipient().String()
+	publicKey = newID.Recipient().String()
 
 	req := &agentv1.StoreIdentityRequest{
 		PublicKey:  publicKey,
-		PrivateKey: newId.String(),
+		PrivateKey: newID.String(),
 		Comment:    cmd.Comment,
 		Remote:     cmd.Remote,
 	}
@@ -102,7 +101,7 @@ func (a AgentIdentitiesStore) Generate(
 	return publicKey, nil
 }
 
-func (a AgentIdentitiesStore) Identities(ctx context.Context, query dto.IdentitiesQuery) ([]age.Identity, error) {
+func (a AgentIdentitiesStore) Identities(ctx context.Context, query ports.IdentitiesQuery) ([]age.Identity, error) {
 	req := &agentv1.GetIdentitiesRequest{
 		Remotes: query.Remotes,
 	}

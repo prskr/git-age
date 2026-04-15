@@ -7,7 +7,6 @@ import (
 	"io"
 	"log/slog"
 
-	"github.com/prskr/git-age/core/dto"
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
 	"github.com/prskr/git-age/infrastructure"
@@ -64,7 +63,7 @@ func (h *SmudgeCliHandler) AfterApply(ctx context.Context, cwd ports.CWD, env po
 		return fmt.Errorf("failed to determine Git remotes: %w", err)
 	}
 
-	query := dto.IdentitiesQuery{
+	query := ports.IdentitiesQuery{
 		Remotes: remotes,
 	}
 

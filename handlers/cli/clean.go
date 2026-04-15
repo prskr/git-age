@@ -13,7 +13,6 @@ import (
 
 	"github.com/go-git/go-git/v5/plumbing"
 
-	"github.com/prskr/git-age/core/dto"
 	"github.com/prskr/git-age/internal/fsx"
 
 	"github.com/go-git/go-git/v5/plumbing/object"
@@ -108,7 +107,7 @@ func (h *CleanCliHandler) AfterApply(ctx context.Context, cwd ports.CWD, env por
 		return fmt.Errorf("failed to determine Git remotes: %w", err)
 	}
 
-	query := dto.IdentitiesQuery{
+	query := ports.IdentitiesQuery{
 		Remotes: remotes,
 	}
 

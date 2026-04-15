@@ -4,11 +4,19 @@ import (
 	"context"
 
 	"filippo.io/age"
-
-	"github.com/prskr/git-age/core/dto"
 )
 
+type GenerateIdentityCommand struct {
+	Comment   string
+	Remote    string
+	Algorithm IdentityAlgorithm
+}
+
+type IdentitiesQuery struct {
+	Remotes []string
+}
+
 type IdentitiesStore interface {
-	Generate(ctx context.Context, cmd dto.GenerateIdentityCommand) (publicKey string, err error)
-	Identities(ctx context.Context, query dto.IdentitiesQuery) ([]age.Identity, error)
+	Generate(ctx context.Context, cmd GenerateIdentityCommand) (publicKey string, err error)
+	Identities(ctx context.Context, query IdentitiesQuery) ([]age.Identity, error)
 }

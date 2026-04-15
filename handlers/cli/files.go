@@ -14,7 +14,6 @@ import (
 
 	"github.com/go-git/go-git/v5"
 
-	"github.com/prskr/git-age/core/dto"
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/core/services"
 	"github.com/prskr/git-age/infrastructure"
@@ -147,7 +146,7 @@ func (h *FilesCliHandler) AfterApply(ctx context.Context, kongCtx *kong.Context,
 		return fmt.Errorf("failed to determine Git remotes: %w", err)
 	}
 
-	query := dto.IdentitiesQuery{
+	query := ports.IdentitiesQuery{
 		Remotes: remotes,
 	}
 

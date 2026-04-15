@@ -10,7 +10,7 @@ import (
 	"filippo.io/age"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/prskr/git-age/core/dto"
+	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/infrastructure"
 	"github.com/prskr/git-age/internal/testx"
 )
@@ -138,7 +138,7 @@ func TestFileIdentityStore_Identities(t *testing.T) {
 			store, err := infrastructure.NewFileIdentityStoreSource(&url.URL{Path: keysFilePath}).GetStore()
 			assert.NoError(t, err, "failed to get store")
 
-			got, err := store.Identities(testx.Context(t), dto.IdentitiesQuery{})
+			got, err := store.Identities(testx.Context(t), ports.IdentitiesQuery{})
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Identities() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -157,48 +157,76 @@ func TestFileIdentityStore_Generate(t *testing.T) {
 	tests := []struct {
 		name        string
 		keysContent string
-		cmd         dto.GenerateIdentityCommand
+		cmd         ports.GenerateIdentityCommand
 		wantErr     bool
 	}{
 		{
-			name:    "Generate new identity - empty file",
-			cmd:     dto.GenerateIdentityCommand{},
+			name: "Generate new identity - empty file",
+			cmd: ports.GenerateIdentityCommand{
+				Algorithm: ports.IdentityAlgorithmX25519,
+			},
+			wantErr: false,
+		},
+		{
+			name:    "Generate new identity - empty file, default algorithm",
+			cmd:     ports.GenerateIdentityCommand{},
 			wantErr: false,
 		},
 		{
 			name: "Generate new identity with comment - empty file",
-			cmd: dto.GenerateIdentityCommand{
-				Comment: "test",
+			cmd: ports.GenerateIdentityCommand{
+				Algorithm: ports.IdentityAlgorithmX25519,
+				Comment:   "test",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Generate new hybrid identity - empty file",
+			cmd: ports.GenerateIdentityCommand{
+				Algorithm: ports.IdentityAlgorithmHybrid,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Generate new hybrid identity with comment - empty file",
+			cmd: ports.GenerateIdentityCommand{
+				Algorithm: ports.IdentityAlgorithmHybrid,
+				Comment:   "test",
 			},
 			wantErr: false,
 		},
 		{
 			name: "Generate new identity with comment and remote - empty file",
-			cmd: dto.GenerateIdentityCommand{
-				Comment: "test",
-				Remote:  "https://github.com/prskr/git-age",
+			cmd: ports.GenerateIdentityCommand{
+				Algorithm: ports.IdentityAlgorithmHybrid,
+				Comment:   "test",
+				Remote:    "https://github.com/prskr/git-age",
 			},
 			wantErr: false,
 		},
 		{
-			name:        "Generate new identity - non-empty file",
-			cmd:         dto.GenerateIdentityCommand{},
+			name: "Generate new identity - non-empty file",
+			cmd: ports.GenerateIdentityCommand{
+				Algorithm: ports.IdentityAlgorithmHybrid,
+			},
 			keysContent: multipleIdentities,
 			wantErr:     false,
 		},
 		{
 			name: "Generate new identity with comment - non-empty file",
-			cmd: dto.GenerateIdentityCommand{
-				Comment: "test",
+			cmd: ports.GenerateIdentityCommand{
+				Algorithm: ports.IdentityAlgorithmHybrid,
+				Comment:   "test",
 			},
 			keysContent: multipleIdentities,
 			wantErr:     false,
 		},
 		{
 			name: "Generate new identity with comment and remote - non-empty file",
-			cmd: dto.GenerateIdentityCommand{
-				Comment: "test",
-				Remote:  "https://github.com/prskr/git-age",
+			cmd: ports.GenerateIdentityCommand{
+				Algorithm: ports.IdentityAlgorithmHybrid,
+				Comment:   "test",
+				Remote:    "https://github.com/prskr/git-age",
 			},
 			keysContent: multipleIdentities,
 			wantErr:     false,
@@ -230,7 +258,7 @@ func TestFileIdentityStore_Generate(t *testing.T) {
 				return
 			}
 
-			if _, err := age.ParseX25519Recipient(pubKey); err != nil {
+			if _, err := tt.cmd.Algorithm.ParseRecipient(pubKey); err != nil {
 				assert.NoError(t, err, "failed to parse public key")
 			}
 

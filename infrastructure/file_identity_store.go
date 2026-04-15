@@ -14,7 +14,6 @@ import (
 
 	"filippo.io/age"
 
-	"github.com/prskr/git-age/core/dto"
 	"github.com/prskr/git-age/core/ports"
 )
 
@@ -39,7 +38,7 @@ func (f *FileIdentityStoreSource) GetStore() (ports.IdentitiesStore, error) {
 
 type FileIdentityStore url.URL
 
-func (f *FileIdentityStore) Identities(context.Context, dto.IdentitiesQuery) ([]age.Identity, error) {
+func (f *FileIdentityStore) Identities(context.Context, ports.IdentitiesQuery) ([]age.Identity, error) {
 	keysFile, err := os.Open(f.identitiesFilePath())
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
@@ -55,13 +54,13 @@ func (f *FileIdentityStore) Identities(context.Context, dto.IdentitiesQuery) ([]
 	return age.ParseIdentities(keysFile)
 }
 
-func (f *FileIdentityStore) Generate(_ context.Context, cmd dto.GenerateIdentityCommand) (publicKey string, err error) {
-	newId, err := age.GenerateX25519Identity()
+func (f *FileIdentityStore) Generate(_ context.Context, cmd ports.GenerateIdentityCommand) (publicKey string, err error) {
+	newID, err := cmd.Algorithm.Generate()
 	if err != nil {
 		return "", err
 	}
 
-	publicKey = newId.Recipient().String()
+	publicKey = newID.Recipient().String()
 
 	if cmd.Comment == "" {
 		cmd.Comment = "# generated on " + time.Now().Format(time.RFC3339)
@@ -97,7 +96,7 @@ func (f *FileIdentityStore) Generate(_ context.Context, cmd dto.GenerateIdentity
 		return "", fmt.Errorf("failed to write public key to identities file: %w", err)
 	}
 
-	if _, err := identitiesFile.WriteString(newId.String() + "\n"); err != nil {
+	if _, err := identitiesFile.WriteString(newID.String() + "\n"); err != nil {
 		return "", fmt.Errorf("failed to write public key to identities file: %w", err)
 	}
 

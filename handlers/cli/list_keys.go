@@ -8,7 +8,6 @@ import (
 
 	"filippo.io/age"
 
-	"github.com/prskr/git-age/core/dto"
 	"github.com/prskr/git-age/core/ports"
 	"github.com/prskr/git-age/infrastructure"
 )
@@ -20,7 +19,7 @@ type ListKeysCliHandler struct {
 }
 
 func (h *ListKeysCliHandler) Run(ctx context.Context, stdout ports.STDOUT) error {
-	identities, err := h.Identities.Identities(ctx, dto.IdentitiesQuery{Remotes: []string{""}})
+	identities, err := h.Identities.Identities(ctx, ports.IdentitiesQuery{Remotes: []string{""}})
 	if err != nil {
 		return fmt.Errorf("failed to list identities: %w", err)
 	}
