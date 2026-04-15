@@ -91,7 +91,6 @@ homebrew_casks:
       email: bot@goreleaser.com
     commit_msg_template: "chore: update {{ .ProjectName }} to version {{ .Tag }}"
     skip_upload: auto
-    directory: Formula
     dependencies:
       - formula: git
     manpages:

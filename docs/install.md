@@ -9,10 +9,12 @@ You can download the binary for your platform from there.
 
 ## Homebrew
 
+‼️ with the release of _git-age_ v0.3.0 it is no longer packaged as a *formula* but as a *cask* if you've installed _git-age_ already, please uninstall the old formula and install the cask afterwords ‼️
+
 There's a tap for _git-age_ available at [prskr/the-prancing-package](https://github.com/prskr/the-prancing-package).
 
 ```Bash
-brew install prskr/the-prancing-package/git-age
+brew install --cask prskr/the-prancing-package/git-age
 ```
 
 or
@@ -20,7 +22,7 @@ or
 ```Bash
 brew tap prskr/the-prancing-package
 
-brew install git-age
+brew install --cask git-age
 ```
 
 ## Linux
