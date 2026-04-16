@@ -14,7 +14,7 @@ require (
 	github.com/adrg/xdg v0.5.3
 	github.com/alecthomas/kong v1.15.0
 	github.com/go-git/go-billy/v5 v5.8.0
-	github.com/go-git/go-git/v5 v5.17.2
+	github.com/go-git/go-git/v5 v5.18.0
 	github.com/lmittmann/tint v1.1.3
 	github.com/minio/sha256-simd v1.0.1
 	github.com/stretchr/testify v1.11.1
