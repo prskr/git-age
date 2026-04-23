@@ -3,11 +3,11 @@ module github.com/prskr/git-age
 go 1.26.2
 
 require (
-	buf.build/gen/go/git-age/agent/connectrpc/go v1.19.1-20240411154421-ccdd2e6e6f4f.2
+	buf.build/gen/go/git-age/agent/connectrpc/go v1.19.2-20240411154421-ccdd2e6e6f4f.1
 	buf.build/gen/go/git-age/agent/protocolbuffers/go v1.36.11-20240411154421-ccdd2e6e6f4f.1
 	buf.build/gen/go/grpc/grpc/connectrpc/go v1.19.1-20260331211127-1730f7242d0f.2
 	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.11-20260331211127-1730f7242d0f.1
-	connectrpc.com/connect v1.19.1
+	connectrpc.com/connect v1.19.2
 	connectrpc.com/grpchealth v1.4.0
 	filippo.io/age v1.3.1
 	github.com/Masterminds/semver/v3 v3.4.0
