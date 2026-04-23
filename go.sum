@@ -1,5 +1,7 @@
 buf.build/gen/go/git-age/agent/connectrpc/go v1.19.1-20240411154421-ccdd2e6e6f4f.2 h1:0QYq7vYx+YtxWmx4BTtc+vPXmdXppsbmXI5Zc17uziY=
 buf.build/gen/go/git-age/agent/connectrpc/go v1.19.1-20240411154421-ccdd2e6e6f4f.2/go.mod h1:2b86ijadOJALgYCOUe7hcfI3mMfigii0snl1PPALWjo=
+buf.build/gen/go/git-age/agent/connectrpc/go v1.19.2-20240411154421-ccdd2e6e6f4f.1 h1:x6zKcCNPpiz0xgTTgnasWK9JhgY4yQtkn44xycZgjJ8=
+buf.build/gen/go/git-age/agent/connectrpc/go v1.19.2-20240411154421-ccdd2e6e6f4f.1/go.mod h1:elqMlKIuSyxZAR5ItcAyeZZHaPMhYbmpooBfB2tEgds=
 buf.build/gen/go/git-age/agent/protocolbuffers/go v1.36.11-20240411154421-ccdd2e6e6f4f.1 h1:LDtAekDo54UGZWporeba7vA/FdaqnJTVL5ein+QrEes=
 buf.build/gen/go/git-age/agent/protocolbuffers/go v1.36.11-20240411154421-ccdd2e6e6f4f.1/go.mod h1:3uQxN4w5SsZi+4J7Vm+weyPOqNitO8Sx1blMqBOi9eI=
 buf.build/gen/go/grpc/grpc/connectrpc/go v1.19.1-20260331211127-1730f7242d0f.2 h1:ggIIZQMtPmZO+Sl/HLPGoenrNUY9WHWfoh++ryjRFF8=
@@ -10,6 +12,8 @@ c2sp.org/CCTV/age v0.0.0-20251208015420-e9274a7bdbfd h1:ZLsPO6WdZ5zatV4UfVpr7oAw
 c2sp.org/CCTV/age v0.0.0-20251208015420-e9274a7bdbfd/go.mod h1:SrHC2C7r5GkDk8R+NFVzYy/sdj0Ypg9htaPXQq5Cqeo=
 connectrpc.com/connect v1.19.1 h1:R5M57z05+90EfEvCY1b7hBxDVOUl45PrtXtAV2fOC14=
 connectrpc.com/connect v1.19.1/go.mod h1:tN20fjdGlewnSFeZxLKb0xwIZ6ozc3OQs2hTXy4du9w=
+connectrpc.com/connect v1.19.2 h1:McQ83FGdzL+t60peksi0gXC7MQ/iLKgLduAnThbM0mo=
+connectrpc.com/connect v1.19.2/go.mod h1:tN20fjdGlewnSFeZxLKb0xwIZ6ozc3OQs2hTXy4du9w=
 connectrpc.com/grpchealth v1.4.0 h1:MJC96JLelARPgZTiRF9KRfY/2N9OcoQvF2EWX07v2IE=
 connectrpc.com/grpchealth v1.4.0/go.mod h1:WhW6m1EzTmq3Ky1FE8EfkIpSDc6TfUx2M2KqZO3ts/Q=
 dario.cat/mergo v1.0.2 h1:85+piFYR1tMbRrLcDwR18y4UKJ3aH1Tbzi24VRW1TK8=
