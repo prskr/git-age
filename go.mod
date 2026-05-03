@@ -18,7 +18,7 @@ require (
 	github.com/lmittmann/tint v1.1.3
 	github.com/minio/sha256-simd v1.0.1
 	github.com/stretchr/testify v1.11.1
-	gopkg.in/ini.v1 v1.67.1
+	gopkg.in/ini.v1 v1.67.2
 )
 
 replace golang.org/x/crypto => golang.org/x/crypto v0.50.0
