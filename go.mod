@@ -13,7 +13,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/adrg/xdg v0.5.3
 	github.com/alecthomas/kong v1.15.0
-	github.com/go-git/go-billy/v5 v5.8.0
+	github.com/go-git/go-billy/v5 v5.9.0
 	github.com/go-git/go-git/v5 v5.17.2
 	github.com/lmittmann/tint v1.1.3
 	github.com/minio/sha256-simd v1.0.1
