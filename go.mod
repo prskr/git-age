@@ -10,7 +10,7 @@ require (
 	connectrpc.com/connect v1.19.1
 	connectrpc.com/grpchealth v1.4.0
 	filippo.io/age v1.3.1
-	github.com/Masterminds/semver/v3 v3.4.0
+	github.com/Masterminds/semver/v3 v3.5.0
 	github.com/adrg/xdg v0.5.3
 	github.com/alecthomas/kong v1.15.0
 	github.com/go-git/go-billy/v5 v5.8.0
