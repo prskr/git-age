@@ -6,7 +6,7 @@ require (
 	buf.build/gen/go/git-age/agent/connectrpc/go v1.19.1-20240411154421-ccdd2e6e6f4f.2
 	buf.build/gen/go/git-age/agent/protocolbuffers/go v1.36.11-20240411154421-ccdd2e6e6f4f.1
 	buf.build/gen/go/grpc/grpc/connectrpc/go v1.19.1-20260331211127-1730f7242d0f.2
-	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.11-20260331211127-1730f7242d0f.1
+	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.12-20260903202810-d49c978ac9cc.2
 	connectrpc.com/connect v1.19.1
 	connectrpc.com/grpchealth v1.4.0
 	filippo.io/age v1.3.1
@@ -66,7 +66,7 @@ require (
 	golang.org/x/term v0.42.0 // indirect
 	golang.org/x/text v0.36.0 // indirect
 	golang.org/x/tools v0.44.0 // indirect
-	google.golang.org/protobuf v1.36.11 // indirect
+	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gotest.tools/gotestsum v1.13.0 // indirect
