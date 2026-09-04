@@ -2,6 +2,8 @@ buf.build/gen/go/git-age/agent/connectrpc/go v1.19.1-20240411154421-ccdd2e6e6f4f
 buf.build/gen/go/git-age/agent/connectrpc/go v1.19.1-20240411154421-ccdd2e6e6f4f.2/go.mod h1:2b86ijadOJALgYCOUe7hcfI3mMfigii0snl1PPALWjo=
 buf.build/gen/go/git-age/agent/protocolbuffers/go v1.36.11-20240411154421-ccdd2e6e6f4f.1 h1:LDtAekDo54UGZWporeba7vA/FdaqnJTVL5ein+QrEes=
 buf.build/gen/go/git-age/agent/protocolbuffers/go v1.36.11-20240411154421-ccdd2e6e6f4f.1/go.mod h1:3uQxN4w5SsZi+4J7Vm+weyPOqNitO8Sx1blMqBOi9eI=
+buf.build/gen/go/git-age/agent/protocolbuffers/go v1.36.12-20240411154421-ccdd2e6e6f4f.2 h1:i0n2XNR4mvDz92/f7YeTgiu5RYo2nMFodwMC13s6zE8=
+buf.build/gen/go/git-age/agent/protocolbuffers/go v1.36.12-20240411154421-ccdd2e6e6f4f.2/go.mod h1:PELnJjlL8G6Oj5aDkFDhPMdFL6ONkZRJDSwDGwSUygA=
 buf.build/gen/go/grpc/grpc/connectrpc/go v1.19.1-20260331211127-1730f7242d0f.2 h1:ggIIZQMtPmZO+Sl/HLPGoenrNUY9WHWfoh++ryjRFF8=
 buf.build/gen/go/grpc/grpc/connectrpc/go v1.19.1-20260331211127-1730f7242d0f.2/go.mod h1:KWnAD/R4UlvJwCbAGbAQs3NwtnpK7jNIuknYWVmHNhA=
 buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.11-20260331211127-1730f7242d0f.1 h1:9dqL0CgyB/SQGaanKJZDIaJ7j+CvuBEKuiFR/ZlJMow=
@@ -271,6 +273,8 @@ golang.org/x/tools v0.44.0/go.mod h1:KA0AfVErSdxRZIsOVipbv3rQhVXTnlU6UhKxHd1seDI
 golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 google.golang.org/protobuf v1.36.11 h1:fV6ZwhNocDyBLK0dj+fg8ektcVegBBuEolpbTQyBNVE=
 google.golang.org/protobuf v1.36.11/go.mod h1:HTf+CrKn2C3g5S8VImy6tdcUvCska2kB7j23XfzDpco=
+google.golang.org/protobuf v1.36.12 h1:pJOKDDOyeXErUroCihFAd5LQuwXBSpVnKGrj5o/fwxc=
+google.golang.org/protobuf v1.36.12/go.mod h1:HTf+CrKn2C3g5S8VImy6tdcUvCska2kB7j23XfzDpco=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c h1:Hei/4ADfdWqJk1ZMxUNpqntNwaWcugrBjAiHlqqRiVk=
