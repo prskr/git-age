@@ -15,7 +15,7 @@ require (
 	github.com/alecthomas/kong v1.15.0
 	github.com/go-git/go-billy/v5 v5.9.0
 	github.com/go-git/go-git/v5 v5.19.2
-	github.com/lmittmann/tint v1.1.3
+	github.com/lmittmann/tint v1.2.0
 	github.com/minio/sha256-simd v1.0.1
 	github.com/stretchr/testify v1.11.1
 	gopkg.in/ini.v1 v1.67.3
