@@ -9,7 +9,7 @@ require (
 	buf.build/gen/go/grpc/grpc/protocolbuffers/go v1.36.12-20260923205556-5fcf876e6ed8.2
 	connectrpc.com/connect v1.21.0
 	connectrpc.com/grpchealth v1.4.0
-	filippo.io/age v1.3.1
+	filippo.io/age v1.3.2
 	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/adrg/xdg v0.5.3
 	github.com/alecthomas/kong v1.15.0
