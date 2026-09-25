@@ -19,6 +19,8 @@ import (
 
 var ErrRepoNotFound = errors.New("could not find git repository")
 
+const ageGitAttribute = "age"
+
 var (
 	_ ports.RepoStater       = (*GitRepository)(nil)
 	_ ports.RepoWalker       = (*GitRepository)(nil)
@@ -126,7 +128,7 @@ func (g GitRepository) WalkAgeFiles(onMatch fs.WalkDirFunc) error {
 
 	ignoreMatcher := gitignore.NewMatcher(ignorePatterns)
 	attributesMatcher := gitattributes.NewMatcher(matchAttrs)
-	wantedAttributes := []string{"age"}
+	wantedAttributes := []string{ageGitAttribute}
 
 	logger := slog.Default()
 
@@ -156,7 +158,7 @@ func (g GitRepository) WalkAgeFiles(onMatch fs.WalkDirFunc) error {
 		}
 
 		filterMatch, ok := matches["filter"]
-		if !ok || filterMatch.IsUnset() || filterMatch.IsUnspecified() || filterMatch.Value() != "age" {
+		if !ok || filterMatch.IsUnset() || filterMatch.IsUnspecified() || filterMatch.Value() != ageGitAttribute {
 			return nil
 		}
 
