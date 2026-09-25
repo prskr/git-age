@@ -82,6 +82,7 @@ linters:
           - gochecknoglobals
           - gochecknoinits
           - gocognit
+          - goconst
         path: _test\.go
     paths:
       - third_party$
